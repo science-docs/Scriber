@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\cmu.serif-bold.ttf" />
+    <None Remove="Resources\cmu.serif-bolditalic.ttf" />
+    <None Remove="Resources\cmu.serif-italic.ttf" />
+    <None Remove="Resources\cmu.serif-roman.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Fonts\cmu.serif-bold.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\cmu.serif-bolditalic.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\cmu.serif-italic.ttf" />
+    <EmbeddedResource Include="Resources\Fonts\cmu.serif-roman.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PdfSharpCore" Version="1.1.24" />
+    <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta0009" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Util\" />
+  </ItemGroup>
+
+</Project>

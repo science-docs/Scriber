@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tex.Net", "Tex.Net\Tex.Net.csproj", "{D4F10FA4-1713-4212-A6C7-9B82647788F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tex.Net.CLI", "Tex.Net.CLI\Tex.Net.CLI.csproj", "{E7BCE157-3C44-443D-AC35-F3AFD8121385}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4F10FA4-1713-4212-A6C7-9B82647788F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4F10FA4-1713-4212-A6C7-9B82647788F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4F10FA4-1713-4212-A6C7-9B82647788F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4F10FA4-1713-4212-A6C7-9B82647788F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7BCE157-3C44-443D-AC35-F3AFD8121385}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7BCE157-3C44-443D-AC35-F3AFD8121385}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7BCE157-3C44-443D-AC35-F3AFD8121385}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7BCE157-3C44-443D-AC35-F3AFD8121385}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A3C7A567-A7E7-4AD0-B7E3-2D35E5CB89A8}
+	EndGlobalSection
+EndGlobal
