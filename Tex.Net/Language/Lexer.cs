@@ -32,6 +32,7 @@ namespace Tex.Net.Language
                     {
                         cur.Content = sb.ToString();
                         sb.Clear();
+                        // do not return empty text passages
                         yield return cur;
                         cur = null;
                     }

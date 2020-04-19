@@ -23,9 +23,16 @@ namespace Tex.Net.Engine
             return text;
         }
 
-        public override object Execute(CompilerState state)
+        public override object Execute(CompilerState state, object[] arguments)
         {
-            throw new NotImplementedException();
+            // ignore arguments, as text nodes cannot contain children.
+            var env = state.Environments.Current;
+            return new Layout.Document.Text
+            {
+                Content = Content,
+                Font = env.Font,
+                FontSize = env.FontSize.Point
+            };
         }
     }
 }

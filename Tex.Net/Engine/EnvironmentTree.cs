@@ -8,8 +8,10 @@ namespace Tex.Net.Engine
     {
         public Environment Current { get; private set; }
         public Environment Root { get; private set; }
+
+        public bool IsRoot => Current == Root;
         
-        public void Push()
+        public Environment Push()
         {
             if (Root == null)
             {
@@ -20,6 +22,8 @@ namespace Tex.Net.Engine
             {
                 Current = new Environment(Current);
             }
+
+            return Current;
         }
 
         public void Pop()

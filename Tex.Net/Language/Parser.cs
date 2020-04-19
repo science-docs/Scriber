@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -8,8 +9,8 @@ namespace Tex.Net.Language
     using Function = Func<ParserContext, Token, Element, Element>;
 
     public static class Parser
-    {        
-        private readonly static ParserState StateGraph = new ParserState(null, ParserStateType.Start);
+    {
+        private readonly static ParserState StateGraph = new ParserState(null, null);
         private readonly static Dictionary<TokenType, Function> ParseActions = new Dictionary<TokenType, Function>();
 
         static Parser()
@@ -20,6 +21,15 @@ namespace Tex.Net.Language
             ParseActions[TokenType.CurlyClose] = ParseCurlyClose;
             ParseActions[TokenType.Newline] = ParseNewline;
             ParseActions[TokenType.Percent] = ParsePercent;
+
+            var textState = new ParserState(TokenType.Text, ParseText);
+            var commandState = new ParserState(TokenType.Backslash, ParseCommand);
+            var curlyCloseState = new ParserState(TokenType.CurlyClose, ParseCurlyClose);
+            var newlineState = new ParserState(TokenType.Newline, ParseNewline);
+            var commentState = new ParserState(TokenType.Percent, ParsePercent);
+            var curlyOpenState = new ParserState(TokenType.CurlyOpen, ParseCurlyOpen);
+
+            StateGraph.Add(textState, commandState, curlyOpenState, curlyCloseState, newlineState, commentState);
 
             //var textState = new ParserState(TokenType.Text, ParserStateType.Text)
             //{
@@ -43,80 +53,79 @@ namespace Tex.Net.Language
             //commandState.Next.Add(TokenType.Text, textState);
         }
 
-        private static Element ParsePercent(ParserContext context, Token token, Element element)
+        private static Element ParsePercent(ParserContext context, Token token, Element previous)
         {
             context.Comment = true;
-            return new Element(element.Parent, ElementType.Comment, token.Index) { StringBuilder = new StringBuilder() };
+            return new Element(context.Parents.Peek(), ElementType.Comment, token.Index) { StringBuilder = new StringBuilder() };
         }
 
-        private static Element ParseText(ParserContext context, Token token, Element element)
+        private static Element ParseText(ParserContext context, Token token, Element previous)
         {
-            return AppendText(element, FindParent(element), token);
+            return AppendText(previous, context.Parents.Peek(), token);
         }
 
-        private static Element ParseNewline(ParserContext context, Token token, Element element)
+        private static Element ParseNewline(ParserContext context, Token token, Element previous)
         {
             context.Comment = false;
             if (context.Newline)
             {
                 context.Newline = false;
+                context.Parents.Clear();
                 return null;
             }
             else
             {
                 context.Newline = true;
-                return AppendText(element, FindParent(element), new Token(" ", token.Index));
+                return AppendText(previous, context.Parents.Peek(), new Token(" ", token.Index));
             }
         }
 
-        private static Element ParseCommand(ParserContext context, Token token, Element element)
+        private static Element ParseCommand(ParserContext context, Token token, Element previous)
         {
-            var parent = FindParent(element);
-            var command = new Element(parent, ElementType.Command, token.Index)
+            var command = new Element(context.Parents.Peek(), ElementType.Command, token.Index)
             {
                 Content = token.Content.Substring(1)
             };
             return command;
         }
 
-        private static Element ParseCurlyOpen(ParserContext context, Token token, Element element)
+        //private static Element ParseCurlyOpenCommand(ParserContext context, Token token, Element previous)
+        //{
+        //    context.Parents.Push(previous);
+        //    return null;
+        //}
+
+        private static Element ParseCurlyOpen(ParserContext context, Token token, Element previous)
         {
-            if (element.Type == ElementType.Command)
+            Element parent;
+            if (previous.Type == ElementType.Command)
             {
-                if (string.IsNullOrEmpty(element.Content))
-                {
-                    var block = new Element(element.Parent, ElementType.Text, token.Index)
-                    {
-                        Content = token.Content
-                    };
-                    return block;
-                }
-                else
-                {
-                    var block = new Element(element, ElementType.Block, token.Index);
-                    element.CommandArguments.Add(block);
-                    return block;
-                }
+                parent = previous;
             }
             else
             {
-                var block = new Element(element.Parent, ElementType.Block, token.Index);
-                return block;
+                parent = context.Parents.Peek();
             }
+            var element = new Element(parent, ElementType.Block, token.Index);
+            context.Parents.Push(element);
+            return element;
         }
 
-        private static Element ParseCurlyClose(ParserContext context, Token token, Element element)
+        private static Element ParseCurlyClose(ParserContext context, Token token, Element previous)
         {
-            if (element.Type == ElementType.Command && string.IsNullOrEmpty(element.Content))
-            {
-                var block = new Element(element.Parent, ElementType.Text, token.Index)
-                {
-                    Content = token.Content
-                };
-                return block;
-            }
+            //if (element.Type == ElementType.Command && string.IsNullOrEmpty(element.Content))
+            //{
+            //    var block = new Element(element.Parent, ElementType.Text, token.Index)
+            //    {
+            //        Content = token.Content
+            //    };
+            //    return block;
+            //}
 
-            return element.Parent;
+            //return element.Parent;
+
+            context.Parents.Pop();
+            return null;
         }
 
         public static IEnumerable<Element> Parse(IEnumerable<Token> tokens)
@@ -132,17 +141,18 @@ namespace Tex.Net.Language
             Element cur = new Element(null, ElementType.Block, 0);
             Element last = null;
             var context = new ParserContext();
+            context.Parents.Push(cur);
             var state = StateGraph;
             bool returnedLast = false;
 
             foreach (var token in items)
             {
-                //if (!state.Next.TryGetValue(token.Type, out state))
-                //{
-                //    throw new Exception();
-                //}
+                if (!state.Next.TryGetValue(token.Type, out state))
+                {
+                    state = StateGraph.Next[token.Type];
+                }
 
-                var action = ParseActions[token.Type];
+                var action = state.ParseAction;
                 bool isNewline = action == ParseNewline;
 
                 if (!isNewline && context.Comment)
@@ -155,14 +165,23 @@ namespace Tex.Net.Language
 
                 if (element == null)
                 {
-                    cur = TopParent(cur);
-                    BuildContent(cur);
-                    yield return cur;
-                    last = cur;
-                    cur = new Element(null, ElementType.Block, token.Index);
-                    last.NextSibling = cur;
-                    cur.PreviousSibling = last;
-                    returnedLast = true;
+                    if (!context.Parents.TryPeek(out var top))
+                    {
+                        cur = TopParent(cur);
+                        BuildContent(cur);
+                        yield return cur;
+                        last = cur;
+                        cur = new Element(null, ElementType.Block, token.Index);
+                        context.Parents.Push(cur);
+                        last.NextSibling = cur;
+                        cur.PreviousSibling = last;
+                        returnedLast = true;
+                    }
+                    else
+                    {
+                        cur = top;
+                        returnedLast = false;
+                    }
                 }
                 else
                 {
@@ -225,9 +244,9 @@ namespace Tex.Net.Language
             }
         }
 
-        private static Element AppendText(Element element, Element parent, Token token)
+        private static Element AppendText(Element previous, Element parent, Token token)
         {
-            var textItem = element.Type == ElementType.Text ? element : new Element(parent, ElementType.Text, token.Index);
+            var textItem = previous.Type == ElementType.Text ? previous : new Element(parent, ElementType.Text, token.Index);
 
             if (textItem.StringBuilder == null)
             {
@@ -241,18 +260,36 @@ namespace Tex.Net.Language
             return textItem;
         }
 
+        [DebuggerDisplay("{DebuggerDisplay}")]
         private class ParserState
         {
-            public ParserStateType Type { get; set; } = ParserStateType.Start;
+            public TokenType? Token { get; set; }
             public Dictionary<TokenType, ParserState> Next { get; } = new Dictionary<TokenType, ParserState>();
-            public Func<Token, Element, Element> ParseAction { get; set; }
+            public Function ParseAction { get; set; }
 
-            public ParserState(TokenType? tokenType, ParserStateType type)
+            public ParserState(TokenType? tokenType, Function parseAction, params ParserState[] nextStates)
             {
-                Type = type;
-                if (tokenType != null)
+                Token = tokenType;
+                ParseAction = parseAction;
+                Add(nextStates);
+            }
+
+            public void Add(params ParserState[] states)
+            {
+                foreach (var state in states)
                 {
-                    Next.Add(tokenType.Value, this);
+                    if (state.Token.HasValue)
+                    {
+                        Next.Add(state.Token.Value, state);
+                    }
+                }
+            }
+
+            string DebuggerDisplay
+            {
+                get
+                {
+                    return Token == null ? "None" : $"{Token} {ParseAction}";
                 }
             }
         }

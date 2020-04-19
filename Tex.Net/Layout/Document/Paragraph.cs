@@ -7,17 +7,17 @@ namespace Tex.Net.Layout.Document
 {
     public class Paragraph : Block
     {
-        private readonly List<ILeaf> leaves = new List<ILeaf>();
+        private readonly List<Leaf> leaves = new List<Leaf>();
 
         private List<LineNode> lineNodes;
         private PositionedItem[] positionedItems;
 
-        public void Add(ILeaf element)
+        public void Add(Leaf element)
         {
             leaves.Add(element);
         }
 
-        public void Add(IEnumerable<ILeaf> elements)
+        public void Add(IEnumerable<Leaf> elements)
         {
             leaves.AddRange(elements);
         }
@@ -43,7 +43,7 @@ namespace Tex.Net.Layout.Document
             throw new NotImplementedException();
         }
 
-        public override IBlock[] Split()
+        public override Block[] Split()
         {
             base.Split();
 

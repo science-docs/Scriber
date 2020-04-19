@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Tex.Net.Engine;
+using Tex.Net.Language;
 using Tex.Net.Layout;
 using Tex.Net.Layout.Document;
 using Tex.Net.Text;
@@ -10,24 +13,23 @@ namespace Tex.Net.CLI
     {
         static void Main()
         {
-            var tokens = Language.Lexer.Tokenize("\\TeX{argument} is a {\\tt nice language}. % This is a \\comment\n\nAnd some other paragraph");
-            var elements = Language.Parser.Parse(tokens).ToArray();
+            var tokens = Lexer.Tokenize("This is just some text!");//("\\TeX{a}{b} is a {\\tt nice language}. % This is a \\comment\n\nAnd some other paragraph");
+            var elements = Parser.Parse(tokens).ToArray();
+            var result = Compiler.Compile(elements[0]);
 
-            var document = new Document();
+            var document = result.Document;
             var page = new DocumentPage();
             document.Pages.Add(page);
 
             page.Size = new Size(595, 800);
 
-            var paragraph = new Paragraph();
-            paragraph.Add(new Layout.Document.Text
+            var elms = document.Elements;
+            var split = new List<Block>();
+            foreach (var el in elms)
             {
-                Font = Font.Serif,
-                Content = "Lorem ipsum dolor sit amet.",
-                Size = 12
-            });
-            paragraph.Measure(page.Size);
-            var split = paragraph.Split();
+                el.Measure(page.Size);
+                split.AddRange(el.Split());
+            }
 
             foreach (var items in split)
             {

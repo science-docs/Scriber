@@ -1,6 +1,6 @@
 ﻿namespace Tex.Net.Layout.Document
 {
-    public abstract class Leaf : ILeaf
+    public abstract class Leaf : DocumentElement
     {
         public Size DesiredSize { get; private set; }
 

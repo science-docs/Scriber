@@ -4,7 +4,10 @@ namespace Tex.Net.Engine
 {
     public abstract class EngineInstruction
     {
-        public abstract object Execute(CompilerState state);
+        public abstract object Execute(CompilerState state, object[] arguments);
+
+        private const string BeginCommand = "begin";
+        private const string EndCommand = "end";
 
         public static EngineInstruction Create(Element element)
         {
@@ -14,7 +17,25 @@ namespace Tex.Net.Engine
             }
             else if (element.Type == ElementType.Block)
             {
-                return new BlockEnvironmentInstruction();
+                return new BlockInstruction();
+            }
+            else if (element.Type == ElementType.Command)
+            {
+                // special cases for begin/end commands
+                if (element.Content == BeginCommand)
+                {
+                    return EnvironmentInstruction.Create(element);
+                }
+                else if (element.Content == EndCommand)
+                {
+                    var envInstruction = EnvironmentInstruction.Create(element);
+                    envInstruction.IsEnd = true;
+                    return envInstruction;
+                }
+                else
+                {
+
+                }
             }
             return null;
         }

@@ -9,7 +9,7 @@ namespace Tex.Net
 {
     public class DocumentPage
     {
-        public List<IBlock> Blocks { get; } = new List<IBlock>();
+        public List<Block> Blocks { get; } = new List<Block>();
         public Size Size { get; set; }
         public Rectangle ContentArea { get; set; }
 

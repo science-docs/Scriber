@@ -3,7 +3,7 @@ using Tex.Net.Drawing;
 
 namespace Tex.Net.Layout.Document
 {
-    public abstract class Block : IBlock
+    public abstract class Block : DocumentElement
     {
         public Size DesiredSize { get; private set; }
         public Size RenderSize { get; private set; }
@@ -32,14 +32,14 @@ namespace Tex.Net.Layout.Document
 
         public abstract void OnRender(IDrawingContext drawingContext);
 
-        public virtual IBlock[] Split()
+        public virtual Block[] Split()
         {
             if (!measured)
             {
                 throw new InvalidOperationException("Before splitting, an object has to be measured");
             }
 
-            return new IBlock[] { this };
+            return new Block[] { this };
         }
 
         

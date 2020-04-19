@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Tex.Net.Language;
 
 namespace Tex.Net.Engine
 {
@@ -8,12 +9,30 @@ namespace Tex.Net.Engine
     {
         public bool IsEnd { get; set; }
 
-        public override object Execute(CompilerState state)
+        public override object Execute(CompilerState state, object[] args)
         {
-            return IsEnd ? End(state) : Start(state);
+            object result;
+
+            if (IsEnd)
+            {
+                var objects = state.Environments.Current.Objects.ToArray();
+                result = End(state, objects);
+                state.Environments.Pop();
+            }
+            else
+            {
+                state.Environments.Push();
+                result = Start(state, args);
+            }
+            return result;
         }
 
-        public abstract object Start(CompilerState state);
-        public abstract object End(CompilerState state);
+        public abstract object Start(CompilerState state, object[] args);
+        public abstract object End(CompilerState state, object[] objects);
+
+        public static new EnvironmentInstruction Create(Element element)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
