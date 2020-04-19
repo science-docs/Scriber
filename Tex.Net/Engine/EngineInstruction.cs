@@ -34,7 +34,8 @@ namespace Tex.Net.Engine
                 }
                 else
                 {
-
+                    var commandInstruction = CommandInstruction.Create(element);
+                    return commandInstruction;
                 }
             }
             return null;

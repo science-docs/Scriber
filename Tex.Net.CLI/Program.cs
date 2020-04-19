@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Tex.Net.Engine;
@@ -13,9 +14,13 @@ namespace Tex.Net.CLI
     {
         static void Main()
         {
-            var tokens = Lexer.Tokenize("This is just some text!");//("\\TeX{a}{b} is a {\\tt nice language}. % This is a \\comment\n\nAnd some other paragraph");
-            var elements = Parser.Parse(tokens).ToArray();
-            var result = Compiler.Compile(elements[0]);
+            Stopwatch watch = Stopwatch.StartNew();
+
+            CommandCollection.Discover();
+
+            var tokens = Lexer.Tokenize("\\section{This is just some text}");//("\\TeX{a}{b} is a {\\tt nice language}. % This is a \\comment\n\nAnd some other paragraph");
+            var elements = Parser.Parse(tokens).First();
+            var result = Compiler.Compile(elements);
 
             var document = result.Document;
             var page = new DocumentPage();
@@ -33,7 +38,7 @@ namespace Tex.Net.CLI
 
             foreach (var items in split)
             {
-                items.Arrange(new Rectangle(50, 50, 10000, 1000));
+                items.Arrange(new Rectangle(0, 50, 10000, 1000));
             }
 
             page.Blocks.AddRange(split);
@@ -41,6 +46,9 @@ namespace Tex.Net.CLI
             var bytes = document.ToPdf();
 
             File.WriteAllBytes("test.pdf", bytes);
+
+            watch.Stop();
+            Debug.WriteLine($"Created document in {watch.ElapsedMilliseconds}ms");
         }
     }
 }

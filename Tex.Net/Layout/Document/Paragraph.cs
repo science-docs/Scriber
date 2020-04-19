@@ -7,25 +7,25 @@ namespace Tex.Net.Layout.Document
 {
     public class Paragraph : Block
     {
-        private readonly List<Leaf> leaves = new List<Leaf>();
+        public List<Leaf> Leaves { get; } = new List<Leaf>();
 
         private List<LineNode> lineNodes;
         private PositionedItem[] positionedItems;
 
         public void Add(Leaf element)
         {
-            leaves.Add(element);
+            Leaves.Add(element);
         }
 
         public void Add(IEnumerable<Leaf> elements)
         {
-            leaves.AddRange(elements);
+            Leaves.AddRange(elements);
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
             lineNodes = new List<LineNode>();
-            foreach (var leaf in leaves)
+            foreach (var leaf in Leaves)
             {
                 leaf.Measure(availableSize);
                 lineNodes.AddRange(leaf.GetNodes());
@@ -35,7 +35,7 @@ namespace Tex.Net.Layout.Document
             positionedItems = linebreak.PositionItems(lineNodes, new double[] { availableSize.Width }, breaks, false);
             var last = positionedItems[^1];
             var lineheight = 10.0;
-            return new Size(availableSize.Width, lineheight * last.Line + leaves[^1].DesiredSize.Height);
+            return new Size(availableSize.Width, lineheight * last.Line + Leaves[^1].DesiredSize.Height);
         }
 
         protected override void ArrangeOverride(Rectangle finalRectangle)
