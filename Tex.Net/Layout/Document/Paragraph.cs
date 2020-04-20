@@ -1,25 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Tex.Net.Drawing;
 
 namespace Tex.Net.Layout.Document
 {
     public class Paragraph : Block
     {
-        public List<Leaf> Leaves { get; } = new List<Leaf>();
+        public DocumentElementCollection<Leaf> Leaves { get; }
 
         private List<LineNode> lineNodes;
         private PositionedItem[] positionedItems;
 
-        public void Add(Leaf element)
+        public Paragraph()
         {
-            Leaves.Add(element);
-        }
-
-        public void Add(IEnumerable<Leaf> elements)
-        {
-            Leaves.AddRange(elements);
+            Leaves = new DocumentElementCollection<Leaf>(this);
         }
 
         protected override Size MeasureOverride(Size availableSize)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Tex.Net.Layout.Document;
 using Tex.Net.Text;
 
 namespace Tex.Net.Layout
@@ -21,8 +22,7 @@ namespace Tex.Net.Layout
     {
         public LineNodeType Type { get; set; }
         public double Width { get; set; }
-        public Font Font { get; set; }
-        public double Size { get; set; }
+        public DocumentElement Element { get; set; }
         public string Text { get; set; }
         public double Stretch { get; set; }
         public double Shrink { get; set; }

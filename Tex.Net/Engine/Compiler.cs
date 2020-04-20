@@ -14,6 +14,7 @@ namespace Tex.Net.Engine
             Execute(state, element, args);
 
             state.Document.Elements.AddRange(state.Environments.Current.Objects.OfType<Block>());
+            ResolveCallbacks(state.Document.Elements);
             var result = new CompilerResult(state.Document);
             result.Issues.AddRange(state.Issues);
             return result;
@@ -28,7 +29,17 @@ namespace Tex.Net.Engine
                 Execute(state, element.Inline, ownArgs);
             }
 
+            if (MustCreateEnvironment(element))
+            {
+                state.Environments.Push();
+            }
+
             var obj = state.Execute(element, ownArgs.ToArray());
+            
+            if (MustDestroyEnvironment(element))
+            {
+                state.Environments.Pop();
+            }
 
             if (obj != null)
             {
@@ -38,6 +49,28 @@ namespace Tex.Net.Engine
             if (element.NextSibling != null)
             {
                 Execute(state, element.NextSibling, arguments);
+            }
+        }
+
+        private static bool MustCreateEnvironment(Element element)
+        {
+            return element.Type == ElementType.Block || (element.Type == ElementType.Command && element.Content == "begin");
+        }
+
+        private static bool MustDestroyEnvironment(Element element)
+        {
+            return element.Type == ElementType.Block || (element.Type == ElementType.Command && element.Content == "end");
+        }
+
+        private static void ResolveCallbacks(DocumentElementCollection<Block> blocks)
+        {
+            for (int i = 0; i < blocks.Count; i++)
+            {
+                var block = blocks[i];
+                if (block is CallbackBlock callbackBlock)
+                {
+                    blocks[i] = callbackBlock.Callback();
+                }
             }
         }
     }

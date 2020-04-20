@@ -3,14 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tex.Net.Layout.Document;
 using Tex.Net.Text;
 
 namespace Tex.Net.Layout
 {
     public static class LineNodeTransformer
     {
-        public static List<LineNode> Create(string text, Font font, double size)
+        public static List<LineNode> Create(DocumentElement element, string text)
         {
+            var font = element.Font;
+            var size = element.FontSize;
             var spaceWidth = GetWidth(" ");
             //var hyphenWidth = GetWidth("-");
             var stretch = Math.Max(0, spaceWidth / 2);
@@ -28,8 +31,7 @@ namespace Tex.Net.Layout
                 }
 
                 var box = LineNode.Box(GetWidth(chunks[i]), chunks[i]);
-                box.Font = font;
-                box.Size = size;
+                box.Element = element;
                 nodes.Add(box);
             }
 
@@ -37,7 +39,7 @@ namespace Tex.Net.Layout
 
             double GetWidth(string value)
             {
-                return font.GetWidth(value);
+                return font.GetWidth(value, size);
             }
         }
 

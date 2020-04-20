@@ -38,14 +38,14 @@ namespace Tex.Net.Layout.Document
                     Text = node.Text,
                     Typeface = new Net.Text.Typeface
                     {
-                        Font = node.Font,
-                        Size = node.Size
+                        Font = node.Element.Font,
+                        Size = node.Element.FontSize
                     }
                 };
 
                 drawingContext.Offset = offset;
 
-                drawingContext.DrawText(run, Color.Red);
+                drawingContext.DrawText(run, node.Element.Foreground);
             }
         }
     }

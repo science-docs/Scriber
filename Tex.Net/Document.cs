@@ -8,17 +8,19 @@ using Tex.Net.Layout.Document;
 
 namespace Tex.Net
 {
-    public class Document
+    public class Document : DocumentElement
     {
-        public DocumentObject Objects { get; } = new DocumentObject();
+        public DocumentVariable Variables { get; } = new DocumentVariable();
 
         public List<DocumentPage> Pages { get; } = new List<DocumentPage>();
 
-        public List<Block> Elements { get; } = new List<Block>();
+        public DocumentElementCollection<Block> Elements { get; }
 
         public Document()
         {
-
+            Elements = new DocumentElementCollection<Block>(this);
+            Font = Text.Font.Serif;
+            FontSize = 12;
         }
 
         public byte[] ToPdf()

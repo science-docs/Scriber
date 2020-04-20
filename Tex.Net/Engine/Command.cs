@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace Tex.Net.Engine
@@ -10,5 +11,6 @@ namespace Tex.Net.Engine
     {
         public string Name { get; set; }
         public CommandExecution Execution { get; set; }
+        public ParameterInfo[] Parameters { get; set; }
     }
 }

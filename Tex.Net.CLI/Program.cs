@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using Tex.Net.Engine;
 using Tex.Net.Language;
 using Tex.Net.Layout;
 using Tex.Net.Layout.Document;
-using Tex.Net.Text;
 
 namespace Tex.Net.CLI
 {
@@ -18,9 +16,9 @@ namespace Tex.Net.CLI
 
             CommandCollection.Discover();
 
-            var tokens = Lexer.Tokenize("\\section{This is just some text}");//("\\TeX{a}{b} is a {\\tt nice language}. % This is a \\comment\n\nAnd some other paragraph");
-            var elements = Parser.Parse(tokens).First();
-            var result = Compiler.Compile(elements);
+            var tokens = Lexer.Tokenize("\\section{This is just some text}\n\n\\section{Some more Text}");//("\\TeX{a}{b} is a {\\tt nice language}. % This is a \\comment\n\nAnd some other paragraph");
+            var element = Parser.Parse(tokens);
+            var result = Compiler.Compile(element);
 
             var document = result.Document;
             var page = new DocumentPage();

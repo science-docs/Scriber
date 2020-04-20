@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Tex.Net.Drawing;
 using Tex.Net.Text;
 
 namespace Tex.Net.Layout.Document
@@ -11,13 +12,13 @@ namespace Tex.Net.Layout.Document
 
         public override LineNode[] GetNodes()
         {
-            return LineNodeTransformer.Create(Content, Font, FontSize).ToArray();
+            return LineNodeTransformer.Create(this, Content).ToArray();
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
             var height = FontSize;
-            var width = Font.GetWidth(Content);
+            var width = Font.GetWidth(Content, FontSize);
             return new Size(width, height);
         }
     }

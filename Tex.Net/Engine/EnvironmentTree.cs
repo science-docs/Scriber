@@ -6,31 +6,28 @@ namespace Tex.Net.Engine
 {
     public class EnvironmentTree
     {
-        public Environment Current { get; private set; }
-        public Environment Root { get; private set; }
+        public Environment Current => stack.Peek();
 
-        public bool IsRoot => Current == Root;
+        private readonly Stack<Environment> stack = new Stack<Environment>();
+
+        public bool IsRoot => stack.Count == 1;
         
+        public EnvironmentTree()
+        {
+            Push();
+        }
+
         public Environment Push()
         {
-            if (Root == null)
-            {
-                Root = new Environment(null);
-                Current = Root;
-            }
-            else
-            {
-                Current = new Environment(Current);
-            }
-
+            stack.Push(new Environment());
             return Current;
         }
 
         public void Pop()
         {
-            if (Current != Root)
+            if (!IsRoot)
             {
-                Current = Current.Parent;
+                stack.Pop();
             }
         }
     }

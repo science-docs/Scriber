@@ -61,11 +61,12 @@ namespace Tex.Net.Engine
             {
                 if (IsCommand(method, out var command))
                 {
-                    var del = CreateDelegate(command.Name, method, out var parameter);
+                    var del = CreateDelegate(command.Name, method, out var parameters);
                     var commandItem = new Command
                     {
                         Name = command.Name,
-                        Execution = del
+                        Execution = del,
+                        Parameters = parameters
                     };
                     Add(commandItem);
                 }

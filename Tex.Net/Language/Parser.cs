@@ -128,7 +128,12 @@ namespace Tex.Net.Language
             return null;
         }
 
-        public static IEnumerable<Element> Parse(IEnumerable<Token> tokens)
+        public static Element Parse(IEnumerable<Token> tokens)
+        {
+            return ParseInternal(tokens).ToArray().FirstOrDefault();
+        }
+
+        private static IEnumerable<Element> ParseInternal(IEnumerable<Token> tokens)
         {
             if (tokens == null)
                 throw new ArgumentNullException(nameof(tokens));

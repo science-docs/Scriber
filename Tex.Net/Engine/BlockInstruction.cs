@@ -11,7 +11,7 @@ namespace Tex.Net.Engine
             if (arguments.All(e => e is Leaf))
             {
                 var paragraph = new Paragraph();
-                paragraph.Add(arguments.Cast<Leaf>());
+                paragraph.Leaves.AddRange(arguments.Cast<Leaf>());
                 return paragraph;
             }
             return arguments;

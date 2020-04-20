@@ -24,6 +24,7 @@ namespace Tex.Net.Layout.Document
             VisualOffset = finalRectangle.Position;
             RenderSize = finalRectangle.Size;
             ArrangeOverride(finalRectangle);
+            arranged = true;
         }
 
         protected abstract Size MeasureOverride(Size availableSize);
@@ -41,7 +42,5 @@ namespace Tex.Net.Layout.Document
 
             return new Block[] { this };
         }
-
-        
     }
 }

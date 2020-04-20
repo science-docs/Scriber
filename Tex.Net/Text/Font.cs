@@ -15,31 +15,30 @@ namespace Tex.Net.Text
 
         private const float Dpi = 72;
 
-        public static Font Serif { get; } = new Font(serif, 12);
-        public static Font SerifItalic { get; } = new Font(serifItalic, 12);
-        public static Font SerifBold { get; } = new Font(serifBold, 12);
-        public static Font SerifBoldItalic { get; } = new Font(serifBoldItalic, 12);
+        public static Font Serif { get; } = new Font(serif);
+        public static Font SerifItalic { get; } = new Font(serifItalic);
+        public static Font SerifBold { get; } = new Font(serifBold);
+        public static Font SerifBoldItalic { get; } = new Font(serifBoldItalic);
 
         static Font()
         {
             GlobalFontSettings.FontResolver = new FontResolver();
         }
 
-        internal SixLabors.Fonts.Font font { get; set; }
+        internal FontFamily FontFamily { get; set; }
 
         public string Name { get; }
-        public double Size { get; }
 
-        private Font(FontFamily font, double size)
+        private Font(FontFamily fontFamily)
         {
-            Name = font.Name;
-            Size = size;
-            this.font = font.CreateFont((float)size);
+            Name = fontFamily.Name;
+            FontFamily = fontFamily;
         }
 
-        public double GetWidth(string text)
+        public double GetWidth(string text, double size)
         {
-            return TextMeasurer.Measure(text, new RendererOptions(font, Dpi)).Width;
+            var realizedFont = FontFamily.CreateFont((float)size);
+            return TextMeasurer.Measure(text, new RendererOptions(realizedFont, Dpi)).Width;
         }
 
         private static Stream LoadFont(string name)
