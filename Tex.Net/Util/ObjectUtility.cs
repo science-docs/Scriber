@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Tex.Net.Util
@@ -14,9 +15,9 @@ namespace Tex.Net.Util
 
         private static void ConvertFlatArrayInternal(object obj, List<object> objects)
         {
-            if (obj is Array arr)
+            if (obj is IEnumerable enumerable)
             {
-                foreach (var o in arr)
+                foreach (var o in enumerable)
                 {
                     ConvertFlatArrayInternal(o, objects);
                 }

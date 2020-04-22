@@ -10,10 +10,26 @@ namespace Tex.Net.Layout
 {
     public static class LineNodeTransformer
     {
-        public static List<LineNode> Create(DocumentElement element, string text)
+        public static LineNode GetDefaultGlue(DocumentElement element)
         {
             var font = element.Font;
             var size = element.FontSize;
+            var spaceWidth = GetWidth(" ");
+            var stretch = Math.Max(0, spaceWidth / 2);
+            var shrink = Math.Max(0, spaceWidth / 3);
+
+            return LineNode.Glue(spaceWidth, stretch, shrink);
+
+            double GetWidth(string value)
+            {
+                return font.GetWidth(value, size);
+            }
+        }
+
+        public static List<LineNode> Create(Leaf leaf, string text)
+        {
+            var font = leaf.Font;
+            var size = leaf.FontSize;
             var spaceWidth = GetWidth(" ");
             //var hyphenWidth = GetWidth("-");
             var stretch = Math.Max(0, spaceWidth / 2);
@@ -31,7 +47,7 @@ namespace Tex.Net.Layout
                 }
 
                 var box = LineNode.Box(GetWidth(chunks[i]), chunks[i]);
-                box.Element = element;
+                box.Element = leaf;
                 nodes.Add(box);
             }
 
@@ -50,7 +66,10 @@ namespace Tex.Net.Layout
                 yield break;
             }
 
+            fullText = fullText.Trim();
+
             int last = 0;
+
             for (int i = 1; i < fullText.Length - 1; i++)
             {
                 var c = fullText[i];
@@ -63,6 +82,7 @@ namespace Tex.Net.Layout
                     last = i + 1;
                 }
             }
+
             yield return fullText.Substring(last);
         }
     }

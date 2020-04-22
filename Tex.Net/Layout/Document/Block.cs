@@ -5,42 +5,21 @@ namespace Tex.Net.Layout.Document
 {
     public abstract class Block : DocumentElement
     {
-        public Size DesiredSize { get; private set; }
-        public Size RenderSize { get; private set; }
-        public Position VisualOffset { get; private set; }
+        public Measurements Measurements { get; private set; }
+        public virtual bool IsVisible => true;
 
-        private bool measured = false;
-        private bool split = false;
-        private bool arranged = false;
-
-        public Size Measure(Size availableSize)
+        public Measurements Measure(Size availableSize)
         {
-            measured = true;
-            return DesiredSize = MeasureOverride(availableSize);
+            return Measurements = MeasureOverride(availableSize);
         }
 
-        public void Arrange(Rectangle finalRectangle)
+        protected abstract Measurements MeasureOverride(Size availableSize);
+
+        public abstract void OnRender(IDrawingContext drawingContext, Measurement measurement);
+
+        public new Block Clone()
         {
-            VisualOffset = finalRectangle.Position;
-            RenderSize = finalRectangle.Size;
-            ArrangeOverride(finalRectangle);
-            arranged = true;
-        }
-
-        protected abstract Size MeasureOverride(Size availableSize);
-
-        protected abstract void ArrangeOverride(Rectangle finalRectangle);
-
-        public abstract void OnRender(IDrawingContext drawingContext);
-
-        public virtual Block[] Split()
-        {
-            if (!measured)
-            {
-                throw new InvalidOperationException("Before splitting, an object has to be measured");
-            }
-
-            return new Block[] { this };
+            return base.Clone() as Block;
         }
     }
 }

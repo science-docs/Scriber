@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Tex.Net.Drawing;
 
 namespace Tex.Net.Layout.Document
@@ -16,17 +14,17 @@ namespace Tex.Net.Layout.Document
             Callback = callback;
         }
 
-        public override void OnRender(IDrawingContext drawingContext)
+        protected override DocumentElement CloneInternal()
+        {
+            return new CallbackBlock(Callback);
+        }
+
+        protected override Measurements MeasureOverride(Size availableSize)
         {
             throw new NotImplementedException();
         }
 
-        protected override void ArrangeOverride(Rectangle finalRectangle)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
+        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             throw new NotImplementedException();
         }

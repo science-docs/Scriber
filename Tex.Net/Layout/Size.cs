@@ -25,6 +25,11 @@
             return Width.GetHashCode() + Height.GetHashCode() * 13;
         }
 
+        public override string ToString()
+        {
+            return $"Width: {Width.ToString("N4")} Height: {Height.ToString("N4")}";
+        }
+
         public static bool operator ==(Size left, Size right)
         {
             return left.Equals(right);

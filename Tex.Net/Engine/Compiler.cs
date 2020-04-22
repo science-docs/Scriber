@@ -2,6 +2,7 @@
 using System.Linq;
 using Tex.Net.Language;
 using Tex.Net.Layout.Document;
+using Tex.Net.Util;
 
 namespace Tex.Net.Engine
 {
@@ -24,14 +25,14 @@ namespace Tex.Net.Engine
         {
             var ownArgs = new List<object>();
 
+            if (MustCreateEnvironment(element, out string name))
+            {
+                state.Environments.Push(name);
+            }
+
             if (element.Inline != null)
             {
                 Execute(state, element.Inline, ownArgs);
-            }
-
-            if (MustCreateEnvironment(element))
-            {
-                state.Environments.Push();
             }
 
             var obj = state.Execute(element, ownArgs.ToArray());
@@ -43,7 +44,10 @@ namespace Tex.Net.Engine
 
             if (obj != null)
             {
-                arguments.Add(obj);
+                // basically pass the returned object to the previous environment
+                var flattened = obj.ConvertToFlatArray();
+                state.Environments.Current.Objects.AddRange(flattened);
+                arguments.AddRange(flattened);
             }
 
             if (element.NextSibling != null)
@@ -52,9 +56,28 @@ namespace Tex.Net.Engine
             }
         }
 
-        private static bool MustCreateEnvironment(Element element)
+        private static bool MustCreateEnvironment(Element element, out string name)
         {
-            return element.Type == ElementType.Block || (element.Type == ElementType.Command && element.Content == "begin");
+            if (element.Type == ElementType.Block)
+            {
+                name = "{none}";
+                return true;
+            }
+            else if (element.Type == ElementType.Command && element.Content == "begin")
+            {
+                name = EnvironmentName(element);
+                return true;
+            }
+            else
+            {
+                name = null;
+                return false;
+            }
+        }
+
+        private static string EnvironmentName(Element command)
+        {
+            return command.Inline.Inline.Content;
         }
 
         private static bool MustDestroyEnvironment(Element element)

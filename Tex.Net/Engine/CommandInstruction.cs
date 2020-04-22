@@ -22,6 +22,12 @@ namespace Tex.Net.Engine
         public override object Execute(CompilerState state, object[] arguments)
         {
             var command = CommandCollection.Find(Name);
+
+            if (command.RequiredEnvironment != null && state.Environments.Current.Name != command.RequiredEnvironment)
+            {
+                throw new CommandInvocationException($"Command {command.Name} requires environment {command.RequiredEnvironment}. Current environment is {state.Environments.Current.Name}");
+            }
+
             return command.Execution(state, arguments);
         }
     }

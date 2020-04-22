@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using Tex.Net.Drawing;
+﻿using System.Drawing;
 using Tex.Net.Text;
 
 namespace Tex.Net.Layout.Document
@@ -32,16 +28,43 @@ namespace Tex.Net.Layout.Document
             set => foreground = value;
         }
 
-        public Thickness Margin
+        public DocumentPage Page
         {
-            get => margin ?? Parent?.Margin ?? Thickness.Zero;
-            set => margin = value;
+            get => page ?? Parent?.Page;
+            set => page = value;
         }
+
+        public Net.Document Document
+        {
+            get => document ?? Parent?.Document;
+            set => document = value;
+        }
+
+        public Thickness Margin { get; set; } = Thickness.Zero;
         
         private Font font;
         private double? fontSize;
         private Color? foreground;
         private FontWeight? fontWeight;
-        private Thickness? margin;
+        private DocumentPage page;
+        private Net.Document document;
+
+        public DocumentElement Clone()
+        {
+            var clone = CloneInternal();
+            clone.font = font;
+            clone.fontSize = fontSize;
+            clone.foreground = foreground;
+            clone.fontWeight = fontWeight;
+            clone.document = document;
+            return clone;
+        }
+
+        protected abstract DocumentElement CloneInternal();
+
+        public virtual void Interlude()
+        {
+
+        }
     }
 }

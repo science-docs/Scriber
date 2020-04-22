@@ -19,7 +19,12 @@ namespace Tex.Net.Engine
 
         public Environment Push()
         {
-            stack.Push(new Environment());
+            return Push("{none}");
+        }
+
+        public Environment Push(string name)
+        {
+            stack.Push(new Environment(name));
             return Current;
         }
 

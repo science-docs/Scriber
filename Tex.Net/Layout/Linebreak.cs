@@ -22,7 +22,7 @@ namespace Tex.Net.Layout
     {
         public LineNodeType Type { get; set; }
         public double Width { get; set; }
-        public DocumentElement Element { get; set; }
+        public Leaf Element { get; set; }
         public string Text { get; set; }
         public double Stretch { get; set; }
         public double Shrink { get; set; }

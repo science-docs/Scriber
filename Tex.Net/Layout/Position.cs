@@ -25,6 +25,11 @@
             return X.GetHashCode() + Y.GetHashCode() * 13;
         }
 
+        public override string ToString()
+        {
+            return $"X: {X.ToString("N4")} Y: {Y.ToString("N4")}";
+        }
+
         public static bool operator ==(Position left, Position right)
         {
             return left.Equals(right);

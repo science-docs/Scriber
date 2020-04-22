@@ -29,11 +29,11 @@ namespace Tex.Net.Engine
             //        break;
             //}
 
-            if (result != null)
-            {
-                var flattened = result.ConvertToFlatArray();
-                Environments.Current.Objects.AddRange(flattened);
-            }
+            //if (result != null)
+            //{
+            //    var flattened = result.ConvertToFlatArray();
+            //    Environments.Current.Objects.AddRange(flattened);
+            //}
 
             return result;
         }

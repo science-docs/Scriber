@@ -12,5 +12,10 @@
         }
 
         protected abstract Size MeasureOverride(Size availableSize);
+
+        public new Leaf Clone()
+        {
+            return base.Clone() as Leaf;
+        }
     }
 }

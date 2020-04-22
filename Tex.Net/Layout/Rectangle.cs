@@ -54,6 +54,11 @@
             return X.GetHashCode() + Y.GetHashCode() * 13 + Width.GetHashCode() * 31 + Height.GetHashCode() * 37;
         }
 
+        public override string ToString()
+        {
+            return $"{Position} {Size}";
+        }
+
         public static bool operator ==(Rectangle left, Rectangle right)
         {
             return left.Equals(right);

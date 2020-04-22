@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Tex.Net.Layout.Document;
 
 namespace Tex.Net.Engine
 {
@@ -18,7 +19,10 @@ namespace Tex.Net.Engine
 
         public static void Add(Assembly asm)
         {
-            assemblies.Add(asm);
+            lock (assemblies)
+            {
+                assemblies.Add(asm);
+            }
         }
 
         public static void Add(Command command)
@@ -32,20 +36,25 @@ namespace Tex.Net.Engine
             return command;
         }
 
-        public static void Discover()
+        public static void Discover(params Assembly[] additionalAssemblies)
         {
-            foreach (var asm in assemblies)
+            lock (assemblies)
             {
-                var types = asm.GetTypes().Where(e => IsPackage(e));
+                assemblies.AddRange(additionalAssemblies);
 
-                foreach (var type in types)
+                foreach (var asm in assemblies)
                 {
-                    FindCommands(type);
-                }
-            }
+                    var types = asm.GetTypes().Where(e => IsPackage(e));
 
-            // After assemblies have been discovered, remove them
-            assemblies.Clear();
+                    foreach (var type in types)
+                    {
+                        FindCommands(type);
+                    }
+                }
+
+                // After assemblies have been discovered, remove them
+                assemblies.Clear();
+            }
         }
 
         private static bool IsPackage(Type type)
@@ -66,7 +75,8 @@ namespace Tex.Net.Engine
                     {
                         Name = command.Name,
                         Execution = del,
-                        Parameters = parameters
+                        Parameters = parameters,
+                        RequiredEnvironment = command.RequiredEnvironment
                     };
                     Add(commandItem);
                 }
@@ -96,7 +106,7 @@ namespace Tex.Net.Engine
         {
             if (parameters.Length == 0)
             {
-                if (args.Length == 0)
+                if (args.Length != 0)
                 {
                     throw new CommandInvocationException($"Command {command} does not expect any arguments. Received: {args.Length}");
                 }
@@ -131,11 +141,45 @@ namespace Tex.Net.Engine
             {
                 var arg = args[i];
                 var parm = parameters[i];
-                if (!parm.ParameterType.IsAssignableFrom(arg.GetType()))
+                if (!IsAssignableFrom(parm.ParameterType, arg, out var transformed))
                 {
-                    throw new CommandInvocationException($"Object of type {arg.GetType().Name} cannot be assigned to parameter of type {parm.ParameterType.Name}");
+                    throw new CommandInvocationException($"Object of type {arg.GetType().Name} cannot be assigned or transformed to parameter of type {parm.ParameterType.Name}");
+                }
+                else
+                {
+                    args[i] = transformed;
                 }
             }
+        }
+
+        private static bool IsAssignableFrom(Type target, object obj, out object transformed)
+        {
+            if (target.IsAssignableFrom(obj.GetType()))
+            {
+                transformed = obj;
+                return true;
+            }
+            // todo: refactor this completely
+            else if (target == typeof(IEnumerable<Leaf>))
+            {
+                if (obj is Paragraph paragraph)
+                {
+                    transformed = paragraph.Leaves;
+                    return true;
+                }
+            }
+            else if (target == typeof(Paragraph))
+            {
+                if (obj is Leaf leaf)
+                {
+                    var paragraph = new Paragraph();
+                    paragraph.Leaves.Add(leaf);
+                    transformed = paragraph;
+                    return true;
+                }
+            }
+            transformed = null;
+            return false;
         }
 
         private static void CountParameters(ParameterInfo[] parameters, out bool hasState, out int required, out int optional)

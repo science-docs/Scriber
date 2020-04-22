@@ -10,6 +10,7 @@ namespace Tex.Net.Engine
     public class Command
     {
         public string Name { get; set; }
+        public string RequiredEnvironment { get; set; }
         public CommandExecution Execution { get; set; }
         public ParameterInfo[] Parameters { get; set; }
     }

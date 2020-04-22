@@ -26,6 +26,12 @@ namespace Tex.Net.Language
             {
                 c = (char)code;
 
+                if (c == '\r')
+                {
+                    index++;
+                    continue;
+                }
+
                 if (cur != null)
                 {
                     if (IsSpecialCharacter(c) || (cur.Type == TokenType.Backslash && char.IsWhiteSpace(c)))

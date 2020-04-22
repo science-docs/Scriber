@@ -26,7 +26,7 @@ namespace Tex.Net.Language
         public Element Parent { get; set; }
         public Element NextSibling { get; set; }
         public Element PreviousSibling { get; set; }
-        public Element LastSibling => NextSibling == null ? this : NextSibling.LastSibling;
+        public Element LastSibling => last;
         public int Index { get; set; }
         public int Length { get; set; }
         public string Content { get; set; }
@@ -34,8 +34,11 @@ namespace Tex.Net.Language
         internal StringBuilder StringBuilder { get; set; }
         public List<Element> CommandArguments { get; } = new List<Element>();
 
+        private Element last;
+
         public Element(Element parent, ElementType type, int index)
         {
+            last = this;
             Type = type;
             Parent = parent;
             Index = index;
@@ -61,9 +64,9 @@ namespace Tex.Net.Language
 
         public void AddSibling(Element element)
         {
-            var last = LastSibling;
             element.PreviousSibling = last;
             last.NextSibling = element;
+            last = element;
         }
 
         public override string ToString()

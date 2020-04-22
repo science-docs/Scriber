@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tex.Net.Drawing;
-using Tex.Net.Text;
+﻿using Tex.Net.Text;
 
 namespace Tex.Net.Layout.Document
 {
     public class Text : Leaf
     {
         public string Content { get; set; }
+
+        protected override DocumentElement CloneInternal()
+        {
+            return new Text { Content = Content };
+        }
 
         public override LineNode[] GetNodes()
         {

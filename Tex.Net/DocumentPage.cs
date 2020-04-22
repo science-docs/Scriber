@@ -9,16 +9,25 @@ namespace Tex.Net
 {
     public class DocumentPage
     {
-        public List<Block> Blocks { get; } = new List<Block>();
+        public Measurements Measurements { get; }
+        public Document Document { get; }
         public Size Size { get; set; }
         public Rectangle ContentArea { get; set; }
 
+        public string Number { get; set; }
+
+        public DocumentPage(Document document)
+        {
+            Document = document;
+            Measurements = new Measurements();
+        }
+
         public void OnRender(IDrawingContext drawingContext)
         {
-            foreach (var block in Blocks)
+            foreach (var measurement in Measurements)
             {
-                drawingContext.Offset = block.VisualOffset;
-                block.OnRender(drawingContext);
+                drawingContext.Offset = measurement.Position;
+                measurement.Element.OnRender(drawingContext, measurement);
             }
         }
     }

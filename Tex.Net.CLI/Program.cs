@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using Tex.Net.Engine;
 using Tex.Net.Language;
 using Tex.Net.Layout;
@@ -16,30 +17,49 @@ namespace Tex.Net.CLI
 
             CommandCollection.Discover();
 
-            var tokens = Lexer.Tokenize("\\section{This is just some text}\n\n\\section{Some more Text}");//("\\TeX{a}{b} is a {\\tt nice language}. % This is a \\comment\n\nAnd some other paragraph");
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("\\cfooter{Page \\thepage}");
+            sb.AppendLine("\\section{This is a section}");
+            sb.AppendLine("After the \\red{first} section follows a pagebreak at page.");
+            sb.AppendLine("This is the same paragraph");
+
+            sb.AppendLine();
+            sb.AppendLine("1 1 1 1 1 1 1 1 1 1");
+
+            sb.AppendLine();
+            sb.AppendLine();
+
+            for (int i = 0; i < 200; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    sb.Append("\\thepage ");
+                }
+                sb.AppendLine();
+                sb.AppendLine();
+                
+            }
+            sb.AppendLine();
+            sb.AppendLine("\\pagebreak");
+
+            for (int i = 0; i < 98; i++)
+            {
+                sb.AppendLine("\\section{This is a section}");
+                sb.AppendLine();
+            }
+
+            var tokens = Lexer.Tokenize(sb.ToString());
             var element = Parser.Parse(tokens);
             var result = Compiler.Compile(element);
 
             var document = result.Document;
-            var page = new DocumentPage();
-            document.Pages.Add(page);
-
-            page.Size = new Size(595, 800);
-
-            var elms = document.Elements;
-            var split = new List<Block>();
-            foreach (var el in elms)
-            {
-                el.Measure(page.Size);
-                split.AddRange(el.Split());
-            }
-
-            foreach (var items in split)
-            {
-                items.Arrange(new Rectangle(0, 50, 10000, 1000));
-            }
-
-            page.Blocks.AddRange(split);
+            document.Measure();
+            document.Arrange();
+            document.Interlude();
+            //document.Reflow();
+            document.Measure();
+            document.Arrange();
 
             var bytes = document.ToPdf();
 

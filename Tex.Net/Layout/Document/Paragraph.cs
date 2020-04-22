@@ -9,63 +9,139 @@ namespace Tex.Net.Layout.Document
         public DocumentElementCollection<Leaf> Leaves { get; }
 
         private List<LineNode> lineNodes;
-        private PositionedItem[] positionedItems;
+        private PositionedItem[][] lines;
 
         public Paragraph()
         {
             Leaves = new DocumentElementCollection<Leaf>(this);
         }
 
-        protected override Size MeasureOverride(Size availableSize)
+        protected override Measurements MeasureOverride(Size availableSize)
         {
+            var ms = new Measurements();
             lineNodes = new List<LineNode>();
             foreach (var leaf in Leaves)
             {
                 leaf.Measure(availableSize);
-                lineNodes.AddRange(leaf.GetNodes());
+                var nodes = leaf.GetNodes();
+                if (nodes.Length > 0)
+                {
+                    lineNodes.AddRange(nodes);
+                    lineNodes.Add(LineNodeTransformer.GetDefaultGlue(leaf));
+                }
             }
-            var linebreak = new Linebreak();
-            var breaks = linebreak.BreakLines(lineNodes, new double[] { availableSize.Width }, new LinebreakOptions());
-            positionedItems = linebreak.PositionItems(lineNodes, new double[] { availableSize.Width }, breaks, false);
-            var last = positionedItems[^1];
-            var lineheight = 10.0;
-            return new Size(availableSize.Width, lineheight * last.Line + Leaves[^1].DesiredSize.Height);
+            if (lineNodes.Count > 1)
+            {
+                lineNodes.RemoveAt(lineNodes.Count - 1);
+                var linebreak = new Linebreak();
+                var breaks = linebreak.BreakLines(lineNodes, new double[] { availableSize.Width }, new LinebreakOptions());
+                var positionedItems = linebreak.PositionItems(lineNodes, new double[] { availableSize.Width }, breaks, false);
+                lines = ProduceLines(positionedItems);
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var first = i == 0;
+                    var last = i == lines.Length - 1;
+                    var line = lines[i];
+                    var height = 0.0;
+                    foreach (var item in line)
+                    {
+                        height = Math.Max(lineNodes[item.Index].Element.DesiredSize.Height, height);
+                    }
+                    var stretch = Document.Variables[DocumentVariables.Length][DocumentVariables.BaselineStretch].GetValue<double>();
+
+                    var margin = new Thickness();
+                    if (first)
+                    {
+                        margin.Top = Margin.Top;
+                    }
+                    if (last)
+                    {
+                        margin.Bottom = Margin.Bottom;
+                    }
+                    else
+                    {
+                        height *= stretch;
+                    }
+                    var size = new Size(availableSize.Width, height);
+                    var measurement = new Measurement(this, size, margin);
+                    ms.Add(measurement);
+                }
+            }
+            return ms;
         }
 
-        protected override void ArrangeOverride(Rectangle finalRectangle)
+        private static PositionedItem[][] ProduceLines(PositionedItem[] items)
         {
-            throw new NotImplementedException();
-        }
-
-        public override Block[] Split()
-        {
-            base.Split();
-
-            List<ParagraphLine> lines = new List<ParagraphLine>();
+            List<PositionedItem[]> lines = new List<PositionedItem[]>();
             var curItems = new List<PositionedItem>();
             var curLine = 0;
-            foreach (var item in positionedItems)
+            if (items != null)
             {
-                if (item.Line != curLine)
+                foreach (var item in items)
                 {
-                    lines.Add(new ParagraphLine(lineNodes, curItems));
-                    curItems.Clear();
-                    curLine = item.Line;
+                    if (item.Line != curLine)
+                    {
+                        lines.Add(curItems.ToArray());
+                        curItems.Clear();
+                        curLine = item.Line;
+                    }
+                    curItems.Add(item);
                 }
-                curItems.Add(item);
             }
 
             if (curItems.Count > 0)
             {
-                lines.Add(new ParagraphLine(lineNodes, curItems));
+                lines.Add(curItems.ToArray());
             }
 
             return lines.ToArray();
         }
 
-        public override void OnRender(IDrawingContext drawingContext)
+        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
-            throw new InvalidOperationException("A paragraph should never be rendered");
+            var items = lines[measurement.Index];
+            var position = measurement.Position;
+
+            foreach (var item in items)
+            {
+                var node = lineNodes[item.Index];
+                var offset = new Position(position.X + item.Offset, position.Y);
+
+                var run = new TextRun
+                {
+                    Text = node.Text,
+                    Typeface = new Net.Text.Typeface
+                    {
+                        Font = node.Element.Font,
+                        Size = node.Element.FontSize
+                    }
+                };
+
+                drawingContext.Offset = offset;
+
+                drawingContext.DrawText(run, node.Element.Foreground);
+            }
+        }
+
+        public override void Interlude()
+        {
+            foreach (var leaf in Leaves)
+            {
+                leaf.Interlude();
+            }
+        }
+
+        protected override DocumentElement CloneInternal()
+        {
+            var paragraph = new Paragraph();
+
+            foreach (var leaf in Leaves)
+            {
+                paragraph.Leaves.Add(leaf.Clone());
+            }
+
+            return paragraph;
         }
     }
 }

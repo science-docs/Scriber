@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using Tex.Net.Layout.Document;
 
 namespace Tex.Net.Engine.Commands
@@ -31,7 +32,7 @@ namespace Tex.Net.Engine.Commands
                 Preamble = pretext,
                 Page = new PageReference(content)
             };
-            vars["toc"][pretext].SetValue(entry);
+            GetEntryTable(vars).Add(entry);
             ResetNumbering(vars, level);
             var text = new Layout.Document.Text
             {
@@ -45,7 +46,7 @@ namespace Tex.Net.Engine.Commands
         [Command("section*")]
         public static Paragraph SectionStar(CompilerState state, Paragraph content)
         {
-            content.FontSize = 16;
+            content.FontSize = 18;
             content.Margin = new Layout.Thickness(12, 0);
             return content;
         }
@@ -81,7 +82,17 @@ namespace Tex.Net.Engine.Commands
             }
         }
 
-        
+        private static List<TableEntry> GetEntryTable(DocumentVariable variables)
+        {
+            var toc = variables[DocumentVariables.TableOfContent]["entries"];
+            var list = toc.GetValue<List<TableEntry>>();
+            if (list == null)
+            {
+                list = new List<TableEntry>();
+                toc.SetValue(list);
+            }
+            return list;
+        }
     }
 
     public class TableEntry

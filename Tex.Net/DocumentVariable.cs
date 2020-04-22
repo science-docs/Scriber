@@ -15,6 +15,22 @@ namespace Tex.Net
             set => objects[name] = value;
         }
 
+        public DocumentVariable this[params string[] names]
+        {
+            get => names.Length == 1 ? this[names[0]] : this[names[0]][names[1..^0]];
+            set
+            {
+                if (names.Length == 1)
+                {
+                    this[names[0]] = value;
+                }
+                else
+                {
+                    this[names[0]][names[1..^0]] = value;
+                }
+            }
+        }
+
         private object value;
 
         public DocumentVariable()

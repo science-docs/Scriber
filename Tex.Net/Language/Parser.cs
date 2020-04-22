@@ -165,6 +165,10 @@ namespace Tex.Net.Language
                     cur.StringBuilder.Append(token.Content);
                     continue;
                 }
+                else if (!isNewline)
+                {
+                    context.Newline = false;
+                }
 
                 var element = action(context, token, cur);
 
