@@ -115,11 +115,9 @@ namespace Tex.Net
                     page = AddPage(pageSize, contentArea, PageNumbering.Next());
                 }
 
-                measurement.Element.Page = page;
-
                 if (measurement.Element.Page == null)
                 {
-                    
+                    measurement.Element.Page = page;
                 }
 
                 if (measurement.Element.IsVisible)
@@ -131,6 +129,7 @@ namespace Tex.Net
                 visualOffset.X += measurement.Margin.Left;
 
                 measurement.Position = visualOffset;
+                Realign(measurement, boxSize, measurement.Element.Alignment);
 
                 if (measurement.Element.IsVisible)
                 {
@@ -205,6 +204,24 @@ namespace Tex.Net
             }
 
             return elements;
+        }
+
+        private void Realign(Measurement measurement, Size space, Alignment alignment)
+        {
+            var size = measurement.Size;
+            Position pos = measurement.Position;
+
+            switch (alignment)
+            {
+                case Alignment.Left:
+                    pos.X = space.Width - size.Width;
+                    break;
+                case Alignment.Center:
+                    pos.X = (space.Width - size.Width) / 2;
+                    break;
+            }
+
+            measurement.Position = pos;
         }
     }
 }

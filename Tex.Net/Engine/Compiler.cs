@@ -8,11 +8,15 @@ namespace Tex.Net.Engine
 {
     public static class Compiler
     {
-        public static CompilerResult Compile(Element element)
+        public static CompilerResult Compile(IEnumerable<Element> elements)
         {
             var state = new CompilerState();
             var args = new List<object>();
-            Execute(state, element, args);
+
+            foreach (var element in elements)
+            {
+                Execute(state, element, args);
+            }
 
             state.Document.Elements.AddRange(state.Environments.Current.Objects.OfType<Block>());
             ResolveCallbacks(state.Document.Elements);
@@ -30,9 +34,9 @@ namespace Tex.Net.Engine
                 state.Environments.Push(name);
             }
 
-            if (element.Inline != null)
+            foreach (var inline in element.Inlines)
             {
-                Execute(state, element.Inline, ownArgs);
+                Execute(state, inline, ownArgs);
             }
 
             var obj = state.Execute(element, ownArgs.ToArray());
@@ -50,10 +54,10 @@ namespace Tex.Net.Engine
                 arguments.AddRange(flattened);
             }
 
-            if (element.NextSibling != null)
-            {
-                Execute(state, element.NextSibling, arguments);
-            }
+            //if (element.NextSibling != null)
+            //{
+            //    Execute(state, element.NextSibling, arguments);
+            //}
         }
 
         private static bool MustCreateEnvironment(Element element, out string name)
@@ -77,7 +81,7 @@ namespace Tex.Net.Engine
 
         private static string EnvironmentName(Element command)
         {
-            return command.Inline.Inline.Content;
+            return command.Inlines.First().Inlines.First().Content;
         }
 
         private static bool MustDestroyEnvironment(Element element)

@@ -26,7 +26,7 @@ namespace Tex.Net.Engine
         public override object Execute(CompilerState state, object[] arguments)
         {
             // ignore arguments, as text nodes cannot contain children.
-            return new Layout.Document.Text
+            return new Layout.Document.TextLeaf
             {
                 Content = Content
             };

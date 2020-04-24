@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Tex.Net.Engine;
 using Tex.Net.Language;
-using Tex.Net.Layout;
-using Tex.Net.Layout.Document;
 
 namespace Tex.Net.CLI
 {
@@ -15,13 +12,15 @@ namespace Tex.Net.CLI
         {
             Stopwatch watch = Stopwatch.StartNew();
 
-            CommandCollection.Discover();
+            ReflectionLoader.Discover();
 
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine("\\setlength[baselinestretch]{2}");
             sb.AppendLine("\\cfooter{Page \\thepage}");
+            sb.AppendLine("\\includegraphics{test-image.jpg}");
             sb.AppendLine("\\section{This is a section}");
-            sb.AppendLine("After the \\red{first} section follows a pagebreak at page.");
+            sb.AppendLine("After the \\red{first} section [follows] a pagebreak at page.");
             sb.AppendLine("This is the same paragraph");
 
             sb.AppendLine();
@@ -30,15 +29,9 @@ namespace Tex.Net.CLI
             sb.AppendLine();
             sb.AppendLine();
 
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 100; i++)
             {
-                for (int j = 0; j < 10; j++)
-                {
-                    sb.Append("\\thepage ");
-                }
-                sb.AppendLine();
-                sb.AppendLine();
-                
+                sb.Append("1 ");
             }
             sb.AppendLine();
             sb.AppendLine("\\pagebreak");
@@ -50,18 +43,19 @@ namespace Tex.Net.CLI
             }
 
             var tokens = Lexer.Tokenize(sb.ToString());
-            var element = Parser.Parse(tokens);
-            var result = Compiler.Compile(element);
+            var elements = Parser.Parse(tokens);
+            var result = Compiler.Compile(elements);
 
             var document = result.Document;
             document.Measure();
             document.Arrange();
             document.Interlude();
-            //document.Reflow();
             document.Measure();
             document.Arrange();
 
-            var bytes = document.ToPdf();
+           var bytes = document.ToPdf();
+
+
 
             File.WriteAllBytes("test.pdf", bytes);
 

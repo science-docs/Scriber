@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Tex.Net.Language;
 
 namespace Tex.Net.Engine
@@ -28,7 +26,18 @@ namespace Tex.Net.Engine
                 throw new CommandInvocationException($"Command {command.Name} requires environment {command.RequiredEnvironment}. Current environment is {state.Environments.Current.Name}");
             }
 
-            return command.Execution(state, arguments);
+            try
+            {
+                return command.Execution(state, arguments);
+            }
+            catch (CommandInvocationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new CommandInvocationException("Unhandled exception occured during execution of command " + Name, ex);
+            }
         }
     }
 }

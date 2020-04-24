@@ -8,6 +8,7 @@ namespace Tex.Net.Language
     {
         public bool Newline { get; set; }
         public bool Comment { get; set; }
+        public bool BracketBlock { get; set; }
         public Stack<Element> Parents { get; } = new Stack<Element>();
     }
 }

@@ -34,7 +34,7 @@ namespace Tex.Net.Engine.Commands
             };
             GetEntryTable(vars).Add(entry);
             ResetNumbering(vars, level);
-            var text = new Layout.Document.Text
+            var text = new Layout.Document.TextLeaf
             {
                 Content = pretext
             };

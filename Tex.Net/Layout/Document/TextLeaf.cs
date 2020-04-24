@@ -2,13 +2,13 @@
 
 namespace Tex.Net.Layout.Document
 {
-    public class Text : Leaf
+    public class TextLeaf : Leaf, ITextLeaf
     {
         public string Content { get; set; }
 
         protected override DocumentElement CloneInternal()
         {
-            return new Text { Content = Content };
+            return new TextLeaf { Content = Content };
         }
 
         public override LineNode[] GetNodes()

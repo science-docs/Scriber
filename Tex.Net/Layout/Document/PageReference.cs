@@ -1,8 +1,10 @@
 ﻿namespace Tex.Net.Layout.Document
 {
-    public class PageReference : Leaf
+    public class PageReference : Leaf, ITextLeaf
     {
         public DocumentElement ReferencedElement { get; }
+
+        public string Content => PageNumber;
 
         public string PageNumber { get; set; } = "%";
 

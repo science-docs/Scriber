@@ -10,7 +10,7 @@ namespace Tex.Net.Language
 
     public static class Parser
     {
-        private readonly static ParserState StateGraph = new ParserState(null, null);
+        //private readonly static ParserState StateGraph = new ParserState(null, null);
         private readonly static Dictionary<TokenType, Function> ParseActions = new Dictionary<TokenType, Function>();
 
         static Parser()
@@ -21,36 +21,17 @@ namespace Tex.Net.Language
             ParseActions[TokenType.CurlyClose] = ParseCurlyClose;
             ParseActions[TokenType.Newline] = ParseNewline;
             ParseActions[TokenType.Percent] = ParsePercent;
+            ParseActions[TokenType.BracketOpen] = ParseBracketOpen;
+            ParseActions[TokenType.BracketClose] = ParseBracketClose;
 
-            var textState = new ParserState(TokenType.Text, ParseText);
-            var commandState = new ParserState(TokenType.Backslash, ParseCommand);
-            var curlyCloseState = new ParserState(TokenType.CurlyClose, ParseCurlyClose);
-            var newlineState = new ParserState(TokenType.Newline, ParseNewline);
-            var commentState = new ParserState(TokenType.Percent, ParsePercent);
-            var curlyOpenState = new ParserState(TokenType.CurlyOpen, ParseCurlyOpen);
+            //var textState = new ParserState(TokenType.Text, ParseText);
+            //var commandState = new ParserState(TokenType.Backslash, ParseCommand);
+            //var curlyCloseState = new ParserState(TokenType.CurlyClose, ParseCurlyClose);
+            //var newlineState = new ParserState(TokenType.Newline, ParseNewline);
+            //var commentState = new ParserState(TokenType.Percent, ParsePercent);
+            //var curlyOpenState = new ParserState(TokenType.CurlyOpen, ParseCurlyOpen);
 
-            StateGraph.Add(textState, commandState, curlyOpenState, curlyCloseState, newlineState, commentState);
-
-            //var textState = new ParserState(TokenType.Text, ParserStateType.Text)
-            //{
-            //    ParseAction = ParseText
-            //};
-            //var commandState = new ParserState(TokenType.Backslash, ParserStateType.Command)
-            //{
-            //    ParseAction = ParseCommand
-            //};
-            //var curlyOpenState = new ParserState(TokenType.CurlyOpen, ParserStateType.Text)
-            //{
-            //    ParseAction = ParseCurlyOpen
-            //};
-            //var curlyCloseState = new ParserState(TokenType.CurlyClose, ParserStateType.Text)
-            //{
-            //    ParseAction = ParseCurlyClose
-            //};
-            //StateGraph.Next.Add(TokenType.Text, textState);
-            //StateGraph.Next.Add(TokenType.Backslash, commandState);
-            //textState.Next.Add(TokenType.Backslash, commandState);
-            //commandState.Next.Add(TokenType.Text, textState);
+            //StateGraph.Add(textState, commandState, curlyOpenState, curlyCloseState, newlineState, commentState);
         }
 
         private static Element ParsePercent(ParserContext context, Token token, Element previous)
@@ -89,23 +70,46 @@ namespace Tex.Net.Language
             return command;
         }
 
-        //private static Element ParseCurlyOpenCommand(ParserContext context, Token token, Element previous)
-        //{
-        //    context.Parents.Push(previous);
-        //    return null;
-        //}
+        private static Element ParseBracketOpen(ParserContext context, Token token, Element previous)
+        {
+            if (previous.Type == ElementType.Command && context.Parents.Peek().Type != ElementType.Command)
+            {
+                context.Parents.Push(previous);
+                var element = new Element(previous, ElementType.Block, token.Index);
+                context.Parents.Push(element);
+                context.BracketBlock = true;
+                return element;
+            }
+            else
+            {
+                return AppendText(previous, context.Parents.Peek(), token);
+            }
+        }
+
+        private static Element ParseBracketClose(ParserContext context, Token token, Element previous)
+        {
+            if (context.BracketBlock)
+            {
+                context.BracketBlock = false;
+                context.Parents.Pop();
+                return null;
+            }
+            else
+            {
+                return AppendText(previous, context.Parents.Peek(), token);
+            }
+        }
 
         private static Element ParseCurlyOpen(ParserContext context, Token token, Element previous)
         {
             Element parent;
-            if (previous.Type == ElementType.Command)
+
+            if (previous.Type == ElementType.Command && context.Parents.Peek().Type != ElementType.Command)
             {
-                parent = previous;
+                context.Parents.Push(previous);
             }
-            else
-            {
-                parent = context.Parents.Peek();
-            }
+
+            parent = context.Parents.Peek();
             var element = new Element(parent, ElementType.Block, token.Index);
             context.Parents.Push(element);
             return element;
@@ -113,24 +117,13 @@ namespace Tex.Net.Language
 
         private static Element ParseCurlyClose(ParserContext context, Token token, Element previous)
         {
-            //if (element.Type == ElementType.Command && string.IsNullOrEmpty(element.Content))
-            //{
-            //    var block = new Element(element.Parent, ElementType.Text, token.Index)
-            //    {
-            //        Content = token.Content
-            //    };
-            //    return block;
-            //}
-
-            //return element.Parent;
-
             context.Parents.Pop();
             return null;
         }
 
-        public static Element Parse(IEnumerable<Token> tokens)
+        public static Element[] Parse(IEnumerable<Token> tokens)
         {
-            return ParseInternal(tokens).ToArray().FirstOrDefault();
+            return ParseInternal(tokens).ToArray();
         }
 
         private static IEnumerable<Element> ParseInternal(IEnumerable<Token> tokens)
@@ -144,21 +137,27 @@ namespace Tex.Net.Language
                 yield break;
 
             Element cur = new Element(null, ElementType.Block, 0);
-            Element last = null;
             var context = new ParserContext();
             context.Parents.Push(cur);
-            var state = StateGraph;
+            //var state = StateGraph;
             bool returnedLast = false;
 
             foreach (var token in items)
             {
-                if (!state.Next.TryGetValue(token.Type, out state))
-                {
-                    state = StateGraph.Next[token.Type];
-                }
+                //if (!state.Next.TryGetValue(token.Type, out state))
+                //{
+                //    state = StateGraph.Next[token.Type];
+                //}
 
-                var action = state.ParseAction;
-                bool isNewline = action == ParseNewline;
+                var action = ParseActions[token.Type];
+                bool isNewline = token.Type == TokenType.Newline;
+                bool isCurlyOpen = token.Type == TokenType.CurlyOpen;
+                bool isBracketOpen = token.Type == TokenType.BracketOpen;
+
+                if (!isCurlyOpen && !isBracketOpen && context.Parents.Peek().Type == ElementType.Command)
+                {
+                    context.Parents.Pop();
+                }
 
                 if (!isNewline && context.Comment)
                 {
@@ -179,11 +178,8 @@ namespace Tex.Net.Language
                         cur = TopParent(cur);
                         BuildContent(cur);
                         yield return cur;
-                        last = cur;
                         cur = new Element(null, ElementType.Block, token.Index);
                         context.Parents.Push(cur);
-                        last.NextSibling = cur;
-                        cur.PreviousSibling = last;
                         returnedLast = true;
                     }
                     else
@@ -203,7 +199,6 @@ namespace Tex.Net.Language
             {
                 cur = TopParent(cur);
                 BuildContent(cur);
-                last?.SetNextSibling(cur);
                 yield return cur;
             }
         }
@@ -220,21 +215,6 @@ namespace Tex.Net.Language
             }
         }
 
-        private static Element FindParent(Element element)
-        {
-            var parent = element.Parent;
-            if (parent == null || EmptyBlock(element))
-            {
-                parent = element;
-            }
-            return parent;
-        }
-
-        private static bool EmptyBlock(Element element)
-        {
-            return element.Type == ElementType.Block && element.Inline == null;
-        }
-
         private static void BuildContent(Element element)
         {
             if (element.StringBuilder != null)
@@ -243,13 +223,10 @@ namespace Tex.Net.Language
                 element.StringBuilder = null;
                 element.Length = element.Content.Length;
             }
-            if (element.Inline != null)
+
+            foreach (var inline in element.Inlines)
             {
-                BuildContent(element.Inline);
-            }
-            if (element.NextSibling != null)
-            {
-                BuildContent(element.NextSibling);
+                BuildContent(inline);
             }
         }
 
@@ -301,14 +278,6 @@ namespace Tex.Net.Language
                     return Token == null ? "None" : $"{Token} {ParseAction}";
                 }
             }
-        }
-
-        private enum ParserStateType
-        {
-            Start = 0,
-            Text,
-            Command
-
         }
     }
 }

@@ -28,6 +28,12 @@ namespace Tex.Net.Layout.Document
             set => foreground = value;
         }
 
+        public Alignment Alignment
+        {
+            get => alignment ?? Parent?.Alignment ?? 0;
+            set => alignment = value;
+        }
+
         public DocumentPage Page
         {
             get => page ?? Parent?.Page;
@@ -46,17 +52,20 @@ namespace Tex.Net.Layout.Document
         private double? fontSize;
         private Color? foreground;
         private FontWeight? fontWeight;
+        private Alignment? alignment;
         private DocumentPage page;
         private Net.Document document;
 
         public DocumentElement Clone()
         {
             var clone = CloneInternal();
+            clone.Margin = Margin;
             clone.font = font;
             clone.fontSize = fontSize;
             clone.foreground = foreground;
             clone.fontWeight = fontWeight;
             clone.document = document;
+            clone.alignment = alignment;
             return clone;
         }
 

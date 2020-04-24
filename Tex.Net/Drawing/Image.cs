@@ -1,21 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SixLabors.ImageSharp.Formats.Png;
 using System.IO;
-using System.Text;
 
 namespace Tex.Net.Drawing
 {
     public class Image
     {
-        public double Height { get; private set; }
-        public double Width { get; private set; }
+        public double Height { get; set; }
+        public double Width { get; set; }
 
         private readonly byte[] data;
+        private readonly SixLabors.ImageSharp.Image image;
 
         public Image(byte[] data)
         {
             this.data = data;
-            //var img = new System.Drawing.Image()
+            image = SixLabors.ImageSharp.Image.Load(data);
+        }
+
+        public Image(byte[] data, SixLabors.ImageSharp.Image image)
+        {
+            this.data = data;
+            this.image = image;
         }
 
         public byte[] GetData()
@@ -25,7 +30,17 @@ namespace Tex.Net.Drawing
 
         public Stream GetStream()
         {
-            return new MemoryStream(data);
+            if (data == null)
+            {
+                var ms = new MemoryStream();
+                image.Save(ms, new PngEncoder());
+                ms.Position = 0;
+                return ms;
+            }
+            else
+            {
+                return new MemoryStream(data);
+            }
         }
 
         public static Image FromStream(Stream stream)
