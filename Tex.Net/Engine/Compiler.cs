@@ -29,9 +29,9 @@ namespace Tex.Net.Engine
         {
             var ownArgs = new List<object>();
 
-            if (MustCreateEnvironment(element, out string name))
+            if (element.Type == ElementType.Block)
             {
-                state.Environments.Push(name);
+                state.Environments.Push();
             }
 
             foreach (var inline in element.Inlines)
@@ -40,8 +40,8 @@ namespace Tex.Net.Engine
             }
 
             var obj = state.Execute(element, ownArgs.ToArray());
-            
-            if (MustDestroyEnvironment(element))
+
+            if (element.Type == ElementType.Block)
             {
                 state.Environments.Pop();
             }
@@ -51,8 +51,12 @@ namespace Tex.Net.Engine
                 // basically pass the returned object to the previous environment
                 var flattened = obj.ConvertToFlatArray();
                 state.Environments.Current.Objects.AddRange(flattened);
-                arguments.AddRange(flattened);
+                arguments.Clear();
+                arguments.AddRange(state.Environments.Current.Objects);
+                //arguments.AddRange(flattened);
             }
+
+            
 
             //if (element.NextSibling != null)
             //{

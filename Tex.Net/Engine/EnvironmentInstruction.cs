@@ -1,38 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tex.Net.Language;
+﻿using Tex.Net.Language;
 
 namespace Tex.Net.Engine
 {
-    public abstract class EnvironmentInstruction : EngineInstruction
+    public class EnvironmentInstruction : EngineInstruction
     {
         public bool IsEnd { get; set; }
 
         public override object Execute(CompilerState state, object[] args)
         {
-            object result;
+            if (args.Length == 0)
+            {
+                throw new CommandInvocationException("An environment needs an argument specifying its name");
+            }
+
+            var firstArg = args[0];
+            var converter = ElementConverters.Find(firstArg.GetType(), typeof(string));
+            var name = converter.Convert(firstArg, typeof(string), state) as string;
+
+            var env = EnvironmentCollection.Find(name);
+            
 
             if (IsEnd)
             {
-                var objects = state.Environments.Current.Objects.ToArray();
-                result = End(state, objects);
+                var cur = state.Environments.Current;
+                var objects = cur.Objects.ToArray();
+                var envArgs = cur.Arguments.ToArray();
                 state.Environments.Pop();
+                return env.Execution(state, objects, envArgs);
             }
             else
             {
-                state.Environments.Push();
-                result = Start(state, args);
+                var cur = state.Environments.Push(name);
+                cur.Instance = env;
+                cur.Arguments.AddRange(args);
+                return null;
             }
-            return result;
         }
-
-        public abstract object Start(CompilerState state, object[] args);
-        public abstract object End(CompilerState state, object[] objects);
 
         public static new EnvironmentInstruction Create(Element element)
         {
-            throw new NotImplementedException();
+            return new EnvironmentInstruction();
         }
     }
 }

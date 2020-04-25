@@ -57,7 +57,8 @@ namespace Tex.Net.Language
             else
             {
                 context.Newline = true;
-                return AppendText(previous, context.Parents.Peek(), new Token(" ", token.Index));
+                return null;
+                //return AppendText(previous, context.Parents.Peek(), new Token(" ", token.Index));
             }
         }
 

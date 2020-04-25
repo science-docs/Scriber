@@ -3,7 +3,7 @@
 namespace Tex.Net.Layout.Document
 {
     /// <summary>
-    /// Base class for block element that manipulate the document during the arrange phase.
+    /// Base class for block element that manipulate the document during the measuring phase.
     /// </summary>
     public abstract class ArrangingBlock : Block
     {

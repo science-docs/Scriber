@@ -1,6 +1,4 @@
 ﻿using PdfSharpCore.Drawing;
-using PdfSharpCore.Fonts;
-using System.Collections.Generic;
 using System.Drawing;
 using Tex.Net.Layout;
 using Tex.Net.Text;

@@ -1,6 +1,6 @@
 ﻿using Tex.Net.Drawing;
 
-using Img = SixLabors.ImageSharp.Image;
+using Img = SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>;
 
 namespace Tex.Net.Layout.Document
 {
@@ -29,7 +29,7 @@ namespace Tex.Net.Layout.Document
         {
             FileName = fileName;
             this.imageData = imageData;
-            Image = image ?? Img.Load(imageData);
+            Image = image ?? SixLabors.ImageSharp.Image.Load(imageData);
             Height = new Unit(Image.Height, UnitType.Presentation);
             Width = new Unit(Image.Width, UnitType.Presentation);
             Origin = new Position(Width.Presentation / 2, Height.Presentation / 2);

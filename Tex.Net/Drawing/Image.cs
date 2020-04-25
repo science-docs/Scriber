@@ -1,4 +1,5 @@
 ﻿using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
 using System.IO;
 
 namespace Tex.Net.Drawing
@@ -9,7 +10,7 @@ namespace Tex.Net.Drawing
         public double Width { get; set; }
 
         private readonly byte[] data;
-        private readonly SixLabors.ImageSharp.Image image;
+        private readonly SixLabors.ImageSharp.Image<Rgba32> image;
 
         public Image(byte[] data)
         {
@@ -17,7 +18,7 @@ namespace Tex.Net.Drawing
             image = SixLabors.ImageSharp.Image.Load(data);
         }
 
-        public Image(byte[] data, SixLabors.ImageSharp.Image image)
+        public Image(byte[] data, SixLabors.ImageSharp.Image<Rgba32> image)
         {
             this.data = data;
             this.image = image;
@@ -30,17 +31,24 @@ namespace Tex.Net.Drawing
 
         public Stream GetStream()
         {
-            if (data == null)
-            {
-                var ms = new MemoryStream();
-                image.Save(ms, new PngEncoder());
-                ms.Position = 0;
-                return ms;
-            }
-            else
-            {
-                return new MemoryStream(data);
-            }
+            // currently, a workaround is needed for jpg images.
+            // so all images are saved as png.
+            var ms = new MemoryStream();
+            image.Save(ms, new PngEncoder());
+            ms.Position = 0;
+            return ms;
+
+            //if (data == null)
+            //{
+            //    var ms = new MemoryStream();
+            //    image.Save(ms, new PngEncoder());
+            //    ms.Position = 0;
+            //    return ms;
+            //}
+            //else
+            //{
+            //    return new MemoryStream(data);
+            //}
         }
 
         public static Image FromStream(Stream stream)

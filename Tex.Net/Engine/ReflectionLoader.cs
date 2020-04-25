@@ -46,6 +46,7 @@ namespace Tex.Net.Engine
             foreach (var package in packages)
             {
                 FindCommands(package);
+                FindEnvironments(package);
             }
 
             var converters = asm.GetTypes().Where(e => IsConverter(e));
@@ -83,6 +84,25 @@ namespace Tex.Net.Engine
         {
             command = method.GetCustomAttribute<CommandAttribute>();
             return command != null && method.IsStatic;
+        }
+
+        private static void FindEnvironments(Type type)
+        {
+            var methods = type.GetMethods();
+
+            foreach (var method in methods)
+            {
+                if (IsEnvironment(method, out var environment))
+                {
+                    EnvironmentCollection.Add(EnvironmentFactory.Create(environment, method));
+                }
+            }
+        }
+
+        private static bool IsEnvironment(MethodInfo method, out EnvironmentAttribute environment)
+        {
+            environment = method.GetCustomAttribute<EnvironmentAttribute>();
+            return environment != null && method.IsStatic;
         }
 
         private static void FindConverter(Type type)

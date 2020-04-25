@@ -16,9 +16,13 @@ namespace Tex.Net.CLI
 
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("\\setlength[baselinestretch]{2}");
-            sb.AppendLine("\\cfooter{Page \\thepage}");
+            //sb.AppendLine("\\setlength[baselinestretch]{2}");
+            //sb.AppendLine("\\cfooter{Page \\thepage}");
+
+            sb.AppendLine("\\begin{figure}");
             sb.AppendLine("\\includegraphics{test-image.jpg}");
+            sb.AppendLine("\\end{figure}");
+
             sb.AppendLine("\\section{This is a section}");
             sb.AppendLine("After the \\red{first} section [follows] a pagebreak at page.");
             sb.AppendLine("This is the same paragraph");
