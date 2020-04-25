@@ -38,7 +38,7 @@ namespace Tex.Net
 
         public override void Interlude()
         {
-            foreach (var element in Elements)
+            foreach (var element in Elements.AsParallel())
             {
                 element.Interlude();
             }
@@ -57,7 +57,7 @@ namespace Tex.Net
             pageBox.Height -= margin.Height;
             pageBox.Width -= margin.Width;
 
-            foreach (var element in Elements)
+            foreach (var element in Elements.AsParallel())
             {
                 element.Document = this;
                 var elementSize = pageBox;
