@@ -4,16 +4,16 @@ using Tex.Net.Drawing;
 
 namespace Tex.Net.Layout.Document
 {
-    public class Paragraph : Block
+    public class Paragraph : DocumentElement
     {
-        public DocumentElementCollection<Leaf> Leaves { get; }
+        public ElementCollection<Leaf> Leaves { get; }
 
         private List<LineNode> lineNodes;
         private PositionedItem[][] lines;
 
         public Paragraph()
         {
-            Leaves = new DocumentElementCollection<Leaf>(this);
+            Leaves = new ElementCollection<Leaf>(this);
         }
 
         protected override Measurements MeasureOverride(Size availableSize)
@@ -132,7 +132,7 @@ namespace Tex.Net.Layout.Document
             }
         }
 
-        protected override DocumentElement CloneInternal()
+        protected override AbstractElement CloneInternal()
         {
             var paragraph = new Paragraph();
 

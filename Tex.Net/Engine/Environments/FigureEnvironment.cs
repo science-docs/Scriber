@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Linq;
+using Tex.Net.Layout.Document;
 
 namespace Tex.Net.Engine.Environments
 {
@@ -10,7 +9,10 @@ namespace Tex.Net.Engine.Environments
         [Environment("figure")]
         public static object Figure(CompilerState state, object[] content)
         {
-            return content;
+            var section = new Section();
+
+            section.Elements.AddRange(content.OfType<DocumentElement>());
+            return section;
         }
     }
 }

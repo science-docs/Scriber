@@ -5,7 +5,7 @@ namespace Tex.Net.Layout.Document
     /// <summary>
     /// Base class for block element that manipulate the document during the measuring phase.
     /// </summary>
-    public abstract class ArrangingBlock : Block
+    public abstract class ArrangingBlock : DocumentElement
     {
         public override bool IsVisible => false;
 
@@ -18,7 +18,7 @@ namespace Tex.Net.Layout.Document
 
         protected override Measurements MeasureOverride(Size availableSize)
         {
-            Manipulate(Page.Document);
+            Manipulate(Document);
             return new Measurements();
         }
     }

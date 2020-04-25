@@ -7,13 +7,13 @@ namespace Tex.Net.Engine
     public class CompilerState
     {
         public Document Document { get; }
-        public EnvironmentTree Environments { get; }
+        public BlockTree Blocks { get; }
         public List<CompilerIssue> Issues { get; } = new List<CompilerIssue>();
 
         public CompilerState()
         {
             Document = new Document();
-            Environments = new EnvironmentTree();
+            Blocks = new BlockTree();
         }
 
         public object Execute(Element element, object[] arguments)

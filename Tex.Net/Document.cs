@@ -10,7 +10,7 @@ using Tex.Net.Layout.Document;
 
 namespace Tex.Net
 {
-    public class Document : DocumentElement
+    public class Document : AbstractElement
     {
         public DocumentVariable Variables { get; } = new DocumentVariable();
 
@@ -18,16 +18,16 @@ namespace Tex.Net
 
         public PageNumberingModule PageNumbering { get; } = new PageNumberingModule();
 
-        public DocumentElementCollection<Block> Elements { get; }
+        public ElementCollection<DocumentElement> Elements { get; }
 
-        public DocumentElementCollection<Block> PageItems { get; }
+        public ElementCollection<DocumentElement> PageItems { get; }
 
         public Measurements Measurements { get; }
 
         public Document()
         {
-            Elements = new DocumentElementCollection<Block>(this);
-            PageItems = new DocumentElementCollection<Block>(this);
+            Elements = new ElementCollection<DocumentElement>(this);
+            PageItems = new ElementCollection<DocumentElement>(this);
             Measurements = new Measurements();
             
             Font = Text.Font.Serif;
@@ -72,25 +72,6 @@ namespace Tex.Net
             }
         }
 
-        public void Reflow()
-        {
-            var pageSize = Variables["page"]["size"].GetValue<Size>();
-            var margin = Variables["page"]["margin"].GetValue<Thickness>();
-
-            var pageBox = pageSize;
-            pageBox.Height -= margin.Height;
-            pageBox.Width -= margin.Width;
-
-            foreach (var element in GetAllInternalElements())
-            {
-                element.Document = this;
-                var elementSize = pageBox;
-                elementSize.Height -= element.Margin.Height;
-                elementSize.Width -= element.Margin.Width;
-                element.Measure(elementSize);
-            }
-        }
-
         public void Arrange()
         {
             var pageSize = Variables["page"]["size"].GetValue<Size>();
@@ -129,7 +110,7 @@ namespace Tex.Net
                 visualOffset.X += measurement.Margin.Left;
 
                 measurement.Position = visualOffset;
-                Realign(measurement, boxSize, measurement.Element.Alignment);
+                Realign(measurement, boxSize, pageSize, measurement.Element.HorizontalAlignment);
 
                 if (measurement.Element.IsVisible)
                 {
@@ -186,14 +167,14 @@ namespace Tex.Net
             throw new NotImplementedException();
         }
 
-        protected override DocumentElement CloneInternal()
+        protected override AbstractElement CloneInternal()
         {
             return new Document();
         }
 
-        private IEnumerable<Block> GetAllInternalElements()
+        private IEnumerable<DocumentElement> GetAllInternalElements()
         {
-            HashSet<Block> elements = new HashSet<Block>();
+            HashSet<DocumentElement> elements = new HashSet<DocumentElement>();
 
             foreach (var page in Pages)
             {
@@ -206,18 +187,18 @@ namespace Tex.Net
             return elements;
         }
 
-        private void Realign(Measurement measurement, Size space, Alignment alignment)
+        private void Realign(Measurement measurement, Size pageBox, Size pageSize, HorizontalAlignment alignment)
         {
             var size = measurement.Size;
             Position pos = measurement.Position;
 
             switch (alignment)
             {
-                case Alignment.Left:
-                    pos.X = space.Width - size.Width;
+                case HorizontalAlignment.Left:
+                    pos.X = pageBox.Width - size.Width;
                     break;
-                case Alignment.Center:
-                    pos.X = (space.Width - size.Width) / 2;
+                case HorizontalAlignment.Center:
+                    pos.X = (pageSize.Width - size.Width) / 2;
                     break;
             }
 

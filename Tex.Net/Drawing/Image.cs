@@ -33,22 +33,22 @@ namespace Tex.Net.Drawing
         {
             // currently, a workaround is needed for jpg images.
             // so all images are saved as png.
-            var ms = new MemoryStream();
-            image.Save(ms, new PngEncoder());
-            ms.Position = 0;
-            return ms;
+            //var ms = new MemoryStream();
+            //image.Save(ms, new PngEncoder());
+            //ms.Position = 0;
+            //return ms;
 
-            //if (data == null)
-            //{
-            //    var ms = new MemoryStream();
-            //    image.Save(ms, new PngEncoder());
-            //    ms.Position = 0;
-            //    return ms;
-            //}
-            //else
-            //{
-            //    return new MemoryStream(data);
-            //}
+            if (data == null)
+            {
+                var ms = new MemoryStream();
+                image.Save(ms, new PngEncoder());
+                ms.Position = 0;
+                return ms;
+            }
+            else
+            {
+                return new MemoryStream(data);
+            }
         }
 
         public static Image FromStream(Stream stream)

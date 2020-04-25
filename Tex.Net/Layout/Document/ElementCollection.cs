@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tex.Net.Layout.Document
 {
-    public class DocumentElementCollection<T> : IList<T> where T : DocumentElement
+    public class ElementCollection<T> : IList<T> where T : AbstractElement
     {
         private readonly List<T> list = new List<T>();
 
@@ -27,11 +27,11 @@ namespace Tex.Net.Layout.Document
 
         public int Count => list.Count;
 
-        public DocumentElement Parent { get; }
+        public AbstractElement Parent { get; }
 
         public bool IsReadOnly => false;
 
-        public DocumentElementCollection(DocumentElement parent)
+        public ElementCollection(AbstractElement parent)
         {
             Parent = parent;
         }

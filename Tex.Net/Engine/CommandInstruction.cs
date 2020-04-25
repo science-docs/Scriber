@@ -21,9 +21,9 @@ namespace Tex.Net.Engine
         {
             var command = CommandCollection.Find(Name);
 
-            if (command.RequiredEnvironment != null && state.Environments.Current.Name != command.RequiredEnvironment)
+            if (command.RequiredEnvironment != null && state.Blocks.Current.Name != command.RequiredEnvironment)
             {
-                throw new CommandInvocationException($"Command {command.Name} requires environment {command.RequiredEnvironment}. Current environment is {state.Environments.Current.Name}");
+                throw new CommandInvocationException($"Command {command.Name} requires environment {command.RequiredEnvironment}. Current environment is {state.Blocks.Current.Name}");
             }
 
             try

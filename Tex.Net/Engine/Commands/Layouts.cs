@@ -6,13 +6,13 @@ namespace Tex.Net.Engine.Commands
     public static class Layouts
     {
         [Command("centering")]
-        public static CallbackArrangingBlock Centering(CompilerState state)
+        public static CallbackArrangingBlock Centering()
         {
             return new CallbackArrangingBlock(Center);
 
-            static void Center(Block block)
+            static void Center(DocumentElement block)
             {
-                block.Parent.Alignment = Layout.Alignment.Center;
+                block.Parent.HorizontalAlignment = Layout.HorizontalAlignment.Center;
             }
         }
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Tex.Net.Layout.Document
 {
-    public abstract class GlueBlock : Block
+    public abstract class GlueBlock : DocumentElement
     {
     }
 }

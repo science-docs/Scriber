@@ -5,11 +5,11 @@ using Tex.Net.Drawing;
 
 namespace Tex.Net.Layout.Document
 {
-    public class Pagebreak : Block
+    public class Pagebreak : DocumentElement
     {
         public override bool IsVisible => false;
 
-        protected override DocumentElement CloneInternal()
+        protected override AbstractElement CloneInternal()
         {
             return new Pagebreak();
         }

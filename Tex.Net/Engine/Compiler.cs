@@ -11,89 +11,58 @@ namespace Tex.Net.Engine
         public static CompilerResult Compile(IEnumerable<Element> elements)
         {
             var state = new CompilerState();
-            var args = new List<object>();
 
             foreach (var element in elements)
             {
-                Execute(state, element, args);
+                Execute(state, element);
             }
 
-            state.Document.Elements.AddRange(state.Environments.Current.Objects.OfType<Block>());
+            state.Document.Elements.AddRange(state.Blocks.Current.Objects.OfType<DocumentElement>());
             ResolveCallbacks(state.Document.Elements);
             var result = new CompilerResult(state.Document);
             result.Issues.AddRange(state.Issues);
             return result;
         }
 
-        private static void Execute(CompilerState state, Element element, List<object> arguments)
+        private static void Execute(CompilerState state, Element element)
         {
-            var ownArgs = new List<object>();
-
-            if (element.Type == ElementType.Block)
+            if (BlockElement(element))
             {
-                state.Environments.Push();
+                state.Blocks.Push();
             }
 
             foreach (var inline in element.Inlines)
             {
-                Execute(state, inline, ownArgs);
+                Execute(state, inline);
             }
 
-            var obj = state.Execute(element, ownArgs.ToArray());
+            var obj = state.Execute(element, state.Blocks.Current.Objects.ToArray());
 
-            if (element.Type == ElementType.Block)
+            if (BlockElement(element))
             {
-                state.Environments.Pop();
+                state.Blocks.Pop();
+                // If we just created a new block in the last instruction
+                // push it to the state.
+                if (obj is Block env)
+                {
+                    state.Blocks.Push(env);
+                }
             }
 
-            if (obj != null)
+            if (obj != null && !(obj is Block))
             {
                 // basically pass the returned object to the previous environment
                 var flattened = obj.ConvertToFlatArray();
-                state.Environments.Current.Objects.AddRange(flattened);
-                arguments.Clear();
-                arguments.AddRange(state.Environments.Current.Objects);
-                //arguments.AddRange(flattened);
+                state.Blocks.Current.Objects.AddRange(flattened);
             }
-
-            
-
-            //if (element.NextSibling != null)
-            //{
-            //    Execute(state, element.NextSibling, arguments);
-            //}
         }
 
-        private static bool MustCreateEnvironment(Element element, out string name)
+        private static bool BlockElement(Element element)
         {
-            if (element.Type == ElementType.Block)
-            {
-                name = "{none}";
-                return true;
-            }
-            else if (element.Type == ElementType.Command && element.Content == "begin")
-            {
-                name = EnvironmentName(element);
-                return true;
-            }
-            else
-            {
-                name = null;
-                return false;
-            }
+            return element.Type == ElementType.Block || element.Type == ElementType.Command;
         }
 
-        private static string EnvironmentName(Element command)
-        {
-            return command.Inlines.First().Inlines.First().Content;
-        }
-
-        private static bool MustDestroyEnvironment(Element element)
-        {
-            return element.Type == ElementType.Block || (element.Type == ElementType.Command && element.Content == "end");
-        }
-
-        private static void ResolveCallbacks(DocumentElementCollection<Block> blocks)
+        private static void ResolveCallbacks(ElementCollection<DocumentElement> blocks)
         {
             for (int i = 0; i < blocks.Count; i++)
             {

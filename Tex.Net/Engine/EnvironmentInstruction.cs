@@ -19,21 +19,27 @@ namespace Tex.Net.Engine
 
             var env = EnvironmentCollection.Find(name);
             
+            if (env == null)
+            {
+                throw new CommandInvocationException("Could not find environment named: " + name);
+            }
 
             if (IsEnd)
             {
-                var cur = state.Environments.Current;
+                state.Blocks.Pop();
+                var cur = state.Blocks.Current;
                 var objects = cur.Objects.ToArray();
                 var envArgs = cur.Arguments.ToArray();
-                state.Environments.Pop();
                 return env.Execution(state, objects, envArgs);
             }
             else
             {
-                var cur = state.Environments.Push(name);
-                cur.Instance = env;
-                cur.Arguments.AddRange(args);
-                return null;
+                var newEnv = new Block(name)
+                {
+                    Environment = env
+                };
+                newEnv.Arguments.AddRange(args);
+                return newEnv;
             }
         }
 

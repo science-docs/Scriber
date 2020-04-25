@@ -5,7 +5,7 @@ using System.Text;
 namespace Tex.Net.Layout
 {
     [Flags]
-    public enum Alignment
+    public enum HorizontalAlignment
     {
         Justify = 0,
         Stretch = 0,

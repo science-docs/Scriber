@@ -2,7 +2,7 @@
 {
     public class PageReference : Leaf, ITextLeaf
     {
-        public DocumentElement ReferencedElement { get; }
+        public AbstractElement ReferencedElement { get; }
 
         public string Content => PageNumber;
 
@@ -13,7 +13,7 @@
             ReferencedElement = this;
         }
 
-        public PageReference(DocumentElement referenced)
+        public PageReference(AbstractElement referenced)
         {
             ReferencedElement = referenced;
         }
@@ -35,7 +35,7 @@
             return new Size(width, height);
         }
 
-        protected override DocumentElement CloneInternal()
+        protected override AbstractElement CloneInternal()
         {
             if (ReferencedElement == this)
             {

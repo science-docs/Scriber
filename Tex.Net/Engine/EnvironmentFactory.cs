@@ -4,10 +4,10 @@ namespace Tex.Net.Engine
 {
     public static class EnvironmentFactory
     {
-        public static EnvironmentInstance Create(EnvironmentAttribute attribute, MethodInfo info)
+        public static Environment Create(EnvironmentAttribute attribute, MethodInfo info)
         {
             var invoke = CreateDelegate(attribute.Name, info, out var parameters);
-            var environmentInstance = new EnvironmentInstance
+            var environmentInstance = new Environment
             {
                 Name = attribute.Name,
                 Execution = invoke,

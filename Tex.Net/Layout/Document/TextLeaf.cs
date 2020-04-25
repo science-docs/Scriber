@@ -6,7 +6,7 @@ namespace Tex.Net.Layout.Document
     {
         public string Content { get; set; }
 
-        protected override DocumentElement CloneInternal()
+        protected override AbstractElement CloneInternal()
         {
             return new TextLeaf { Content = Content };
         }

@@ -6,14 +6,14 @@ namespace Tex.Net.Engine
 {
     public static class EnvironmentCollection
     {
-        private static readonly Dictionary<string, EnvironmentInstance> environments = new Dictionary<string, EnvironmentInstance>();
+        private static readonly Dictionary<string, Environment> environments = new Dictionary<string, Environment>();
 
-        public static void Add(EnvironmentInstance environment)
+        public static void Add(Environment environment)
         {
             environments[environment.Name] = environment;
         }
 
-        public static EnvironmentInstance Find(string name)
+        public static Environment Find(string name)
         {
             environments.TryGetValue(name, out var environment);
             return environment;

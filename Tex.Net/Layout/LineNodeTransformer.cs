@@ -10,7 +10,7 @@ namespace Tex.Net.Layout
 {
     public static class LineNodeTransformer
     {
-        public static LineNode GetDefaultGlue(DocumentElement element)
+        public static LineNode GetDefaultGlue(AbstractElement element)
         {
             var font = element.Font;
             var size = element.FontSize;

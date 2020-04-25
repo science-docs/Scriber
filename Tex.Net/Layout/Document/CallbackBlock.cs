@@ -3,9 +3,9 @@ using Tex.Net.Drawing;
 
 namespace Tex.Net.Layout.Document
 {
-    public delegate Block BlockCallback();
+    public delegate DocumentElement BlockCallback();
 
-    public class CallbackBlock : Block
+    public class CallbackBlock : DocumentElement
     {
         public BlockCallback Callback { get; }
 
@@ -14,7 +14,7 @@ namespace Tex.Net.Layout.Document
             Callback = callback;
         }
 
-        protected override DocumentElement CloneInternal()
+        protected override AbstractElement CloneInternal()
         {
             return new CallbackBlock(Callback);
         }

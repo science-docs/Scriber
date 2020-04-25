@@ -20,7 +20,8 @@ namespace Tex.Net.CLI
             //sb.AppendLine("\\cfooter{Page \\thepage}");
 
             sb.AppendLine("\\begin{figure}");
-            sb.AppendLine("\\includegraphics{test-image.jpg}");
+            sb.AppendLine("\\centering");
+            sb.AppendLine("\\includegraphics{test-image.png}");
             sb.AppendLine("\\end{figure}");
 
             sb.AppendLine("\\section{This is a section}");

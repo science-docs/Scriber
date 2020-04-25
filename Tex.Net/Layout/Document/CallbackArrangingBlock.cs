@@ -6,9 +6,9 @@ namespace Tex.Net.Layout.Document
 {
     public class CallbackArrangingBlock : ArrangingBlock
     {
-        public Action<Block> Callback { get; }
+        public Action<DocumentElement> Callback { get; }
 
-        public CallbackArrangingBlock(Action<Block> callback)
+        public CallbackArrangingBlock(Action<DocumentElement> callback)
         {
             Callback = callback;
         }
@@ -18,7 +18,7 @@ namespace Tex.Net.Layout.Document
             Callback(this);
         }
 
-        protected override DocumentElement CloneInternal()
+        protected override AbstractElement CloneInternal()
         {
             return new CallbackArrangingBlock(Callback);
         }

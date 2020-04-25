@@ -21,12 +21,12 @@ namespace Tex.Net.Layout.Document
         BottomRight = 18
     }
 
-    public class FixedBlock : Block
+    public class FixedBlock : DocumentElement
     {
-        public Block Child { get; }
+        public DocumentElement Child { get; }
         public FixedPosition Position { get; set; } = FixedPosition.TopLeft;
 
-        public FixedBlock(Block child)
+        public FixedBlock(DocumentElement child)
         {
             Child = child;
             Child.Parent = this;
@@ -37,7 +37,7 @@ namespace Tex.Net.Layout.Document
             Child.OnRender(drawingContext, measurement);
         }
 
-        protected override DocumentElement CloneInternal()
+        protected override AbstractElement CloneInternal()
         {
             return new FixedBlock(Child.Clone())
             {

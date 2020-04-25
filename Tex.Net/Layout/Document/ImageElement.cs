@@ -4,7 +4,7 @@ using Img = SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>
 
 namespace Tex.Net.Layout.Document
 {
-    public class ImageElement : Block
+    public class ImageElement : DocumentElement
     {
         private readonly byte[] imageData;
         public Img Image { get; }
@@ -41,7 +41,7 @@ namespace Tex.Net.Layout.Document
             drawingContext.DrawImage(image, new Rectangle(measurement.Position, measurement.Size));
         }
 
-        protected override DocumentElement CloneInternal()
+        protected override AbstractElement CloneInternal()
         {
             var image = new ImageElement(Image, imageData, FileName)
             {
@@ -58,7 +58,7 @@ namespace Tex.Net.Layout.Document
 
         protected override Measurements MeasureOverride(Size availableSize)
         {
-            var size = new Size(Width.Presentation * Scale, Height.Presentation * Scale);
+            var size = new Size(Width.Point * Scale, Height.Point * Scale);
 
             var ms = new Measurements();
             var m = new Measurement(this, size, Margin);
