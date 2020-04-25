@@ -22,6 +22,19 @@ namespace Tex.Net
             Measurements = new Measurements();
         }
 
+        public void AddPageItems()
+        {
+            foreach (var pageItem in Document.PageItems)
+            {
+                var clone = pageItem.Clone();
+                clone.Parent = Document;
+                clone.Page = this;
+                clone.Interlude();
+                var measures = clone.Measure(Size);
+                Measurements.AddInternal(measures);
+            }
+        }
+
         public void OnRender(IDrawingContext drawingContext)
         {
             foreach (var measurement in Measurements)

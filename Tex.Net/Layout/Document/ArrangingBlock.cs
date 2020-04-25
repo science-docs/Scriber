@@ -18,8 +18,12 @@ namespace Tex.Net.Layout.Document
 
         protected override Measurements MeasureOverride(Size availableSize)
         {
+            return Measurements.EmptySingleton(this);
+        }
+
+        protected override void ArrangeOverride(Measurement finalMeasurement)
+        {
             Manipulate(Document);
-            return new Measurements();
         }
     }
 }

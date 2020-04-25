@@ -2,6 +2,8 @@
 {
     public struct Size
     {
+        public static readonly Size Zero = new Size(0, 0);
+
         public double Width;
         public double Height;
 

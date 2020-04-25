@@ -13,7 +13,17 @@ namespace Tex.Net.Layout.Document
             return Measurements = MeasureOverride(availableSize);
         }
 
+        public void Arrange(Measurement finalMeasurement)
+        {
+            ArrangeOverride(finalMeasurement);
+        }
+
         protected abstract Measurements MeasureOverride(Size availableSize);
+
+        protected virtual void ArrangeOverride(Measurement finalMeasurement)
+        {
+
+        }
 
         public abstract void OnRender(IDrawingContext drawingContext, Measurement measurement);
 

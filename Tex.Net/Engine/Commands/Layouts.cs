@@ -22,5 +22,17 @@ namespace Tex.Net.Engine.Commands
             var l = double.Parse(length);
             state.Document.Variables[DocumentVariables.Length][lengthName].SetValue(l);
         }
+
+        [Command("setcounter")]
+        public static CallbackArrangingBlock SetCounter(CompilerState state, string counter, string count)
+        {
+            int intCount = int.Parse(count);
+            return new CallbackArrangingBlock(Set);
+
+            void Set(DocumentElement element)
+            {
+                element.Document.PageNumbering.Set(intCount);
+            }
+        }
     }
 }

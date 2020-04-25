@@ -84,7 +84,7 @@ namespace Tex.Net
             var currentOffset = startOffset;
             var contentArea = new Rectangle(startOffset, boxSize);
 
-            var page = AddPage(pageSize, contentArea, PageNumbering.Next());
+            var page = AddPage(pageSize, contentArea);
 
             foreach (var measurement in Measurements)
             {
@@ -93,7 +93,11 @@ namespace Tex.Net
                 if (currentOffset.Y - startOffset.Y + size.Height > boxSize.Height)
                 {
                     currentOffset = startOffset;
-                    page = AddPage(pageSize, contentArea, PageNumbering.Next());
+                    // Set number at the end of the page layouting
+                    // so that any number changing elements can take effect
+                    page.Number = PageNumbering.Next();
+                    page.AddPageItems();
+                    page = AddPage(pageSize, contentArea);
                 }
 
                 if (measurement.Element.Page == null)
@@ -111,6 +115,7 @@ namespace Tex.Net
 
                 measurement.Position = visualOffset;
                 Realign(measurement, boxSize, pageSize, measurement.Element.HorizontalAlignment);
+                measurement.Element.Arrange(measurement);
 
                 if (measurement.Element.IsVisible)
                 {
@@ -119,26 +124,18 @@ namespace Tex.Net
                 }
                 page.Measurements.Add(measurement);
             }
+
+            page.Number = PageNumbering.Next();
+            page.AddPageItems();
         }
 
-        public DocumentPage AddPage(Size size, Rectangle contentArea, string pageNumber)
+        public DocumentPage AddPage(Size size, Rectangle contentArea)
         {
             var page = new DocumentPage(this)
             {
                 Size = size,
-                ContentArea = contentArea,
-                Number = pageNumber
+                ContentArea = contentArea
             };
-
-            foreach (var pageItem in PageItems)
-            {
-                var clone = pageItem.Clone();
-                clone.Parent = this;
-                clone.Page = page;
-                clone.Interlude();
-                var measures = clone.Measure(size);
-                page.Measurements.AddInternal(measures);
-            }
 
             Pages.Add(page);
             return page;
@@ -170,21 +167,6 @@ namespace Tex.Net
         protected override AbstractElement CloneInternal()
         {
             return new Document();
-        }
-
-        private IEnumerable<DocumentElement> GetAllInternalElements()
-        {
-            HashSet<DocumentElement> elements = new HashSet<DocumentElement>();
-
-            foreach (var page in Pages)
-            {
-                foreach (var measurement in page.Measurements)
-                {
-                    elements.Add(measurement.Element);
-                }
-            }
-
-            return elements;
         }
 
         private void Realign(Measurement measurement, Size pageBox, Size pageSize, HorizontalAlignment alignment)

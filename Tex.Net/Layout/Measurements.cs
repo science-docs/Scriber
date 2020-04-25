@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Tex.Net.Layout.Document;
 
 namespace Tex.Net.Layout
 {
@@ -65,6 +66,11 @@ namespace Tex.Net.Layout
                 measurement
             };
             return measurements;
+        }
+
+        public static Measurements EmptySingleton(DocumentElement documentElement)
+        {
+            return Singleton(new Measurement(documentElement, Size.Zero, Thickness.Zero));
         }
     }
 }
