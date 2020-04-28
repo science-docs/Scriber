@@ -12,7 +12,10 @@ namespace Tex.Net.Engine.Commands
 
             static void Center(DocumentElement block)
             {
-                block.Parent.HorizontalAlignment = Layout.HorizontalAlignment.Center;
+                if (block.Parent != null)
+                {
+                    block.Parent.HorizontalAlignment = Layout.HorizontalAlignment.Center;
+                }
             }
         }
 
@@ -31,7 +34,7 @@ namespace Tex.Net.Engine.Commands
 
             void Set(DocumentElement element)
             {
-                element.Document.PageNumbering.Set(intCount);
+                element.Document?.PageNumbering.Set(intCount);
             }
         }
     }

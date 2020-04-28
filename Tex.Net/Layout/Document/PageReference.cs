@@ -25,11 +25,21 @@
 
         public override void Interlude()
         {
-            PageNumber = ReferencedElement.Page.Number;
+            if (ReferencedElement.Page == null)
+            {
+                throw new LayoutException("Page property of the referenced element was not set");
+            }
+
+            PageNumber = ReferencedElement.Page.Number ?? throw new LayoutException("Pagenumber was not set");
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            if (Font == null)
+            {
+                throw new LayoutException("Font property of the element was not set");
+            }
+
             var height = FontSize;
             var width = Font.GetWidth(PageNumber, FontSize);
             return new Size(width, height);

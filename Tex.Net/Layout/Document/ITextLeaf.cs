@@ -6,6 +6,6 @@ namespace Tex.Net.Layout.Document
 {
     public interface ITextLeaf
     {
-        string Content { get; }
+        string? Content { get; }
     }
 }

@@ -12,6 +12,10 @@ namespace Tex.Net.Layout
 
         public bool IsReadOnly { get; private set; }
 
+        public Measurement this[int index] => measurements[index];
+
+
+
         public void Add(Measurement item)
         {
             if (!IsReadOnly)

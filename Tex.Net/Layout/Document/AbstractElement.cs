@@ -5,9 +5,9 @@ namespace Tex.Net.Layout.Document
 {
     public abstract class AbstractElement
     {
-        public AbstractElement Parent { get; set; }
+        public AbstractElement? Parent { get; set; }
 
-        public Font Font
+        public Font? Font
         {
             get => font ?? Parent?.Font;
             set => font = value;
@@ -40,28 +40,30 @@ namespace Tex.Net.Layout.Document
             set => verticalAlignment = value;
         }
 
-        public DocumentPage Page
+        public DocumentPage? Page
         {
             get => page ?? Parent?.Page;
             set => page = value;
         }
 
-        public Net.Document Document
+        public Net.Document? Document
         {
             get => document ?? Parent?.Document;
             set => document = value;
         }
 
+        public object? Tag { get; set; }
+
         public Thickness Margin { get; set; } = Thickness.Zero;
         
-        private Font font;
+        private Font? font;
         private double? fontSize;
         private Color? foreground;
         private FontWeight? fontWeight;
         private HorizontalAlignment? horizontalAlignment;
         private VerticalAlignment? verticalAlignment;
-        private DocumentPage page;
-        private Net.Document document;
+        private DocumentPage? page;
+        private Net.Document? document;
 
         public AbstractElement Clone()
         {

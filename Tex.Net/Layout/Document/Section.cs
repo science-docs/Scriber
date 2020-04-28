@@ -6,6 +6,7 @@ namespace Tex.Net.Layout.Document
     public class Section : DocumentElement
     {
         public ElementCollection<DocumentElement> Elements { get; }
+        public bool Flexible { get; set; }
 
         private readonly Dictionary<Measurement, DocumentElement> elementMap = new Dictionary<Measurement, DocumentElement>();
 
@@ -36,12 +37,18 @@ namespace Tex.Net.Layout.Document
 
             foreach (var element in Elements)
             {
-                var mss = element.Measure(availableSize);
+                var elementMs = element.Measure(availableSize);
 
-                foreach (var m in mss)
+                foreach (var measurement in elementMs)
                 {
-                    elementMap[m] = element;
-                    ms.Add(m);
+                    measurement.Flexible = Flexible;
+                    elementMap[measurement] = element;
+                    ms.Add(measurement);
+                }
+
+                if (elementMs.Count > 0)
+                {
+                    elementMs[^1].PagebreakPenalty = double.PositiveInfinity;
                 }
             }
 

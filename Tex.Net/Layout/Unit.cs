@@ -202,7 +202,7 @@ namespace Tex.Net.Layout
         /// Returns the object as string using the specified format and format information.
         /// The unit of measure is appended to the end of the string.
         /// </summary>
-        string IFormattable.ToString(string format, IFormatProvider formatProvider)
+        string IFormattable.ToString(string? format, IFormatProvider? formatProvider)
         {
             string valuestring = _value.ToString(format, formatProvider) + GetSuffix();
             return valuestring;
@@ -311,7 +311,7 @@ namespace Tex.Net.Layout
         /// <summary>
         /// Calls base class Equals.
         /// </summary>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is Unit)
                 return this == (Unit)obj;

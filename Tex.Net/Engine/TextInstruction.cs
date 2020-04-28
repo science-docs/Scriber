@@ -9,17 +9,14 @@ namespace Tex.Net.Engine
     {
         public string Content { get; set; }
 
-        private TextInstruction()
+        private TextInstruction(string content)
         {
-
+            Content = content;
         }
 
         public static new TextInstruction Create(Element element)
         {
-            var text = new TextInstruction
-            {
-                Content = element.Content
-            };
+            var text = new TextInstruction(element.Content ?? throw new ArgumentNullException(nameof(element.Content)));
             return text;
         }
 

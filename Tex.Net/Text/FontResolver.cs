@@ -13,12 +13,18 @@ namespace Tex.Net.Text
             var asm = typeof(Font).Assembly;
             var fullName = $"Tex.Net.Resources.Fonts.{faceName}.ttf";
             using var stream = asm.GetManifestResourceStream(fullName);
+
+            if (stream == null)
+            {
+                throw new IOException("Could not load font: " + faceName);
+            }
+
             using var ms = new MemoryStream();
             stream.CopyTo(ms);
             return ms.ToArray();
         }
 
-        public FontResolverInfo ResolveTypeface(string familyName, bool isBold, bool isItalic)
+        public FontResolverInfo? ResolveTypeface(string familyName, bool isBold, bool isItalic)
         {
             if (familyName.Equals("CMU Serif", StringComparison.CurrentCultureIgnoreCase))
             {

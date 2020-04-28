@@ -23,7 +23,10 @@ namespace Tex.Net.Layout.Document
 
         protected override void ArrangeOverride(Measurement finalMeasurement)
         {
-            Manipulate(Document);
+            if (Document != null)
+            {
+                Manipulate(Document);
+            }
         }
     }
 }

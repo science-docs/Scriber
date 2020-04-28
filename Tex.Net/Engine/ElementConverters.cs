@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Tex.Net.Engine
 {
@@ -16,8 +15,18 @@ namespace Tex.Net.Engine
             }
         }
 
-        public static IElementConverter Find(Type source, Type target)
+        public static IElementConverter? Find(Type source, Type target)
         {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (target is null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
             converters.TryGetValue(new Tuple<Type, Type>(source, target), out var converter);
             return converter;
         }

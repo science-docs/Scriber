@@ -45,7 +45,14 @@ namespace Tex.Net.Language
         {
             Type = type;
             Index = index;
-            Content = null;
+            Content = null ?? string.Empty;
+        }
+
+        public Token(TokenType type, int index, string content)
+        {
+            Type = type;
+            Index = index;
+            Content = content;
         }
     }
 }

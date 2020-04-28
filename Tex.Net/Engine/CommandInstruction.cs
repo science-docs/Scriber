@@ -14,12 +14,17 @@ namespace Tex.Net.Engine
 
         public static new CommandInstruction Create(Element element)
         {
-            return new CommandInstruction(element.Content);
+            return new CommandInstruction(element.Content ?? throw new InvalidOperationException("Command with null content was given"));
         }
 
-        public override object Execute(CompilerState state, object[] arguments)
+        public override object? Execute(CompilerState state, object[] arguments)
         {
             var command = CommandCollection.Find(Name);
+
+            if (command == null)
+            {
+                throw new CommandInvocationException("Could not find command: " + Name);
+            }
 
             if (command.RequiredEnvironment != null && state.Blocks.Current.Name != command.RequiredEnvironment)
             {

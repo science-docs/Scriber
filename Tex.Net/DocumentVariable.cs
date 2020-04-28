@@ -31,7 +31,7 @@ namespace Tex.Net
             }
         }
 
-        private object value;
+        private object? value;
 
         public DocumentVariable()
         {
@@ -43,7 +43,17 @@ namespace Tex.Net
             this.value = value;
         }
 
-        public T GetValue<T>()
+        public T GetValue<T>() where T : struct
+        {
+            if (value is T item)
+            {
+                return item;
+            }
+
+            return default;
+        }
+
+        public T? GetValueNullable<T>() where T : class
         {
             if (value is T item)
             {

@@ -8,8 +8,8 @@ namespace Tex.Net.Layout.Document
     {
         public ElementCollection<Leaf> Leaves { get; }
 
-        private List<LineNode> lineNodes;
-        private PositionedItem[][] lines;
+        private List<LineNode>? lineNodes;
+        private PositionedItem[][]? lines;
 
         public Paragraph()
         {
@@ -18,6 +18,8 @@ namespace Tex.Net.Layout.Document
 
         protected override Measurements MeasureOverride(Size availableSize)
         {
+            var doc = Document ?? throw new LayoutException("Document was not set");
+
             var ms = new Measurements();
             lineNodes = new List<LineNode>();
             foreach (var leaf in Leaves)
@@ -48,7 +50,7 @@ namespace Tex.Net.Layout.Document
                     {
                         height = Math.Max(lineNodes[item.Index].Element.DesiredSize.Height, height);
                     }
-                    var stretch = Document.Variables[DocumentVariables.Length][DocumentVariables.BaselineStretch].GetValue<double>();
+                    var stretch = doc.Variables[DocumentVariables.Length][DocumentVariables.BaselineStretch].GetValue<double>();
 
                     var margin = new Thickness();
                     if (first)
@@ -100,29 +102,47 @@ namespace Tex.Net.Layout.Document
 
         public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
+            if (lines == null || lineNodes == null)
+            {
+                throw new InvalidOperationException("Rendering has been called before measuring");
+            }
+
             var items = lines[measurement.Index];
             var position = measurement.Position;
 
             foreach (var item in items)
             {
                 var node = lineNodes[item.Index];
+
+                if (node.Element == null)
+                {
+                    throw new NullReferenceException("The Element property of a LineNode was null");
+                }
+
                 var offset = new Position(position.X + item.Offset, position.Y);
 
-                var run = new TextRun
-                {
-                    Text = node.Text,
-                    Typeface = new Net.Text.Typeface
-                    {
-                        Font = node.Element.Font,
-                        Size = node.Element.FontSize
-                    }
-                };
+                var run = RunFromNode(node);
 
                 drawingContext.Offset = offset;
-
                 drawingContext.DrawText(run, node.Element.Foreground);
             }
         }
+
+        private static TextRun RunFromNode(LineNode node)
+        {
+            if (node.Element == null)
+            {
+                throw new NullReferenceException("The Element property of a LineNode was null");
+            }
+
+            if (node.Element.Font == null)
+            {
+                throw new NullReferenceException("The Font property of a LineNode was null");
+            }
+
+            return new TextRun(node.Text ?? string.Empty, new Text.Typeface(node.Element.Font, node.Element.FontSize, node.Element.FontWeight));
+        }
+
 
         public override void Interlude()
         {

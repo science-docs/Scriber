@@ -17,8 +17,6 @@ namespace Tex.Net.Engine
         /// </summary>
         public List<object> Arguments { get; } = new List<object>();
 
-        public Environment Environment { get; internal set; }
-
         public Block(string name)
         {
             Name = name;

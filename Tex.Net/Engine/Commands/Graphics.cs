@@ -7,7 +7,7 @@ namespace Tex.Net.Engine.Commands
     public static class Graphics
     {
         [Command("includegraphics")]
-        public static ImageElement IncludeGraphics(CompilerState state, string imagePath, DocumentVariable variables = null)
+        public static ImageElement IncludeGraphics(CompilerState state, string imagePath, DocumentVariable? variables = null)
         {
             var bytes = File.ReadAllBytes(imagePath);
             var image = new ImageElement(bytes, imagePath);

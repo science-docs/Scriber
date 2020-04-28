@@ -12,7 +12,7 @@ namespace Tex.Net.Engine
 
         }
 
-        public ConverterException(Type source, Type target, Exception innerException)
+        public ConverterException(Type source, Type target, Exception? innerException)
             : this($"Could not convert element of type {source.Name} to {target.Name}", innerException)
         {
 
@@ -22,7 +22,7 @@ namespace Tex.Net.Engine
         {
         }
 
-        public ConverterException(string message, Exception innerException) : base(message, innerException)
+        public ConverterException(string message, Exception? innerException) : base(message, innerException)
         {
         }
 

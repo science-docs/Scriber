@@ -1,4 +1,4 @@
-﻿using Tex.Net.Language;
+﻿using System;
 
 namespace Tex.Net.Engine
 {
@@ -6,7 +6,7 @@ namespace Tex.Net.Engine
     {
         public bool IsEnd { get; set; }
 
-        public override object Execute(CompilerState state, object[] args)
+        public override object? Execute(CompilerState state, object[] args)
         {
             if (args.Length == 0)
             {
@@ -15,13 +15,22 @@ namespace Tex.Net.Engine
 
             var firstArg = args[0];
             var converter = ElementConverters.Find(firstArg.GetType(), typeof(string));
-            var name = converter.Convert(firstArg, typeof(string), state) as string;
+
+            if (converter == null)
+            {
+                throw new CommandInvocationException("Could not create string converter for type " + firstArg.GetType().Name);
+            }
+
+            if (!(converter.Convert(firstArg, typeof(string), state) is string name))
+            {
+                throw new CommandInvocationException("Could not create environment name from argument");
+            }
 
             var env = EnvironmentCollection.Find(name);
             
             if (env == null)
             {
-                throw new CommandInvocationException("Could not find environment named: " + name);
+                throw new CommandInvocationException("Could not find environment: " + name);
             }
 
             if (IsEnd)
@@ -34,16 +43,13 @@ namespace Tex.Net.Engine
             }
             else
             {
-                var newEnv = new Block(name)
-                {
-                    Environment = env
-                };
+                var newEnv = new Block(name);
                 newEnv.Arguments.AddRange(args);
                 return newEnv;
             }
         }
 
-        public static new EnvironmentInstruction Create(Element element)
+        public static EnvironmentInstruction Create()
         {
             return new EnvironmentInstruction();
         }

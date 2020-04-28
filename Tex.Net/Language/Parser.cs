@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Tex.Net.Language
 {
-    using Function = Func<ParserContext, Token, Element, Element>;
+    using Function = Func<ParserContext, Token, Element, Element?>;
 
     public static class Parser
     {
@@ -45,7 +45,7 @@ namespace Tex.Net.Language
             return AppendText(previous, context.Parents.Peek(), token);
         }
 
-        private static Element ParseNewline(ParserContext context, Token token, Element previous)
+        private static Element? ParseNewline(ParserContext context, Token token, Element previous)
         {
             context.Comment = false;
             if (context.Newline)
@@ -87,7 +87,7 @@ namespace Tex.Net.Language
             }
         }
 
-        private static Element ParseBracketClose(ParserContext context, Token token, Element previous)
+        private static Element? ParseBracketClose(ParserContext context, Token token, Element previous)
         {
             if (context.BracketBlock)
             {
@@ -116,7 +116,7 @@ namespace Tex.Net.Language
             return element;
         }
 
-        private static Element ParseCurlyClose(ParserContext context, Token token, Element previous)
+        private static Element? ParseCurlyClose(ParserContext context, Token token, Element previous)
         {
             context.Parents.Pop();
             return null;
@@ -162,7 +162,7 @@ namespace Tex.Net.Language
 
                 if (!isNewline && context.Comment)
                 {
-                    cur.StringBuilder.Append(token.Content);
+                    cur.StringBuilder?.Append(token.Content);
                     continue;
                 }
                 else if (!isNewline)

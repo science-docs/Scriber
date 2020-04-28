@@ -19,7 +19,10 @@ namespace Tex.Net.Util
             {
                 foreach (var o in enumerable)
                 {
-                    ConvertFlatArrayInternal(o, objects);
+                    if (o != null)
+                    {
+                        ConvertFlatArrayInternal(o, objects);
+                    }
                 }
             }
             else

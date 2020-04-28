@@ -19,7 +19,7 @@ namespace Tex.Net.Language
             int code;
             int index = 0;
             char c;
-            Token cur = null;
+            Token? cur = null;
             StringBuilder sb = new StringBuilder();
 
             while ((code = reader.Read()) != -1)
@@ -55,12 +55,19 @@ namespace Tex.Net.Language
                         var type = GetTokenType(c);
                         if (IsSingleToken(type))
                         {
-                            yield return new Token(type, index) { Content = c.ToString() };
+                            yield return new Token(type, index, c.ToString());
                         }
                         else
                         {
                             cur = new Token(GetTokenType(c), index);
                             sb.Append(c);
+                        }
+
+                        var next = reader.Peek();
+
+                        if (cur != null && cur.Type == TokenType.Backslash && next == '-')
+                        {
+                            cur.Type = TokenType.Text;
                         }
                     }
                     else

@@ -15,6 +15,8 @@ namespace Tex.Net.Layout
         public int Index { get; internal set; } = -1;
         public Position Position { get; internal set; }
 
+        public Size TotalSize => new Size(Size.Width + Margin.Width, Size.Height + Margin.Height);
+
         public Measurement(DocumentElement element, Size size, Thickness margin)
         {
             Element = element;

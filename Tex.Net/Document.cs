@@ -24,6 +24,10 @@ namespace Tex.Net
 
         public Measurements Measurements { get; }
 
+        public Text.Hyphenator Hyphenator { get; set; }
+
+        public IArrangingStrategy ArrangingStrategy { get; set; } = new DefaultArrangingStrategy();
+
         public Document()
         {
             Elements = new ElementCollection<DocumentElement>(this);
@@ -32,6 +36,8 @@ namespace Tex.Net
             
             Font = Text.Font.Serif;
             FontSize = 11;
+
+            Hyphenator = new Text.Hyphenator("en-us");
 
             DocumentVariables.Setup(Variables);
         }
@@ -74,71 +80,7 @@ namespace Tex.Net
 
         public void Arrange()
         {
-            var pageSize = Variables["page"]["size"].GetValue<Size>();
-            var margin = Variables["page"]["margin"].GetValue<Thickness>();
-            var boxSize = pageSize;
-            boxSize.Height -= margin.Height;
-            boxSize.Width -= margin.Width;
-
-            var startOffset = new Position(margin.Left, margin.Top);
-            var currentOffset = startOffset;
-            var contentArea = new Rectangle(startOffset, boxSize);
-
-            var page = AddPage(pageSize, contentArea);
-
-            foreach (var measurement in Measurements)
-            {
-                var size = measurement.Size;
-
-                if (currentOffset.Y - startOffset.Y + size.Height > boxSize.Height)
-                {
-                    currentOffset = startOffset;
-                    // Set number at the end of the page layouting
-                    // so that any number changing elements can take effect
-                    page.Number = PageNumbering.Next();
-                    page.AddPageItems();
-                    page = AddPage(pageSize, contentArea);
-                }
-
-                if (measurement.Element.Page == null)
-                {
-                    measurement.Element.Page = page;
-                }
-
-                if (measurement.Element.IsVisible)
-                {
-                    currentOffset.Y += measurement.Margin.Top;
-                }
-
-                var visualOffset = new Position(currentOffset.X, currentOffset.Y);
-                visualOffset.X += measurement.Margin.Left;
-
-                measurement.Position = visualOffset;
-                Realign(measurement, boxSize, pageSize, measurement.Element.HorizontalAlignment);
-                measurement.Element.Arrange(measurement);
-
-                if (measurement.Element.IsVisible)
-                {
-                    currentOffset.Y += size.Height;
-                    currentOffset.Y += measurement.Margin.Bottom;
-                }
-                page.Measurements.Add(measurement);
-            }
-
-            page.Number = PageNumbering.Next();
-            page.AddPageItems();
-        }
-
-        public DocumentPage AddPage(Size size, Rectangle contentArea)
-        {
-            var page = new DocumentPage(this)
-            {
-                Size = size,
-                ContentArea = contentArea
-            };
-
-            Pages.Add(page);
-            return page;
+            ArrangingStrategy.Arrange(this);
         }
 
         public byte[] ToPdf()
@@ -167,24 +109,6 @@ namespace Tex.Net
         protected override AbstractElement CloneInternal()
         {
             return new Document();
-        }
-
-        private void Realign(Measurement measurement, Size pageBox, Size pageSize, HorizontalAlignment alignment)
-        {
-            var size = measurement.Size;
-            Position pos = measurement.Position;
-
-            switch (alignment)
-            {
-                case HorizontalAlignment.Left:
-                    pos.X = pageBox.Width - size.Width;
-                    break;
-                case HorizontalAlignment.Center:
-                    pos.X = (pageSize.Width - size.Width) / 2;
-                    break;
-            }
-
-            measurement.Position = pos;
         }
     }
 }

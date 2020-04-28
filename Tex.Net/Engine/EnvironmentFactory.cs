@@ -7,12 +7,7 @@ namespace Tex.Net.Engine
         public static Environment Create(EnvironmentAttribute attribute, MethodInfo info)
         {
             var invoke = CreateDelegate(attribute.Name, info, out var parameters);
-            var environmentInstance = new Environment
-            {
-                Name = attribute.Name,
-                Execution = invoke,
-                Parameters = parameters
-            };
+            var environmentInstance = new Environment(attribute.Name, invoke, parameters);
             return environmentInstance;
         }
 
@@ -24,7 +19,7 @@ namespace Tex.Net.Engine
             return InvokeDynamic;
 
             // inline method for better debugging
-            object InvokeDynamic(CompilerState state, object[] content, object[] args)
+            object? InvokeDynamic(CompilerState state, object[] content, object[] args)
             {
                 var embedded = Embed(args, content);
                 var sorted = DynamicDispatch.SortArguments(command, state, embedded, param);
@@ -37,13 +32,6 @@ namespace Tex.Net.Engine
         {
             parent[0] = child;
             return parent;
-            //var arr = new object[parent.Length + 1];
-            //arr[0] = child;
-            //for (int i = 0; i < parent.Length; i++)
-            //{
-            //    arr[i + 1] = parent[i];
-            //}
-            //return arr;
         }
     }
 }

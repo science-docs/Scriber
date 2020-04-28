@@ -5,7 +5,7 @@ namespace Tex.Net.Layout.Document
 {
     public abstract class DocumentElement : AbstractElement
     {
-        public Measurements Measurements { get; private set; }
+        public Measurements Measurements { get; private set; } = new Measurements();
         public virtual bool IsVisible => true;
 
         public Measurements Measure(Size availableSize)
@@ -29,7 +29,12 @@ namespace Tex.Net.Layout.Document
 
         public new DocumentElement Clone()
         {
-            return base.Clone() as DocumentElement;
+            if (!(base.Clone() is DocumentElement element))
+            {
+                throw new InvalidCastException();
+            }
+
+            return element;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Tex.Net
         public Size Size { get; set; }
         public Rectangle ContentArea { get; set; }
 
-        public string Number { get; set; }
+        public string? Number { get; set; }
 
         public DocumentPage(Document document)
         {

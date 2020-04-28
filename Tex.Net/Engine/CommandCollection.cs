@@ -16,7 +16,7 @@ namespace Tex.Net.Engine
             commands[command.Name] = command;
         }
 
-        public static Command Find(string name)
+        public static Command? Find(string name)
         {
             commands.TryGetValue(name, out var command);
             return command;

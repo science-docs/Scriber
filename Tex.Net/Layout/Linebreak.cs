@@ -15,15 +15,15 @@ namespace Tex.Net.Layout
         public double TotalWidth { get; set; }
         public double TotalStretch { get; set; }
         public double TotalShrink { get; set; }
-        public Breakpoint Previous { get; set; }
+        public Breakpoint? Previous { get; set; }
     }
 
     public class LineNode
     {
         public LineNodeType Type { get; set; }
         public double Width { get; set; }
-        public Leaf Element { get; set; }
-        public string Text { get; set; }
+        public Leaf? Element { get; set; }
+        public string? Text { get; set; }
         public double Stretch { get; set; }
         public double Shrink { get; set; }
         public double Cost { get; set; }
@@ -67,7 +67,8 @@ namespace Tex.Net.Layout
                 Type = LineNodeType.Penalty,
                 Width = width,
                 Cost = cost,
-                Flagged = flagged
+                Flagged = flagged,
+                Text = "-"
             };
         }
 
@@ -203,7 +204,7 @@ namespace Tex.Net.Layout
                     continue;
                 }
 
-                Breakpoint lastActive = null;
+                Breakpoint lastActive = new Breakpoint();
                 List<Breakpoint> feasible = new List<Breakpoint>();
 
                 for (int j = 0; j < active.Count; j++)
@@ -389,7 +390,7 @@ namespace Tex.Net.Layout
             return output.ToArray();
         }
 
-        private Breakpoint FindBest(List<Breakpoint> breakpoints)
+        private Breakpoint? FindBest(List<Breakpoint> breakpoints)
         {
             if (breakpoints.Count > 0)
             {

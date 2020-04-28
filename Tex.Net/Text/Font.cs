@@ -46,6 +46,12 @@ namespace Tex.Net.Text
             var asm = typeof(Font).Assembly;
             var fullName = $"Tex.Net.Resources.Fonts.{name}.ttf";
             using var stream = asm.GetManifestResourceStream(fullName);
+
+            if (stream == null)
+            {
+                throw new IOException("Could not load font: " + name);
+            }
+
             using var ms = new MemoryStream();
             stream.CopyTo(ms);
             ms.Position = 0;

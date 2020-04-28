@@ -6,7 +6,7 @@ namespace Tex.Net.Engine
     public sealed class CommandAttribute : Attribute
     {
         public string Name { get; set; }
-        public string RequiredEnvironment { get; set; }
+        public string? RequiredEnvironment { get; set; }
 
         public CommandAttribute(string name)
         {

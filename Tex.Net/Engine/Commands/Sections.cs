@@ -34,7 +34,7 @@ namespace Tex.Net.Engine.Commands
             };
             GetEntryTable(vars).Add(entry);
             ResetNumbering(vars, level);
-            var text = new Layout.Document.TextLeaf
+            var text = new TextLeaf
             {
                 Content = pretext
             };
@@ -85,7 +85,7 @@ namespace Tex.Net.Engine.Commands
         private static List<TableEntry> GetEntryTable(DocumentVariable variables)
         {
             var toc = variables[DocumentVariables.TableOfContent]["entries"];
-            var list = toc.GetValue<List<TableEntry>>();
+            var list = toc.GetValueNullable<List<TableEntry>>();
             if (list == null)
             {
                 list = new List<TableEntry>();

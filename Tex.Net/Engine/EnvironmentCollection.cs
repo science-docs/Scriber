@@ -13,7 +13,7 @@ namespace Tex.Net.Engine
             environments[environment.Name] = environment;
         }
 
-        public static Environment Find(string name)
+        public static Environment? Find(string name)
         {
             environments.TryGetValue(name, out var environment);
             return environment;

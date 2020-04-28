@@ -15,8 +15,19 @@ namespace Tex.Net.Engine.Commands
         {
             var block = new FixedBlock(content)
             {
-                Position = FixedPosition.BottomCenter
+                Position = position
             };
+
+            for (int i = 0; i < state.Document.PageItems.Count; i++)
+            {
+                var item = state.Document.PageItems[i];
+                if (item is FixedBlock fix && fix.Position == position)
+                {
+                    state.Document.PageItems.RemoveAt(i);
+                    break;
+                }
+            }
+
             state.Document.PageItems.Add(block);
         }
     }

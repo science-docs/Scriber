@@ -10,13 +10,7 @@ namespace Tex.Net.Engine
         public static Command Create(CommandAttribute attribute, MethodInfo info)
         {
             var invoke = CreateDelegate(attribute.Name, info, out var parameters);
-            var commandItem = new Command
-            {
-                Name = attribute.Name,
-                Execution = invoke,
-                Parameters = parameters,
-                RequiredEnvironment = attribute.RequiredEnvironment
-            };
+            var commandItem = new Command(attribute.Name, attribute.RequiredEnvironment, invoke, parameters);
             return commandItem;
         }
 
@@ -28,7 +22,7 @@ namespace Tex.Net.Engine
             return InvokeDynamic;
 
             // inline method for better debugging
-            object InvokeDynamic(CompilerState state, object[] args)
+            object? InvokeDynamic(CompilerState state, object[] args)
             {
                 var sorted = DynamicDispatch.SortArguments(command, state, args, param);
                 DynamicDispatch.MatchArguments(state, sorted, param);

@@ -10,7 +10,7 @@ namespace Tex.Net.Engine
             var results = new List<object>();
 
             // Group continueous leafs into one paragraph
-            Paragraph currentParagraph = null;
+            Paragraph? currentParagraph = null;
 
             for (int i = 0; i < arguments.Length; i++)
             {

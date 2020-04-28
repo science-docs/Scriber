@@ -1,8 +1,6 @@
-﻿using PdfSharpCore.Drawing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Tex.Net.Layout.Document;
 using Tex.Net.Text;
 
@@ -12,7 +10,7 @@ namespace Tex.Net.Layout
     {
         public static LineNode GetDefaultGlue(AbstractElement element)
         {
-            var font = element.Font;
+            var font = element.Font ?? throw new ArgumentException("Specified element missing font");
             var size = element.FontSize;
             var spaceWidth = GetWidth(" ");
             var stretch = Math.Max(0, spaceWidth / 2);
@@ -28,15 +26,17 @@ namespace Tex.Net.Layout
 
         public static List<LineNode> Create(Leaf leaf, string text)
         {
-            var font = leaf.Font;
+            var font = leaf.Font ?? throw new ArgumentException("Specified element missing font");
             var size = leaf.FontSize;
             var spaceWidth = GetWidth(" ");
-            //var hyphenWidth = GetWidth("-");
+            var hyphenWidth = GetWidth("-");
             var stretch = Math.Max(0, spaceWidth / 2);
             var shrink = Math.Max(0, spaceWidth / 3);
 
             var chunks = Chunkenize(text).ToArray();
             var nodes = new List<LineNode>();
+
+            Hyphenator? hyph = leaf.Document?.Hyphenator;
 
             for (int i = 0; i < chunks.Length; i++)
             {
@@ -46,9 +46,32 @@ namespace Tex.Net.Layout
                     nodes.Add(glue);
                 }
 
-                var box = LineNode.Box(GetWidth(chunks[i]), chunks[i]);
-                box.Element = leaf;
-                nodes.Add(box);
+                if (hyph != null)
+                {
+                    var hyphenated = hyph.Hyphenate(chunks[i]);
+
+                    for (int j = 0; j < hyphenated.Length; j++)
+                    {
+                        var box = LineNode.Box(GetWidth(hyphenated[j]), hyphenated[j]);
+                        box.Element = leaf;
+                        nodes.Add(box);
+
+                        if (j < hyphenated.Length - 1)
+                        {
+                            var penalty = LineNode.Penalty(hyphenWidth, 10, true);
+                            penalty.Element = leaf;
+                            nodes.Add(penalty);
+                        }
+                    }
+                }
+                else
+                {
+                    var box = LineNode.Box(GetWidth(chunks[i]), chunks[i]);
+                    box.Element = leaf;
+                    nodes.Add(box);
+                }
+
+                
             }
 
             return nodes;

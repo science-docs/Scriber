@@ -25,7 +25,7 @@ namespace Tex.Net.Layout.Document
             
         }
 
-        private ImageElement(Img image, byte[] imageData, string fileName)
+        private ImageElement(Img? image, byte[] imageData, string fileName)
         {
             FileName = fileName;
             this.imageData = imageData;

@@ -16,24 +16,11 @@ namespace Tex.Net.Engine
             Blocks = new BlockTree();
         }
 
-        public object Execute(Element element, object[] arguments)
+        public object? Execute(Element element, object[] arguments)
         {
             var instruction = EngineInstruction.Create(element);
 
             var result = instruction?.Execute(this, arguments);
-
-            //switch (result)
-            //{
-            //    case Document doc:
-            //        Document = doc;
-            //        break;
-            //}
-
-            //if (result != null)
-            //{
-            //    var flattened = result.ConvertToFlatArray();
-            //    Environments.Current.Objects.AddRange(flattened);
-            //}
 
             return result;
         }

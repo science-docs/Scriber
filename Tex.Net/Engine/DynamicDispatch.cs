@@ -84,12 +84,12 @@ namespace Tex.Net.Engine
                 }
                 else
                 {
-                    args[i] = transformed;
+                    args[i] = transformed ?? throw new CommandInvocationException("Transformed element cannot be null");
                 }
             }
         }
 
-        public static bool IsAssignableFrom(CompilerState state, Type target, object obj, out object transformed)
+        public static bool IsAssignableFrom(CompilerState state, Type target, object obj, out object? transformed)
         {
             if (target.IsAssignableFrom(obj.GetType()))
             {
@@ -103,8 +103,17 @@ namespace Tex.Net.Engine
                 {
                     throw new CommandInvocationException("");
                 }
-                var str = stringConverter.Convert(obj, typeof(string), state) as string;
-                var argument = Activator.CreateInstance(target) as ICommandArgument;
+
+                if (!(stringConverter.Convert(obj, typeof(string), state) is string str))
+                {
+                    throw new Exception();
+                }
+
+                if (!(Activator.CreateInstance(target) is ICommandArgument argument))
+                {
+                    throw new InvalidCastException($"Could not create object of type {nameof(ICommandArgument)} from type {target.Name}");
+                }
+
                 argument.Parse(str);
                 transformed = argument;
                 return true;

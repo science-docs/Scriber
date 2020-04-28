@@ -73,14 +73,14 @@ namespace Tex.Net.Engine
 
             foreach (var method in methods)
             {
-                if (IsCommand(method, out var command))
+                if (IsCommand(method, out var command) && command != null)
                 {
                     CommandCollection.Add(CommandFactory.Create(command, method));
                 }
             }
         }
 
-        private static bool IsCommand(MethodInfo method, out CommandAttribute command)
+        private static bool IsCommand(MethodInfo method, out CommandAttribute? command)
         {
             command = method.GetCustomAttribute<CommandAttribute>();
             return command != null && method.IsStatic;
@@ -92,14 +92,14 @@ namespace Tex.Net.Engine
 
             foreach (var method in methods)
             {
-                if (IsEnvironment(method, out var environment))
+                if (IsEnvironment(method, out var environment) && environment != null)
                 {
                     EnvironmentCollection.Add(EnvironmentFactory.Create(environment, method));
                 }
             }
         }
 
-        private static bool IsEnvironment(MethodInfo method, out EnvironmentAttribute environment)
+        private static bool IsEnvironment(MethodInfo method, out EnvironmentAttribute? environment)
         {
             environment = method.GetCustomAttribute<EnvironmentAttribute>();
             return environment != null && method.IsStatic;
@@ -109,9 +109,13 @@ namespace Tex.Net.Engine
         {
             var attribute = type.GetCustomAttribute<CommandArgumentConverterAttribute>();
 
-            if (typeof(IElementConverter).IsAssignableFrom(type))
+            if (attribute != null && typeof(IElementConverter).IsAssignableFrom(type))
             {
-                var instance = Activator.CreateInstance(type) as IElementConverter;
+                if (!(Activator.CreateInstance(type) is IElementConverter instance))
+                {
+                    throw new Exception("Could not create converter instance from type " + type.Name);
+                }
+
                 ElementConverters.Add(instance, attribute.Source, attribute.Targets);
             }
         }

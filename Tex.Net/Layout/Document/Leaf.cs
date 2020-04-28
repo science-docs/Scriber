@@ -1,4 +1,6 @@
-﻿namespace Tex.Net.Layout.Document
+﻿using System;
+
+namespace Tex.Net.Layout.Document
 {
     public abstract class Leaf : AbstractElement
     {
@@ -15,7 +17,12 @@
 
         public new Leaf Clone()
         {
-            return base.Clone() as Leaf;
+            if (!(base.Clone() is Leaf leaf))
+            {
+                throw new InvalidCastException($"Cloned element is not of type {nameof(Leaf)}");
+            }
+
+            return leaf;
         }
     }
 }
