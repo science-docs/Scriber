@@ -3,14 +3,14 @@ using Tex.Net.Drawing;
 
 namespace Tex.Net.Layout.Document
 {
-    public class Section : DocumentElement
+    public class Region : DocumentElement
     {
         public ElementCollection<DocumentElement> Elements { get; }
         public bool Flexible { get; set; }
 
         private readonly Dictionary<Measurement, DocumentElement> elementMap = new Dictionary<Measurement, DocumentElement>();
 
-        public Section()
+        public Region()
         {
             Elements = new ElementCollection<DocumentElement>(this);
         }
@@ -22,7 +22,7 @@ namespace Tex.Net.Layout.Document
 
         protected override AbstractElement CloneInternal()
         {
-            var section = new Section();
+            var section = new Region();
             foreach (var element in Elements)
             {
                 section.Elements.Add(element.Clone());
@@ -50,6 +50,11 @@ namespace Tex.Net.Layout.Document
                 {
                     elementMs[^1].PagebreakPenalty = double.PositiveInfinity;
                 }
+            }
+
+            if (ms.Count > 0)
+            {
+                ms[^1].PagebreakPenalty = 0;
             }
 
             return ms;

@@ -21,11 +21,17 @@ namespace Tex.Net
             double curHeight = boxSize.Height;
 
             var flexQueue = new Queue<Measurement>();
+            var lastPenalty = .0;
 
             // Stage one:
             // Add measurements to pages
             foreach (var measurement in document.Measurements)
             {
+                if (lastPenalty > 0)
+                {
+
+                }
+
                 while (flexQueue.Count > 0)
                 {
                     var result = TryFitMeasurement(curPage, flexQueue.Peek(), flexQueue, true, ref curHeight);
@@ -38,6 +44,7 @@ namespace Tex.Net
                 if (TryFitMeasurement(curPage, measurement, flexQueue, false, ref curHeight) == FitResult.AddPage)
                 {
                     curHeight = boxSize.Height;
+                    curPage.Filled = true;
                     curPage = AddPage(document, pageSize, contentArea);
                 }
             }
@@ -51,6 +58,7 @@ namespace Tex.Net
                 if (TryFitMeasurement(curPage, ms, flexQueue, false, ref curHeight) == FitResult.AddPage)
                 {
                     curHeight = boxSize.Height;
+                    curPage.Filled = true;
                     curPage = AddPage(document, pageSize, contentArea);
                 }
             }
@@ -100,7 +108,7 @@ namespace Tex.Net
                     else
                     {
                         queue.Enqueue(measurement);
-                        return FitResult.Continue;
+                        return FitResult.Enqueue;
                     }
                 }
                 else
@@ -159,6 +167,7 @@ namespace Tex.Net
         {
             Continue,
             AddPage,
+            Enqueue,
             Stop
         }
     }

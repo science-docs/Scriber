@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Tex.Net.Layout.Document;
 
 namespace Tex.Net.Engine
 {
@@ -125,16 +124,7 @@ namespace Tex.Net.Engine
                 transformed = converter.Convert(obj, target, state);
                 return true;
             }
-            else if (target == typeof(Paragraph))
-            {
-                if (obj is Leaf leaf)
-                {
-                    var paragraph = new Paragraph();
-                    paragraph.Leaves.Add(leaf);
-                    transformed = paragraph;
-                    return true;
-                }
-            }
+
             transformed = null;
             return false;
         }

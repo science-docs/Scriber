@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Tex.Net.Layout.Document;
+﻿using Tex.Net.Layout.Document;
 
 namespace Tex.Net.Layout
 {
@@ -15,10 +12,13 @@ namespace Tex.Net.Layout
         public int Index { get; internal set; } = -1;
         public Position Position { get; internal set; }
 
+        public Measurements Subs { get; }
+
         public Size TotalSize => new Size(Size.Width + Margin.Width, Size.Height + Margin.Height);
 
         public Measurement(DocumentElement element, Size size, Thickness margin)
         {
+            Subs = new Measurements();
             Element = element;
             Size = size;
             Margin = margin;

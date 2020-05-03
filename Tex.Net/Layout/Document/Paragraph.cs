@@ -46,10 +46,16 @@ namespace Tex.Net.Layout.Document
                     var last = i == lines.Length - 1;
                     var line = lines[i];
                     var height = 0.0;
+                    var lastElement = line[^1];
+                    var width = lastElement.Offset;
+                    var lastNode = lineNodes[lastElement.Index];
+                    width += lastNode.Width;
                     foreach (var item in line)
                     {
                         height = Math.Max(lineNodes[item.Index].Element.DesiredSize.Height, height);
                     }
+
+
                     var stretch = doc.Variables[DocumentVariables.Length][DocumentVariables.BaselineStretch].GetValue<double>();
 
                     var margin = new Thickness();
@@ -65,7 +71,7 @@ namespace Tex.Net.Layout.Document
                     {
                         height *= stretch;
                     }
-                    var size = new Size(availableSize.Width, height);
+                    var size = new Size(width, height);
                     var measurement = new Measurement(this, size, margin);
                     ms.Add(measurement);
                 }

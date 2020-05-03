@@ -24,11 +24,13 @@ namespace Tex.Net.CLI
             sb.AppendLine("\\begin{figure}");
             sb.AppendLine("\\centering");
             sb.AppendLine("\\includegraphics{test-image.png}");
+            sb.AppendLine("\\caption{First Test Image}");
             sb.AppendLine("\\end{figure}");
 
             sb.AppendLine("\\begin{figure}");
             sb.AppendLine("\\centering");
             sb.AppendLine("\\includegraphics{test-image.png}");
+            sb.AppendLine("\\caption{Second Test Image}");
             sb.AppendLine("\\end{figure}");
 
             sb.AppendLine("Aft\\-er the \\red{first} section [follows] a pagebreak at page.");
@@ -47,6 +49,7 @@ namespace Tex.Net.CLI
             sb.AppendLine("\\begin{figure}");
             sb.AppendLine("\\centering");
             sb.AppendLine("\\includegraphics{test-image.png}");
+            sb.AppendLine("\\caption{Third Test Image}");
             sb.AppendLine("\\end{figure}");
 
             sb.AppendLine();
