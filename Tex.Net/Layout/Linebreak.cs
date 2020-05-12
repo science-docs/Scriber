@@ -9,7 +9,6 @@ namespace Tex.Net.Layout
     {
         public int Index { get; set; }
         public double Demerits { get; set; }
-        public double Ratio { get; set; }
         public int Line { get; set; }
         public int FitnessClass { get; set; }
         public double TotalWidth { get; set; }
@@ -373,11 +372,9 @@ namespace Tex.Net.Layout
                 }
             }
 
-            var actualBestNode = FindBest(active);
-
             var output = new List<int>();
 
-            var next = actualBestNode;
+            var next = FindBest(active);
 
             while (next != null)
             {

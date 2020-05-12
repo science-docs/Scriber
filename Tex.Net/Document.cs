@@ -28,6 +28,10 @@ namespace Tex.Net
 
         public IArrangingStrategy ArrangingStrategy { get; set; } = new DefaultArrangingStrategy();
 
+        public Size PageSize { get; private set; }
+        public Size PageBoxSize { get; private set; }
+        public Thickness PageMargin { get; private set; }
+
         public Document()
         {
             Elements = new ElementCollection<DocumentElement>(this);
@@ -56,17 +60,15 @@ namespace Tex.Net
 
         public void Measure()
         {
-            var pageSize = Variables["page"]["size"].GetValue<Size>();
-            var margin = Variables["page"]["margin"].GetValue<Thickness>();
+            PageSize = Variables["page"]["size"].GetValue<Size>();
+            PageMargin = Variables["page"]["margin"].GetValue<Thickness>();
 
-            var pageBox = pageSize;
-            pageBox.Height -= margin.Height;
-            pageBox.Width -= margin.Width;
+            PageBoxSize = new Size(PageSize.Width - PageMargin.Width, PageSize.Height - PageMargin.Height);
 
             foreach (var element in Elements.AsParallel())
             {
                 element.Document = this;
-                var elementSize = pageBox;
+                var elementSize = PageBoxSize;
                 elementSize.Height -= element.Margin.Height;
                 elementSize.Width -= element.Margin.Width;
                 Measurements.AddInternal(element.Measure(elementSize));

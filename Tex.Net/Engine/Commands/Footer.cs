@@ -5,6 +5,14 @@ namespace Tex.Net.Engine.Commands
     [Package]
     public static class Footer
     {
+        [Command("footnote")]
+        public static FootnoteLeaf Footnote(Paragraph content)
+        {
+            var footnote = new FootnoteLeaf("0", content);
+            content.Parent = footnote;
+            return footnote;
+        }
+
         [Command("cfooter")]
         public static void CenterFooter(CompilerState state, Paragraph content)
         {

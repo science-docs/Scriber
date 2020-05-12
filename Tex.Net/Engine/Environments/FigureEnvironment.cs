@@ -11,7 +11,8 @@ namespace Tex.Net.Engine.Environments
         {
             var section = new Region
             {
-                Flexible = true
+                Flexible = true,
+                Margin = new Layout.Thickness(12, 0)
             };
 
             var elements = content.OfType<DocumentElement>().ToArray();

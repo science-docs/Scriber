@@ -10,6 +10,7 @@ namespace Tex.Net.Engine.Commands
         public static Paragraph Caption(Paragraph paragraph)
         {
             paragraph.Tag = "caption";
+            paragraph.Margin = new Layout.Thickness(16, 0, 0, 0);
             return paragraph;
         }
 

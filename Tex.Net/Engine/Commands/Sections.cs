@@ -36,7 +36,7 @@ namespace Tex.Net.Engine.Commands
             ResetNumbering(vars, level);
             var text = new TextLeaf
             {
-                Content = pretext
+                Content = pretext + " "
             };
             content.Leaves.Insert(0, text);
 

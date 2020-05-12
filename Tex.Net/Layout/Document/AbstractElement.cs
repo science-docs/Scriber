@@ -22,6 +22,13 @@ namespace Tex.Net.Layout.Document
             get => fontWeight ?? Parent?.FontWeight ?? FontWeight.Normal;
             set => fontWeight = value;
         }
+
+        public FontStyle FontStyle
+        {
+            get => fontStyle ?? Parent?.FontStyle ?? FontStyle.Normal;
+            set => fontStyle = value;
+        }
+
         public Color Foreground
         {
             get => foreground ?? Parent?.Foreground ?? Color.Black;
@@ -58,6 +65,7 @@ namespace Tex.Net.Layout.Document
         
         private Font? font;
         private double? fontSize;
+        private FontStyle? fontStyle;
         private Color? foreground;
         private FontWeight? fontWeight;
         private HorizontalAlignment? horizontalAlignment;
@@ -73,6 +81,7 @@ namespace Tex.Net.Layout.Document
             clone.fontSize = fontSize;
             clone.foreground = foreground;
             clone.fontWeight = fontWeight;
+            clone.fontStyle = fontStyle;
             clone.document = document;
             clone.horizontalAlignment = horizontalAlignment;
             return clone;

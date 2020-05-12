@@ -54,6 +54,13 @@ namespace Tex.Net.Layout.Document
 
             if (ms.Count > 0)
             {
+                var fm = ms[0].Margin;
+                fm.Top += Margin.Top;
+                var lm = ms[^1].Margin;
+                lm.Bottom += Margin.Bottom;
+                ms[0].Margin = fm;
+                ms[^1].Margin = lm;
+
                 ms[^1].PagebreakPenalty = 0;
             }
 

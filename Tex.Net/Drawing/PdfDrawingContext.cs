@@ -20,7 +20,22 @@ namespace Tex.Net.Drawing
 
         public void DrawText(TextRun run, Color color)
         {
-            G.DrawString(run.Text, ToXFont(run.Typeface.Font, run.Typeface.Size, run.Typeface.Weight), ToXBrush(color), new XPoint(Offset.X, Offset.Y + run.Typeface.Size));
+            double yOffset = run.Typeface.Size;
+            double size = run.Typeface.Size;
+            if (run.Typeface.Style == FontStyle.Superscript)
+            {
+                yOffset *= 0.66;
+            }
+            else if (run.Typeface.Style == FontStyle.Subscript)
+            {
+                yOffset *= 1.33;
+            }
+            if (run.Typeface.Style != FontStyle.Normal)
+            {
+                size *= 0.58;
+            }
+
+            G.DrawString(run.Text, ToXFont(run.Typeface.Font, size, run.Typeface.Weight), ToXBrush(color), new XPoint(Offset.X, Offset.Y + yOffset));
         }
 
         private XFont ToXFont(Font font, double size, FontWeight weight)

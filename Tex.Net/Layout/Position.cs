@@ -27,7 +27,7 @@
 
         public override string ToString()
         {
-            return $"X: {X.ToString("N4")} Y: {Y.ToString("N4")}";
+            return $"X: {X:N4} Y: {Y:N4}";
         }
 
         public static bool operator ==(Position left, Position right)

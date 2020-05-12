@@ -5,6 +5,13 @@ namespace Tex.Net.Engine.Commands
     [Package]
     public static class Layouts
     {
+        [Command("vspace")]
+        public static Box VSpace(string vertical)
+        {
+            double value = double.Parse(vertical);
+            return new Box(new Layout.Size(0, value));
+        }
+
         [Command("centering")]
         public static CallbackArrangingBlock Centering()
         {

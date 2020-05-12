@@ -29,12 +29,12 @@ namespace Tex.Net.Layout.Document
                 if (nodes.Length > 0)
                 {
                     lineNodes.AddRange(nodes);
-                    lineNodes.Add(LineNodeTransformer.GetDefaultGlue(leaf));
+                    //lineNodes.Add(LineNodeTransformer.GetDefaultGlue(leaf));
                 }
             }
             if (lineNodes.Count > 1)
             {
-                lineNodes.RemoveAt(lineNodes.Count - 1);
+                //lineNodes.RemoveAt(lineNodes.Count - 1);
                 var linebreak = new Linebreak();
                 var breaks = linebreak.BreakLines(lineNodes, new double[] { availableSize.Width }, new LinebreakOptions());
                 var positionedItems = linebreak.PositionItems(lineNodes, new double[] { availableSize.Width }, breaks, false);
@@ -42,7 +42,6 @@ namespace Tex.Net.Layout.Document
 
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    var first = i == 0;
                     var last = i == lines.Length - 1;
                     var line = lines[i];
                     var height = 0.0;
@@ -52,30 +51,48 @@ namespace Tex.Net.Layout.Document
                     width += lastNode.Width;
                     foreach (var item in line)
                     {
-                        height = Math.Max(lineNodes[item.Index].Element.DesiredSize.Height, height);
+                        height = Math.Max(lineNodes[item.Index].Element?.DesiredSize.Height ?? 0, height);
                     }
 
+                    var stretch = doc.Variables[DocumentVariables.Length, DocumentVariables.BaselineStretch].GetValue<double>();
 
-                    var stretch = doc.Variables[DocumentVariables.Length][DocumentVariables.BaselineStretch].GetValue<double>();
-
-                    var margin = new Thickness();
-                    if (first)
-                    {
-                        margin.Top = Margin.Top;
-                    }
-                    if (last)
-                    {
-                        margin.Bottom = Margin.Bottom;
-                    }
-                    else
+                    if (!last)
                     {
                         height *= stretch;
                     }
                     var size = new Size(width, height);
-                    var measurement = new Measurement(this, size, margin);
+                    var measurement = new Measurement(this, size, Thickness.Zero);
                     ms.Add(measurement);
+
+                    foreach (var node in line)
+                    {
+                        var item = lineNodes[node.Index];
+                        if (item.Element is FootnoteLeaf footnote)
+                        {
+                            var footMS = footnote.Element.Measure(Document.PageBoxSize);
+                            ms[^1].PagebreakPenalty = double.PositiveInfinity;
+                            ms.AddInternal(footMS);
+                            foreach (var m in footMS)
+                            {
+                                m.PagebreakPenalty = double.PositiveInfinity;
+                            }
+                        }
+                    }
                 }
             }
+
+            
+            if (ms.Count > 0)
+            {
+                ms[0].Margin = new Thickness(Margin.Top, 0, 0, 0);
+                ms[^1].Margin = new Thickness(0, 0, Margin.Bottom, 0);
+
+                if (ms.Count > 1)
+                {
+                    ms[^2].PagebreakPenalty = double.PositiveInfinity;
+                }
+            }
+
             return ms;
         }
 
@@ -146,7 +163,7 @@ namespace Tex.Net.Layout.Document
                 throw new NullReferenceException("The Font property of a LineNode was null");
             }
 
-            return new TextRun(node.Text ?? string.Empty, new Text.Typeface(node.Element.Font, node.Element.FontSize, node.Element.FontWeight));
+            return new TextRun(node.Text ?? string.Empty, new Text.Typeface(node.Element.Font, node.Element.FontSize, node.Element.FontWeight, node.Element.FontStyle));
         }
 
 
@@ -165,6 +182,16 @@ namespace Tex.Net.Layout.Document
             foreach (var leaf in Leaves)
             {
                 paragraph.Leaves.Add(leaf.Clone());
+            }
+
+            return paragraph;
+        }
+
+        public new Paragraph Clone()
+        {
+            if (!(base.Clone() is Paragraph paragraph))
+            {
+                throw new InvalidCastException();
             }
 
             return paragraph;

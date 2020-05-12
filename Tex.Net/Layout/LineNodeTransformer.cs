@@ -27,7 +27,7 @@ namespace Tex.Net.Layout
         public static List<LineNode> Create(Leaf leaf, string text)
         {
             var font = leaf.Font ?? throw new ArgumentException("Specified element missing font");
-            var size = leaf.FontSize;
+            var size = ScaleByStyle(leaf);
             var spaceWidth = GetWidth(" ");
             var hyphenWidth = GetWidth("-");
             var stretch = Math.Max(0, spaceWidth / 2);
@@ -35,8 +35,14 @@ namespace Tex.Net.Layout
 
             var chunks = Chunkenize(text).ToArray();
             var nodes = new List<LineNode>();
+            Glue(text, out bool start, out bool end);
 
             Hyphenator? hyph = leaf.Document?.Hyphenator;
+
+            if (start)
+            {
+                nodes.Add(LineNode.Glue(spaceWidth, stretch, shrink));
+            }
 
             for (int i = 0; i < chunks.Length; i++)
             {
@@ -74,12 +80,28 @@ namespace Tex.Net.Layout
                 
             }
 
+            if (end)
+            {
+                nodes.Add(LineNode.Glue(spaceWidth, stretch, shrink));
+            }
+
             return nodes;
 
             double GetWidth(string value)
             {
                 return font.GetWidth(value, size);
             }
+        }
+
+        private static double ScaleByStyle(Leaf leaf)
+        {
+            return leaf.FontStyle == FontStyle.Normal ? leaf.FontSize : leaf.FontSize * 0.58;
+        }
+
+        private static void Glue(string fullText, out bool start, out bool end)
+        {
+            start = char.IsWhiteSpace(fullText[0]);
+            end = char.IsWhiteSpace(fullText[^1]);
         }
 
         private static IEnumerable<string> Chunkenize(string fullText)
@@ -90,6 +112,7 @@ namespace Tex.Net.Layout
             }
 
             fullText = fullText.Trim();
+
 
             int last = 0;
 
