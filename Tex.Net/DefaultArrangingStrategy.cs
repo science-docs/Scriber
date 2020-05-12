@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Tex.Net.Layout;
 
 namespace Tex.Net
@@ -20,47 +21,76 @@ namespace Tex.Net
             var curPage = AddPage(document, pageSize, contentArea);
             double curHeight = boxSize.Height;
 
-            var flexQueue = new Queue<Measurement>();
-            var lastPenalty = .0;
+            var flexQueue = new FlexQueue<Measurement>(); //new Queue<Measurement>();
+            var enqueueNext = false;
 
             // Stage one:
             // Add measurements to pages
             foreach (var measurement in document.Measurements)
             {
-                if (lastPenalty > 0)
+                if (enqueueNext)
                 {
-
+                    flexQueue.Enqueue(measurement, measurement.Flexible);
+                    enqueueNext = measurement.PagebreakPenalty > 0;
                 }
-
-                while (flexQueue.Count > 0)
+                else if (measurement.PagebreakPenalty > 0)
                 {
-                    var result = TryFitMeasurement(curPage, flexQueue.Peek(), flexQueue, true, ref curHeight);
-                    if (result == FitResult.Stop)
+                    flexQueue.Enqueue(measurement.Flexible);
+                    flexQueue.Enqueue(measurement, measurement.Flexible);
+                    enqueueNext = true;
+                }
+                else
+                {
+                    while (flexQueue.Count > 0)
                     {
-                        break;
+                        var peeked = flexQueue.Peek();
+                        if (FitAll(peeked, curHeight))
+                        {
+                            foreach (var ms in peeked)
+                            {
+                                TryFitMeasurement(curPage, ms, flexQueue, true, ref curHeight);
+                            }
+                            flexQueue.Dequeue();
+                        }
+                        else if (!flexQueue.IsFlex)
+                        {
+                            curHeight = boxSize.Height;
+                            curPage.Filled = true;
+                            curPage = AddPage(document, pageSize, contentArea);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (TryFitMeasurement(curPage, measurement, flexQueue, false, ref curHeight) == FitResult.AddPage)
+                    {
+                        curHeight = boxSize.Height;
+                        curPage.Filled = true;
+                        curPage = AddPage(document, pageSize, contentArea);
                     }
                 }
 
-                if (TryFitMeasurement(curPage, measurement, flexQueue, false, ref curHeight) == FitResult.AddPage)
-                {
-                    curHeight = boxSize.Height;
-                    curPage.Filled = true;
-                    curPage = AddPage(document, pageSize, contentArea);
-                }
+                
             }
 
             // Add leftover flexible items
             while (flexQueue.Count > 0)
             {
                 var ms = flexQueue.Dequeue();
-                ms.Flexible = false;
-
-                if (TryFitMeasurement(curPage, ms, flexQueue, false, ref curHeight) == FitResult.AddPage)
+                foreach (var m in ms)
                 {
-                    curHeight = boxSize.Height;
-                    curPage.Filled = true;
-                    curPage = AddPage(document, pageSize, contentArea);
+                    m.Flexible = false;
+
+                    if (TryFitMeasurement(curPage, m, flexQueue, false, ref curHeight) == FitResult.AddPage)
+                    {
+                        curHeight = boxSize.Height;
+                        curPage.Filled = true;
+                        curPage = AddPage(document, pageSize, contentArea);
+                    }
                 }
+                
             }
 
             // Stage two:
@@ -93,7 +123,7 @@ namespace Tex.Net
             }
         }
 
-        private static FitResult TryFitMeasurement(DocumentPage page, Measurement measurement, Queue<Measurement> queue, bool flexMode, ref double height)
+        private static FitResult TryFitMeasurement(DocumentPage page, Measurement measurement, FlexQueue<Measurement> queue, bool flexMode, ref double height)
         {
             var size = measurement.TotalSize;
 
@@ -107,7 +137,7 @@ namespace Tex.Net
                     }
                     else
                     {
-                        queue.Enqueue(measurement);
+                        queue.Enqueue(measurement, measurement.Flexible);
                         return FitResult.Enqueue;
                     }
                 }
@@ -125,12 +155,12 @@ namespace Tex.Net
             height -= size.Height;
             page.Measurements.Add(measurement);
 
-            if (flexMode)
-            {
-                queue.Dequeue();
-            }
-
             return FitResult.Continue;
+        }
+
+        private static bool FitAll(IEnumerable<Measurement> measurements, double height)
+        {
+            return measurements.Sum(e => e.TotalSize.Height) <= height;
         }
 
         private static DocumentPage AddPage(Document document, Size size, Rectangle contentArea)

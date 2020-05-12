@@ -14,7 +14,7 @@ namespace Tex.Net.Layout
 
         public Measurement this[int index] => measurements[index];
 
-
+        private int count = 0;
 
         public void Add(Measurement item)
         {
@@ -22,7 +22,7 @@ namespace Tex.Net.Layout
             {
                 if (item.Index < 0)
                 {
-                    item.Index = Count;
+                    item.Index = count++;
                 }
                 measurements.Add(item);
             }
@@ -30,6 +30,7 @@ namespace Tex.Net.Layout
 
         public void Clear()
         {
+            count = 0;
             measurements.Clear();
         }
 
