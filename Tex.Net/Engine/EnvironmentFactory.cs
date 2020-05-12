@@ -30,7 +30,14 @@ namespace Tex.Net.Engine
 
         private static object[] Embed(object[] parent, object[] child)
         {
-            parent[0] = child;
+            if (parent.Length == 0)
+            {
+                parent = new object[] { child };
+            }
+            else
+            {
+                parent[0] = child;
+            }
             return parent;
         }
     }

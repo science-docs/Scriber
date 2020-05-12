@@ -24,6 +24,11 @@ namespace Tex.Net.Engine
 
                     currentParagraph.Leaves.Add(leaf);
                 }
+                else if (item == EmptyInstruction.Object)
+                {
+                    results.Add(currentParagraph);
+                    currentParagraph = null;
+                }
                 else
                 {
                     if (currentParagraph != null)

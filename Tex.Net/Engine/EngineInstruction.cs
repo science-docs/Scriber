@@ -19,6 +19,10 @@ namespace Tex.Net.Engine
             {
                 return new BlockInstruction();
             }
+            else if (element.Type == ElementType.Paragraph)
+            {
+                return new EmptyInstruction();
+            }
             else if (element.Type == ElementType.Command)
             {
                 // special cases for begin/end commands

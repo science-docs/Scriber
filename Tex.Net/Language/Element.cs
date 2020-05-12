@@ -6,6 +6,7 @@ namespace Tex.Net.Language
     public enum ElementType
     {
         Text,
+        Paragraph,
         Block,
         Math,
         Command,
@@ -47,6 +48,10 @@ namespace Tex.Net.Language
             if (Content != null)
             {
                 return $"{Type} '{Content}'";
+            }
+            else if (Type == ElementType.Paragraph)
+            {
+                return Type.ToString();
             }
             else
             {

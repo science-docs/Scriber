@@ -54,5 +54,10 @@ namespace Tex.Net.Language
             Index = index;
             Content = content;
         }
+
+        public override string ToString()
+        {
+            return Content;
+        }
     }
 }

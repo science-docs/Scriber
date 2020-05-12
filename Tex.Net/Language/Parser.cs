@@ -48,17 +48,22 @@ namespace Tex.Net.Language
         private static Element? ParseNewline(ParserContext context, Token token, Element previous)
         {
             context.Comment = false;
-            if (context.Newline)
+            context.LastLine.Clear();
+            context.LastLine.AddRange(context.CurrentLine);
+            context.CurrentLine.Clear();
+            if (IsLineMixed(context.LastLine) && !context.Newline)
+            {
+                context.Newline = true;
+                return AppendText(previous, context.Parents.Peek(), new Token(" ", token.Index));
+            }
+            else if (context.Newline)
             {
                 context.Newline = false;
-                context.Parents.Clear();
-                return null;
+                return new Element(context.Parents.Peek(), ElementType.Paragraph, token.Index);
             }
             else
             {
-                context.Newline = true;
                 return null;
-                //return AppendText(previous, context.Parents.Peek(), new Token(" ", token.Index));
             }
         }
 
@@ -140,16 +145,10 @@ namespace Tex.Net.Language
             Element cur = new Element(null, ElementType.Block, 0);
             var context = new ParserContext();
             context.Parents.Push(cur);
-            //var state = StateGraph;
             bool returnedLast = false;
 
             foreach (var token in items)
             {
-                //if (!state.Next.TryGetValue(token.Type, out state))
-                //{
-                //    state = StateGraph.Next[token.Type];
-                //}
-
                 var action = ParseActions[token.Type];
                 bool isNewline = token.Type == TokenType.Newline;
                 bool isCurlyOpen = token.Type == TokenType.CurlyOpen;
@@ -191,6 +190,11 @@ namespace Tex.Net.Language
                 }
                 else
                 {
+                    // if at top parent
+                    if (context.Parents.Count == 1)
+                    {
+                        context.CurrentLine.Add(element);
+                    }
                     cur = element;
                     returnedLast = false;
                 }
@@ -245,6 +249,11 @@ namespace Tex.Net.Language
             }
 
             return textItem;
+        }
+
+        private static bool IsLineMixed(IEnumerable<Element> elements)
+        {
+            return elements.Any(e => e.Type == ElementType.Text);
         }
 
         [DebuggerDisplay("{DebuggerDisplay}")]
