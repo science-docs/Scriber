@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Tex.Net.Language
@@ -20,6 +21,7 @@ namespace Tex.Net.Language
         Superscript
     }
 
+    [DebuggerDisplay("{DebuggerDisplay}")]
     public class Element
     {
         public ElementType Type { get; set; }
@@ -43,19 +45,22 @@ namespace Tex.Net.Language
             }
         }
 
-        public override string ToString()
+        string DebuggerDisplay
         {
-            if (Content != null)
+            get
             {
-                return $"{Type} '{Content}'";
-            }
-            else if (Type == ElementType.Paragraph)
-            {
-                return Type.ToString();
-            }
-            else
-            {
-                return $"{Type} Count: {Inlines.Count}";
+                if (Content != null)
+                {
+                    return $"{Type} '{Content}'";
+                }
+                else if (Type == ElementType.Paragraph)
+                {
+                    return Type.ToString();
+                }
+                else
+                {
+                    return $"{Type} Count: {Inlines.Count}";
+                }
             }
         }
     }

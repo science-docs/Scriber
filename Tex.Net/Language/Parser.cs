@@ -108,23 +108,38 @@ namespace Tex.Net.Language
 
         private static Element ParseCurlyOpen(ParserContext context, Token token, Element previous)
         {
-            Element parent;
-
-            if (previous.Type == ElementType.Command && context.Parents.Peek().Type != ElementType.Command)
+            // if we are in optional arguments
+            if (context.BracketBlock)
             {
-                context.Parents.Push(previous);
+                return AppendText(previous, context.Parents.Peek(), token);
             }
+            else
+            {
+                Element parent;
 
-            parent = context.Parents.Peek();
-            var element = new Element(parent, ElementType.Block, token.Index);
-            context.Parents.Push(element);
-            return element;
+                if (previous.Type == ElementType.Command && context.Parents.Peek().Type != ElementType.Command)
+                {
+                    context.Parents.Push(previous);
+                }
+
+                parent = context.Parents.Peek();
+                var element = new Element(parent, ElementType.Block, token.Index);
+                context.Parents.Push(element);
+                return element;
+            }
         }
 
         private static Element? ParseCurlyClose(ParserContext context, Token token, Element previous)
         {
-            context.Parents.Pop();
-            return null;
+            if (context.BracketBlock)
+            {
+                return AppendText(previous, context.Parents.Peek(), token);
+            }
+            else
+            {
+                context.Parents.Pop();
+                return null;
+            }
         }
 
         public static Element[] Parse(IEnumerable<Token> tokens)

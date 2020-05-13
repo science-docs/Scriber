@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Diagnostics;
 
 namespace Tex.Net.Language
 {
@@ -27,6 +25,7 @@ namespace Tex.Net.Language
         Caret
     }
 
+    [DebuggerDisplay("{Content}")]
     public class Token
     {
         public string Content { get; set; }
@@ -53,11 +52,6 @@ namespace Tex.Net.Language
             Type = type;
             Index = index;
             Content = content;
-        }
-
-        public override string ToString()
-        {
-            return Content;
         }
     }
 }
