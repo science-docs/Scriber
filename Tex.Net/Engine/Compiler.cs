@@ -18,8 +18,17 @@ namespace Tex.Net.Engine
             }
 
             state.Document.Elements.AddRange(state.Blocks.Current.Objects.OfType<DocumentElement>());
+
             ResolveCallbacks(state.Document.Elements);
-            var result = new CompilerResult(state.Document);
+
+            Document? doc = state.Document;
+
+            if (state.Issues.Any(e => e.Type == CompilerIssueType.Error))
+            {
+                doc = null;
+            }
+
+            var result = new CompilerResult(doc);
             result.Issues.AddRange(state.Issues);
             return result;
         }
@@ -41,8 +50,8 @@ namespace Tex.Net.Engine
             if (BlockElement(element))
             {
                 state.Blocks.Pop();
-                // If we just created a new block in the last instruction
-                // push it to the state.
+                // If we just created a new block via an environment
+                // in the last instruction push it to the state.
                 if (obj is Block env)
                 {
                     state.Blocks.Push(env);

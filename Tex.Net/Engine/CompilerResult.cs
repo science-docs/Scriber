@@ -6,11 +6,11 @@ namespace Tex.Net.Engine
 {
     public class CompilerResult
     {
-        public Document Document { get; }
+        public Document? Document { get; }
         public bool Success => Document != null;
         public List<CompilerIssue> Issues { get; } = new List<CompilerIssue>();
 
-        public CompilerResult(Document document)
+        public CompilerResult(Document? document)
         {
             Document = document;
         }
