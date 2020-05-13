@@ -46,6 +46,15 @@ namespace Tex.Net
             DocumentVariables.Setup(Variables);
         }
 
+        public void Run()
+        {
+            Measure();
+            Arrange();
+            Interlude();
+            Measure();
+            Arrange();
+        }
+
         public override void Interlude()
         {
             foreach (var element in Elements.AsParallel())

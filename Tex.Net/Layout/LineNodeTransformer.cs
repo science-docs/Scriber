@@ -24,10 +24,18 @@ namespace Tex.Net.Layout
             }
         }
 
-        public static List<LineNode> Create(Leaf leaf, string text)
+        public static List<LineNode> Create<T>(T leaf) where T : Leaf, ITextLeaf
         {
+            return Create(leaf, leaf.Content);
+        }
+
+        public static List<LineNode> Create(Leaf leaf, string? text)
+        {
+            if (text == null)
+                return new List<LineNode>();
+
             var font = leaf.Font ?? throw new ArgumentException("Specified element missing font");
-            var size = ScaleByStyle(leaf);
+            var size = FontStyler.ScaleSize(leaf.FontStyle, leaf.FontSize);
             var spaceWidth = GetWidth(" ");
             var hyphenWidth = GetWidth("-");
             var stretch = Math.Max(0, spaceWidth / 2);
@@ -91,11 +99,6 @@ namespace Tex.Net.Layout
             {
                 return font.GetWidth(value, size);
             }
-        }
-
-        private static double ScaleByStyle(Leaf leaf)
-        {
-            return leaf.FontStyle == FontStyle.Normal ? leaf.FontSize : leaf.FontSize * 0.58;
         }
 
         private static void Glue(string fullText, out bool start, out bool end)

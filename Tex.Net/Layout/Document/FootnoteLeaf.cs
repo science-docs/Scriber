@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Mime;
-using System.Text;
-
-namespace Tex.Net.Layout.Document
+﻿namespace Tex.Net.Layout.Document
 {
     public class FootnoteLeaf : Leaf, ITextLeaf
     {
@@ -23,14 +18,14 @@ namespace Tex.Net.Layout.Document
 
             if (addPrefix)
             {
-                value.Leaves.Insert(0, new TextLeaf { Content = content, FontStyle = Text.FontStyle.Superscript });
+                value.Leaves.Insert(0, new TextLeaf(content) { FontStyle = Text.FontStyle.Superscript });
             }
         }
 
         public override LineNode[] GetNodes()
         {
             Element.Parent = Parent;
-            return LineNodeTransformer.Create(this, Content ?? string.Empty).ToArray();
+            return LineNodeTransformer.Create(this).ToArray();
         }
 
         protected override AbstractElement CloneInternal()

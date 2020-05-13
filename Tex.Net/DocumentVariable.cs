@@ -63,6 +63,15 @@ namespace Tex.Net
             return default;
         }
 
+        public bool OfType<T>()
+        {
+            if (value is T)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public void SetValue(object value)
         {
             this.value = value;

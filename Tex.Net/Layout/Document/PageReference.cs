@@ -20,7 +20,7 @@
 
         public override LineNode[] GetNodes()
         {
-            return LineNodeTransformer.Create(this, PageNumber).ToArray();
+            return LineNodeTransformer.Create(this).ToArray();
         }
 
         public override void Interlude()

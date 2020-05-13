@@ -1,8 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#region PDFsharp - A .NET library for processing PDF
+//
+// Authors:
+//   Stefan Lange
+//
+// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
+//
+// http://www.PdfSharpCore.com
+// http://sourceforge.net/projects/pdfsharp
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+// DEALINGS IN THE SOFTWARE.
+#endregion
+
+using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 
 namespace Tex.Net.Layout
 {
@@ -35,8 +62,8 @@ namespace Tex.Net.Layout
         /// </summary>
         public Unit(double point)
         {
-            _value = point;
-            _type = UnitType.Point;
+            Value = point;
+            Type = UnitType.Point;
         }
 
         /// <summary>
@@ -46,8 +73,8 @@ namespace Tex.Net.Layout
         {
             if (!Enum.IsDefined(typeof(UnitType), type))
                 throw new System.ComponentModel.InvalidEnumArgumentException("type");
-            _value = value;
-            _type = type;
+            Value = value;
+            Type = type;
         }
 
         /// <summary>
@@ -55,18 +82,12 @@ namespace Tex.Net.Layout
         /// To determine the XGraphicsUnit use property <code>Type</code>.
         /// To get the value in point use the implicit conversion to double.
         /// </summary>
-        public double Value
-        {
-            get { return _value; }
-        }
+        public double Value { get; private set; }
 
         /// <summary>
         /// Gets the unit of measure.
         /// </summary>
-        public UnitType Type
-        {
-            get { return _type; }
-        }
+        public UnitType Type { get; private set; }
 
         /// <summary>
         /// Gets or sets the value in point.
@@ -75,20 +96,20 @@ namespace Tex.Net.Layout
         {
             get
             {
-                return _type switch
+                return Type switch
                 {
-                    UnitType.Point => _value,
-                    UnitType.Inch => _value * InchFactor,
-                    UnitType.Millimeter => _value * MillimeterFactor,
-                    UnitType.Centimeter => _value * CentimeterFactor,
-                    UnitType.Presentation => _value * PresentationFactor,
+                    UnitType.Point => Value,
+                    UnitType.Inch => Value * InchFactor,
+                    UnitType.Millimeter => Value * MillimeterFactor,
+                    UnitType.Centimeter => Value * CentimeterFactor,
+                    UnitType.Presentation => Value * PresentationFactor,
                     _ => throw new InvalidCastException(),
                 };
             }
             set
             {
-                _value = value;
-                _type = UnitType.Point;
+                Value = value;
+                Type = UnitType.Point;
             }
         }
 
@@ -99,20 +120,20 @@ namespace Tex.Net.Layout
         {
             get
             {
-                return _type switch
+                return Type switch
                 {
-                    UnitType.Point => _value / 72,
-                    UnitType.Inch => _value,
-                    UnitType.Millimeter => _value / 25.4,
-                    UnitType.Centimeter => _value / 2.54,
-                    UnitType.Presentation => _value / 96,
+                    UnitType.Point => Value / 72,
+                    UnitType.Inch => Value,
+                    UnitType.Millimeter => Value / 25.4,
+                    UnitType.Centimeter => Value / 2.54,
+                    UnitType.Presentation => Value / 96,
                     _ => throw new InvalidCastException(),
                 };
             }
             set
             {
-                _value = value;
-                _type = UnitType.Inch;
+                Value = value;
+                Type = UnitType.Inch;
             }
         }
 
@@ -123,20 +144,20 @@ namespace Tex.Net.Layout
         {
             get
             {
-                return _type switch
+                return Type switch
                 {
-                    UnitType.Point => _value * 25.4 / 72,
-                    UnitType.Inch => _value * 25.4,
-                    UnitType.Millimeter => _value,
-                    UnitType.Centimeter => _value * 10,
-                    UnitType.Presentation => _value * 25.4 / 96,
+                    UnitType.Point => Value * 25.4 / 72,
+                    UnitType.Inch => Value * 25.4,
+                    UnitType.Millimeter => Value,
+                    UnitType.Centimeter => Value * 10,
+                    UnitType.Presentation => Value * 25.4 / 96,
                     _ => throw new InvalidCastException(),
                 };
             }
             set
             {
-                _value = value;
-                _type = UnitType.Millimeter;
+                Value = value;
+                Type = UnitType.Millimeter;
             }
         }
 
@@ -147,20 +168,20 @@ namespace Tex.Net.Layout
         {
             get
             {
-                return _type switch
+                return Type switch
                 {
-                    UnitType.Point => _value * 2.54 / 72,
-                    UnitType.Inch => _value * 2.54,
-                    UnitType.Millimeter => _value / 10,
-                    UnitType.Centimeter => _value,
-                    UnitType.Presentation => _value * 2.54 / 96,
+                    UnitType.Point => Value * 2.54 / 72,
+                    UnitType.Inch => Value * 2.54,
+                    UnitType.Millimeter => Value / 10,
+                    UnitType.Centimeter => Value,
+                    UnitType.Presentation => Value * 2.54 / 96,
                     _ => throw new InvalidCastException(),
                 };
             }
             set
             {
-                _value = value;
-                _type = UnitType.Centimeter;
+                Value = value;
+                Type = UnitType.Centimeter;
             }
         }
 
@@ -171,20 +192,20 @@ namespace Tex.Net.Layout
         {
             get
             {
-                return _type switch
+                return Type switch
                 {
-                    UnitType.Point => _value * 96 / 72,
-                    UnitType.Inch => _value * 96,
-                    UnitType.Millimeter => _value * 96 / 25.4,
-                    UnitType.Centimeter => _value * 96 / 2.54,
-                    UnitType.Presentation => _value,
+                    UnitType.Point => Value * 96 / 72,
+                    UnitType.Inch => Value * 96,
+                    UnitType.Millimeter => Value * 96 / 25.4,
+                    UnitType.Centimeter => Value * 96 / 2.54,
+                    UnitType.Presentation => Value,
                     _ => throw new InvalidCastException(),
                 };
             }
             set
             {
-                _value = value;
-                _type = UnitType.Point;
+                Value = value;
+                Type = UnitType.Point;
             }
         }
 
@@ -194,7 +215,7 @@ namespace Tex.Net.Layout
         /// </summary>
         public string ToString(IFormatProvider formatProvider)
         {
-            string valuestring = _value.ToString(formatProvider) + GetSuffix();
+            string valuestring = Value.ToString(formatProvider) + GetSuffix();
             return valuestring;
         }
 
@@ -204,7 +225,7 @@ namespace Tex.Net.Layout
         /// </summary>
         string IFormattable.ToString(string? format, IFormatProvider? formatProvider)
         {
-            string valuestring = _value.ToString(format, formatProvider) + GetSuffix();
+            string valuestring = Value.ToString(format, formatProvider) + GetSuffix();
             return valuestring;
         }
 
@@ -213,7 +234,7 @@ namespace Tex.Net.Layout
         /// </summary>
         public override string ToString()
         {
-            string valuestring = _value.ToString(CultureInfo.InvariantCulture) + GetSuffix();
+            string valuestring = Value.ToString(CultureInfo.InvariantCulture) + GetSuffix();
             return valuestring;
         }
 
@@ -222,7 +243,7 @@ namespace Tex.Net.Layout
         /// </summary>
         string GetSuffix()
         {
-            return _type switch
+            return Type switch
             {
                 UnitType.Point => "pt",
                 UnitType.Inch => "in",
@@ -238,9 +259,11 @@ namespace Tex.Net.Layout
         /// </summary>
         public static Unit FromPoint(double value)
         {
-            Unit unit;
-            unit._value = value;
-            unit._type = UnitType.Point;
+            Unit unit = new Unit
+            {
+                Value = value,
+                Type = UnitType.Point
+            };
             return unit;
         }
 
@@ -249,9 +272,11 @@ namespace Tex.Net.Layout
         /// </summary>
         public static Unit FromInch(double value)
         {
-            Unit unit;
-            unit._value = value;
-            unit._type = UnitType.Inch;
+            Unit unit = new Unit
+            {
+                Value = value,
+                Type = UnitType.Inch
+            };
             return unit;
         }
 
@@ -260,9 +285,11 @@ namespace Tex.Net.Layout
         /// </summary>
         public static Unit FromMillimeter(double value)
         {
-            Unit unit;
-            unit._value = value;
-            unit._type = UnitType.Millimeter;
+            Unit unit = new Unit
+            {
+                Value = value,
+                Type = UnitType.Millimeter
+            };
             return unit;
         }
 
@@ -271,9 +298,11 @@ namespace Tex.Net.Layout
         /// </summary>
         public static Unit FromCentimeter(double value)
         {
-            Unit unit;
-            unit._value = value;
-            unit._type = UnitType.Centimeter;
+            Unit unit = new Unit
+            {
+                Value = value,
+                Type = UnitType.Centimeter
+            };
             return unit;
         }
 
@@ -282,9 +311,11 @@ namespace Tex.Net.Layout
         /// </summary>
         public static Unit FromPresentation(double value)
         {
-            Unit unit;
-            unit._value = value;
-            unit._type = UnitType.Presentation;
+            Unit unit = new Unit
+            {
+                Value = value,
+                Type = UnitType.Presentation
+            };
             return unit;
         }
 
@@ -295,7 +326,7 @@ namespace Tex.Net.Layout
         public static bool operator ==(Unit value1, Unit value2)
         {
             // ReSharper disable CompareOfFloatsByEqualityOperator
-            return value1._type == value2._type && value1._value == value2._value;
+            return value1.Type == value2.Type && value1.Value == value2.Value;
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
@@ -323,7 +354,7 @@ namespace Tex.Net.Layout
         /// </summary>
         public override int GetHashCode()
         {
-            return _value.GetHashCode() ^ _type.GetHashCode();
+            return Value.GetHashCode() ^ Type.GetHashCode();
         }
 
         /// <summary>
@@ -331,34 +362,34 @@ namespace Tex.Net.Layout
         /// </summary>
         public void ConvertType(UnitType type)
         {
-            if (_type == type)
+            if (Type == type)
                 return;
 
             switch (type)
             {
                 case UnitType.Point:
-                    _value = Point;
-                    _type = UnitType.Point;
+                    Value = Point;
+                    Type = UnitType.Point;
                     break;
 
                 case UnitType.Inch:
-                    _value = Inch;
-                    _type = UnitType.Inch;
+                    Value = Inch;
+                    Type = UnitType.Inch;
                     break;
 
                 case UnitType.Centimeter:
-                    _value = Centimeter;
-                    _type = UnitType.Centimeter;
+                    Value = Centimeter;
+                    Type = UnitType.Centimeter;
                     break;
 
                 case UnitType.Millimeter:
-                    _value = Millimeter;
-                    _type = UnitType.Millimeter;
+                    Value = Millimeter;
+                    Type = UnitType.Millimeter;
                     break;
 
                 case UnitType.Presentation:
-                    _value = Presentation;
-                    _type = UnitType.Presentation;
+                    Value = Presentation;
+                    Type = UnitType.Presentation;
                     break;
 
                 default:
@@ -371,9 +402,6 @@ namespace Tex.Net.Layout
         /// </summary>
         public static readonly Unit Zero = new Unit();
 
-        double _value;
-        UnitType _type;
-
         /// <summary>
         /// Gets the DebuggerDisplayAttribute text.
         /// </summary>
@@ -382,7 +410,7 @@ namespace Tex.Net.Layout
         {
             get
             {
-                return string.Format(CultureInfo.InvariantCulture, "unit=({0:0000} {1})", _value, GetSuffix());
+                return string.Format(CultureInfo.InvariantCulture, "unit=({0:0000} {1})", Value, GetSuffix());
             }
         }
     }

@@ -6,9 +6,19 @@ namespace Tex.Net.Layout.Document
     {
         public string? Content { get; set; }
 
+        public TextLeaf()
+        {
+
+        }
+
+        public TextLeaf(string? content)
+        {
+            Content = content;
+        }
+
         protected override AbstractElement CloneInternal()
         {
-            return new TextLeaf { Content = Content };
+            return new TextLeaf(Content);
         }
 
         public override LineNode[] GetNodes()
@@ -18,7 +28,7 @@ namespace Tex.Net.Layout.Document
                 throw new LayoutException("Content property is null");
             }
 
-            return LineNodeTransformer.Create(this, Content).ToArray();
+            return LineNodeTransformer.Create(this).ToArray();
         }
 
         protected override Size MeasureOverride(Size availableSize)
