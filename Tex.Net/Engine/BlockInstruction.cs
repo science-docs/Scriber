@@ -26,8 +26,11 @@ namespace Tex.Net.Engine
                 }
                 else if (item == EmptyInstruction.Object)
                 {
-                    results.Add(currentParagraph);
-                    currentParagraph = null;
+                    if (currentParagraph != null)
+                    {
+                        results.Add(currentParagraph);
+                        currentParagraph = null;
+                    }
                 }
                 else
                 {

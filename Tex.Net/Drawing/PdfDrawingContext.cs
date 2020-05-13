@@ -1,6 +1,5 @@
 ﻿using PdfSharpCore.Drawing;
 using System;
-using System.Drawing;
 using Tex.Net.Layout;
 using Tex.Net.Text;
 
@@ -13,7 +12,7 @@ namespace Tex.Net.Drawing
 
         private XGraphics G => Graphics ?? throw new InvalidOperationException("Cannot use pdf drawing context without setting the Graphics property");
 
-        public void DrawImage(Image image, Layout.Rectangle rectangle)
+        public void DrawImage(Image image, Rectangle rectangle)
         {
             G.DrawImage(XImage.FromStream(() => image.GetStream()), new XRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height));
         }
@@ -35,7 +34,7 @@ namespace Tex.Net.Drawing
 
         private XBrush ToXBrush(Color color)
         {
-            return new XSolidBrush(XColor.FromArgb(color.ToArgb()));
+            return new XSolidBrush(XColor.FromArgb(color.Argb));
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using Tex.Net.Text;
+﻿using Tex.Net.Text;
 
 namespace Tex.Net.Layout.Document
 {
@@ -31,7 +30,7 @@ namespace Tex.Net.Layout.Document
 
         public Color Foreground
         {
-            get => foreground ?? Parent?.Foreground ?? Color.Black;
+            get => foreground ?? Parent?.Foreground ?? Colors.Black;
             set => foreground = value;
         }
 
