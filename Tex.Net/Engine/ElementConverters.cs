@@ -30,5 +30,25 @@ namespace Tex.Net.Engine
             converters.TryGetValue(new Tuple<Type, Type>(source, target), out var converter);
             return converter;
         }
+
+        public static object? Convert(object? source, Type target)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var type = source.GetType();
+            var converter = Find(type, target);
+
+            if (converter != null)
+            {
+                return converter.Convert(source, target, new CompilerState());
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

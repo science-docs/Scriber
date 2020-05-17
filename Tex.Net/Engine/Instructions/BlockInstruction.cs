@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Tex.Net.Layout.Document;
 
-namespace Tex.Net.Engine
+namespace Tex.Net.Engine.Instructions
 {
     public class BlockInstruction : EngineInstruction
     {

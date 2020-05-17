@@ -18,6 +18,7 @@ namespace Tex.Net.Language
         {
             int code;
             int index = 0;
+            //bool ignore = false;
             char c;
             Token? cur = null;
             StringBuilder sb = new StringBuilder();
@@ -32,9 +33,22 @@ namespace Tex.Net.Language
                     continue;
                 }
 
+                //if (ignore)
+                //{
+                //    sb.Append(c);
+                //    index++;
+                //    continue;
+                //}
+                //else if (c == '\\')
+                //{
+                //    ignore = true;
+                //    index++;
+                //    continue;
+                //}
+
                 if (cur != null)
                 {
-                    if (IsSpecialCharacter(c) || (cur.Type == TokenType.Backslash && char.IsWhiteSpace(c)))
+                    if (IsSpecialCharacter(c))
                     {
                         cur.Content = sb.ToString();
                         sb.Clear();
@@ -90,13 +104,14 @@ namespace Tex.Net.Language
 
         private static bool IsSpecialCharacter(char c)
         {
-            return c == '\\' || c == '%' || c == '\n' || c == '$' || c == '&' || c == '~' || c == '_' || c == '{' || c == '}' || c == '^' || c == '[' || c == ']';
+            return c == '\\' || c == ',' || c == ':' || c == '"' || c == '@' || c == '%' || c == '\n' || c == '$' || c == '&' || c == '~' || c == '_' || c == '(' || c == ')' || c == '{' || c == '}' || c == '^' || c == '[' || c == ']';
         }
 
         private static bool IsSingleToken(TokenType token)
         {
             return token switch
             {
+                TokenType.At => false,
                 TokenType.Backslash => false,
                 TokenType.Text => false,
                 TokenType.Underscore => false,
@@ -109,17 +124,22 @@ namespace Tex.Net.Language
         {
             return c switch
             {
-                '\\' => TokenType.Backslash,
+                '@' => TokenType.At,
+                '"' => TokenType.Quotation,
                 '%' => TokenType.Percent,
                 '\n' => TokenType.Newline,
                 '$' => TokenType.Currency,
                 '&' => TokenType.Ampersand,
                 '~' => TokenType.Tilde,
                 '_' => TokenType.Underscore,
+                '(' => TokenType.ParenthesesOpen,
+                ')' => TokenType.ParenthesesClose,
                 '{' => TokenType.CurlyOpen,
                 '}' => TokenType.CurlyClose,
                 '[' => TokenType.BracketOpen,
                 ']' => TokenType.BracketClose,
+                ':' => TokenType.Colon,
+                ',' => TokenType.Comma,
                 '^' => TokenType.Caret,
                 _ => TokenType.Text
             };

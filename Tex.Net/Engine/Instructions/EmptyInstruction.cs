@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Tex.Net.Engine
+﻿namespace Tex.Net.Engine.Instructions
 {
     public class EmptyInstruction : EngineInstruction
     {

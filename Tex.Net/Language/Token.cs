@@ -6,19 +6,28 @@ namespace Tex.Net.Language
     {
         Text = 0,
         /// <summary>
-        /// The \ character. Usually initiates a command.
+        /// The @ character. Usually initiates a command.
         /// </summary>
-        Backslash = 1,
+        At,
+        /// <summary>
+        /// Special backslash character used for escaping and hyphenation
+        /// </summary>
+        Backslash,
+        Quotation,
         Newline,
         Ampersand,
         Percent,
         Currency,
         Underscore,
+        ParenthesesOpen,
+        ParenthesesClose,
         CurlyOpen,
         CurlyClose,
         BracketOpen,
         BracketClose,
         Tilde,
+        Colon,
+        Comma,
         /// <summary>
         /// The ^ character. Also known as circumflex.
         /// </summary>

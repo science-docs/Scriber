@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Tex.Net.Language;
 
-namespace Tex.Net.Engine
+namespace Tex.Net.Engine.Instructions
 {
     public class TextInstruction : EngineInstruction
     {

@@ -1,6 +1,6 @@
 ﻿using Tex.Net.Language;
 
-namespace Tex.Net.Engine
+namespace Tex.Net.Engine.Instructions
 {
     public abstract class EngineInstruction
     {
@@ -11,11 +11,11 @@ namespace Tex.Net.Engine
 
         public static EngineInstruction? Create(Element element)
         {
-            if (element.Type == ElementType.Text)
+            if (element.Type == ElementType.Text || element.Type == ElementType.Quotation)
             {
                 return TextInstruction.Create(element);
             }
-            else if (element.Type == ElementType.Block)
+            else if (element.Type == ElementType.Block || element.Type == ElementType.ExpliciteBlock)
             {
                 return new BlockInstruction();
             }
@@ -42,6 +42,19 @@ namespace Tex.Net.Engine
                     return commandInstruction;
                 }
             }
+            else if (element.Type == ElementType.ObjectArray)
+            {
+                return new ObjectArrayInstruction();
+            }
+            else if (element.Type == ElementType.ObjectCreation)
+            {
+                return new ObjectCreationInstruction();
+            }
+            else if (element.Type == ElementType.ObjectField)
+            {
+                return new ObjectFieldInstruction(element);
+            }
+
             return null;
         }
     }

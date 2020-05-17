@@ -77,7 +77,7 @@ namespace Tex.Net.Engine
                     continue;
                 }
 
-                if (!IsAssignableFrom(state, parm.ParameterType, arg, out var transformed))
+                if (!IsAssignableFrom(state, parm, arg, out var transformed))
                 {
                     throw new CommandInvocationException($"Object of type {arg.GetType().Name} cannot be assigned or transformed to parameter of type {parm.ParameterType.Name}");
                 }
@@ -88,8 +88,9 @@ namespace Tex.Net.Engine
             }
         }
 
-        public static bool IsAssignableFrom(CompilerState state, Type target, object obj, out object? transformed)
+        public static bool IsAssignableFrom(CompilerState state, ParameterInfo parameter, object obj, out object? transformed)
         {
+            var target = parameter.ParameterType;
             if (target.IsAssignableFrom(obj.GetType()))
             {
                 transformed = obj;
@@ -115,6 +116,16 @@ namespace Tex.Net.Engine
 
                 argument.Parse(str);
                 transformed = argument;
+                return true;
+            }
+            else if (target.IsArray && obj is ObjectArray list)
+            {
+                transformed = list.Get(target.GetElementType() ?? throw new Exception("Could not convert array type to simple type"));
+                return true;
+            }
+            else if (obj is ObjectCreator creator)
+            {
+                transformed = creator.Create(parameter);
                 return true;
             }
 

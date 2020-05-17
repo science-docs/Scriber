@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Tex.Net.Engine
+﻿namespace Tex.Net.Engine.Instructions
 {
     public class EnvironmentInstruction : EngineInstruction
     {

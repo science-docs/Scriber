@@ -40,7 +40,7 @@ namespace Tex.Net.Engine
                 state.Blocks.Push();
             }
 
-            foreach (var inline in element.Inlines)
+            foreach (var inline in element.Children)
             {
                 Execute(state, inline);
             }
@@ -68,7 +68,12 @@ namespace Tex.Net.Engine
 
         private static bool BlockElement(Element element)
         {
-            return element.Type == ElementType.Block || element.Type == ElementType.Command;
+            return element.Type == ElementType.Block 
+                || element.Type == ElementType.Command 
+                || element.Type == ElementType.ExpliciteBlock 
+                || element.Type == ElementType.ObjectArray 
+                || element.Type == ElementType.ObjectCreation 
+                || element.Type == ElementType.ObjectField;
         }
 
         private static void ResolveCallbacks(ElementCollection<DocumentElement> blocks)

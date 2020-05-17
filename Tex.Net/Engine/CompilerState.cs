@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using Tex.Net.Engine.Instructions;
 using Tex.Net.Language;
-using Tex.Net.Util;
 
 namespace Tex.Net.Engine
 {

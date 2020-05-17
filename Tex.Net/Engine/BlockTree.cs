@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Tex.Net.Engine
 {
@@ -29,6 +30,20 @@ namespace Tex.Net.Engine
         public void Push(Block env)
         {
             stack.Push(env);
+        }
+
+        public Block Peek(int i)
+        {
+            int level = 0;
+
+            foreach (var block in stack)
+            {
+                if (level++ == i)
+                {
+                    return block;
+                }
+            }
+            throw new IndexOutOfRangeException();
         }
 
         public void Pop()

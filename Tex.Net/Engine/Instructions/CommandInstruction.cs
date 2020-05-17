@@ -1,7 +1,7 @@
 ﻿using System;
 using Tex.Net.Language;
 
-namespace Tex.Net.Engine
+namespace Tex.Net.Engine.Instructions
 {
     public class CommandInstruction : EngineInstruction
     {
