@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scriber", "Tex.Net\Scriber.csproj", "{D4F10FA4-1713-4212-A6C7-9B82647788F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scriber", "Scriber\Scriber.csproj", "{D4F10FA4-1713-4212-A6C7-9B82647788F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scriber.CLI", "Tex.Net.CLI\Scriber.CLI.csproj", "{E7BCE157-3C44-443D-AC35-F3AFD8121385}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scriber.CLI", "Scriber.CLI\Scriber.CLI.csproj", "{E7BCE157-3C44-443D-AC35-F3AFD8121385}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
