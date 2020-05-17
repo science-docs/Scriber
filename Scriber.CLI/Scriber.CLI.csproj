@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tex.Net\Scriber.csproj" />
+    <ProjectReference Include="..\Scriber\Scriber.csproj" />
   </ItemGroup>
 
 </Project>
