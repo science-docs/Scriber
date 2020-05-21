@@ -20,11 +20,12 @@ namespace Scriber.Engine
         public Exception? InnerException { get; set; }
         public CompilerIssueType Type { get; set; }
 
-        public CompilerIssue(Element origin, CompilerIssueType type, string message)
+        public CompilerIssue(Element origin, CompilerIssueType type, string message, Exception? innerException)
         {
             Type = type;
             Message = message;
             Origin = origin;
+            InnerException = innerException;
         }
     }
 }

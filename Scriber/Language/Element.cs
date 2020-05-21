@@ -15,9 +15,10 @@ namespace Scriber.Language
         // Default Blocks
         Block,
         // Blocks initialized with curly braces
-        ExpliciteBlock,
+        ExplicitBlock,
         Math,
         Command,
+        Environment,
         Comment,
         /// <summary>
         /// For when a command parameter is actually a 'null' literal
@@ -71,20 +72,6 @@ namespace Scriber.Language
             next = node.Next?.Value;
         }
 
-        public int IndexOf(Element child)
-        {
-            int i = 0;
-            foreach (var c in Children)
-            {
-                if (child == c)
-                {
-                    return i;
-                }
-                i++;
-            }
-            return -1;
-        }
-
         string DebuggerDisplay
         {
             get
@@ -92,10 +79,6 @@ namespace Scriber.Language
                 if (Content != null)
                 {
                     return $"{Type} '{Content}'";
-                }
-                else if (Type == ElementType.Text)
-                {
-                    return Type.ToString();
                 }
                 else
                 {

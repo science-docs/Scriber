@@ -19,7 +19,7 @@ namespace Scriber.Engine
             return InvokeDynamic;
 
             // inline method for better debugging
-            object? InvokeDynamic(CompilerState state, object[] content, object[] args)
+            object? InvokeDynamic(CompilerState state, object?[] content, object?[] args)
             {
                 var embedded = Embed(args, content);
                 var sorted = DynamicDispatch.SortArguments(command, state, embedded, param);
@@ -28,17 +28,18 @@ namespace Scriber.Engine
             }
         }
 
-        private static object[] Embed(object[] parent, object[] child)
+        private static object?[] Embed(object?[] parent, object?[] child)
         {
-            if (parent.Length == 0)
+            var array = new object?[parent.Length + 1];
+
+            array[0] = child;
+
+            for (int i = 0; i < parent.Length; i++)
             {
-                parent = new object[] { child };
+                array[i + 1] = parent[i];
             }
-            else
-            {
-                parent[0] = child;
-            }
-            return parent;
+
+            return array;
         }
     }
 }

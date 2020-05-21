@@ -1,58 +1,36 @@
 ﻿using Scriber.Language;
+using Scriber.Util;
+using System;
 
 namespace Scriber.Engine.Instructions
 {
     public class EnvironmentInstruction : EngineInstruction
     {
-        
-
-        public bool IsEnd { get; set; }
+        public string Name { get; }
 
         public EnvironmentInstruction(Element origin) : base(origin)
         {
+            Name = origin.Content ?? throw new InvalidOperationException();
         }
 
         public override object? Execute(CompilerState state, object?[] args)
         {
             if (args.Length == 0)
             {
-                throw new CommandInvocationException("An environment needs an argument specifying its name");
+                throw new InvalidOperationException("An environment needs to contain at least one child block.");
             }
 
-            var firstArg = args[0] ?? throw new System.Exception();
-            var converter = ElementConverters.Find(firstArg.GetType(), typeof(string));
+            var env = EnvironmentCollection.Find(Name);
 
-            if (converter == null)
-            {
-                throw new CommandInvocationException("Could not create string converter for type " + firstArg.GetType().Name);
-            }
-
-            if (!(converter.Convert(firstArg, typeof(string), state) is string name))
-            {
-                throw new CommandInvocationException("Could not create environment name from argument");
-            }
-
-            var env = EnvironmentCollection.Find(name);
-            
             if (env == null)
             {
-                throw new CommandInvocationException("Could not find environment: " + name);
+                throw new CompilerException(Origin, $"No environment found with name '{Name}'.");
             }
 
-            if (IsEnd)
-            {
-                state.Blocks.Pop();
-                var cur = state.Blocks.Current;
-                var objects = cur.Objects.ToArray();
-                var envArgs = cur.Arguments.ToArray();
-                return env.Execution(state, objects, envArgs);
-            }
-            else
-            {
-                var newEnv = new Block(name);
-                newEnv.Arguments.AddRange(args);
-                return newEnv;
-            }
+            var envArgs = args[0..^1];
+            var envObjs = args[^1].ConvertToFlatArray();
+
+            return env.Execution(state, envObjs, envArgs);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Scriber.Language
         public bool Newline { get; set; }
         public bool Comment { get; set; }
         public bool Quotation { get; set; }
-        public int Line { get; set; } = 0;
+        public int Line { get; set; }
         public Stack<Element> Parents { get; } = new Stack<Element>();
 
         public List<Element> CurrentLine { get; } = new List<Element>();

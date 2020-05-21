@@ -6,7 +6,7 @@ namespace Scriber.Util
 {
     public static class ObjectUtility
     {
-        public static object?[] ConvertToFlatArray(this object obj)
+        public static object?[] ConvertToFlatArray(this object? obj)
         {
             var list = new List<object?>();
             ConvertFlatArrayInternal(obj, list);

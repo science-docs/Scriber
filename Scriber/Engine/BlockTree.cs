@@ -18,10 +18,10 @@ namespace Scriber.Engine
 
         public Block Push()
         {
-            return Push("{none}");
+            return Push((string?)null);
         }
 
-        public Block Push(string name)
+        public Block Push(string? name)
         {
             Push(new Block(name));
             return Current;

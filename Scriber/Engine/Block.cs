@@ -7,7 +7,7 @@ namespace Scriber.Engine
         /// <summary>
         /// The name of the block.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// List of objects that the current block contains.
         /// </summary>
@@ -17,7 +17,7 @@ namespace Scriber.Engine
         /// </summary>
         public List<object> Arguments { get; } = new List<object>();
 
-        public Block(string name)
+        public Block(string? name)
         {
             Name = name;
         }

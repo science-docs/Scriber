@@ -62,7 +62,7 @@ namespace Scriber.Engine
         {
             Type? objType = null;
 
-            if (TypeName != null)
+            if (TypeName != null && TypeName != defaultType.Name && TypeName != defaultType.FullName)
             {
                 foreach (var t in overrides ?? Array.Empty<Type>())
                 {
@@ -92,9 +92,9 @@ namespace Scriber.Engine
             {
                 emptyObj = Activator.CreateInstance(type);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new CompilerException(TypeElement ?? Origin, $"An exception occured while creating object of type '{type.Name}'");
+                throw new CompilerException(TypeElement ?? Origin, $"An exception occured while creating object of type '{type.Name}'", ex);
             }
 
             // An object returned by Activator.CreateInstrance(Type) can be null if the type is e.g. int?. 
@@ -122,6 +122,14 @@ namespace Scriber.Engine
             else if (type.IsPrimitive)
             {
                 issue = "is a primitive";
+            }
+            else if (type.IsArray)
+            {
+                issue = "is an array type";
+            }
+            else if (type.IsEnum)
+            {
+                issue = "is an enum type";
             }
             else if (!type.IsClass && !type.IsValueType)
             {
@@ -196,6 +204,8 @@ namespace Scriber.Engine
 
             if (value is ObjectCreator subCreator)
             {
+                // We can assume that the returned value is a document variable.
+                // In every other case the Create call throws an exception.
                 inner = (subCreator.Create(typeof(DocumentVariable), null) as DocumentVariable)!;
             }
             else

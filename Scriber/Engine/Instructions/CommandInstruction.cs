@@ -18,25 +18,26 @@ namespace Scriber.Engine.Instructions
 
             if (command == null)
             {
-                throw new CommandInvocationException("Could not find command: " + Name);
+                throw new CompilerException(Origin, "Could not find command: " + Name);
             }
 
-            if (command.RequiredEnvironment != null && state.Blocks.Current.Name != command.RequiredEnvironment)
-            {
-                throw new CommandInvocationException($"Command {command.Name} requires environment {command.RequiredEnvironment}. Current environment is {state.Blocks.Current.Name}");
-            }
+            //if (command.RequiredEnvironment != null && state.Blocks.Current.Name != command.RequiredEnvironment)
+            //{
+            //    throw new CompilerException(Origin, $"Command {command.Name} requires environment {command.RequiredEnvironment}. Current environment is {state.Blocks.Current.Name}");
+            //}
 
             try
             {
                 return command.Execution(state, arguments);
             }
-            catch (CommandInvocationException)
+            catch (CompilerException e)
             {
+                e.Origin ??= Origin;
                 throw;
             }
             catch (Exception ex)
             {
-                throw new CommandInvocationException("Unhandled exception occured during execution of command " + Name, ex);
+                throw new CompilerException(Origin, "Unhandled exception occured during execution of command " + Name, ex);
             }
         }
     }

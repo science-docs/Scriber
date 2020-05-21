@@ -18,7 +18,7 @@ namespace Scriber.Engine
         /// <param name="parameters"></param>
         /// <returns></returns>
         /// <exception cref="CommandInvocationException"/>
-        public static object[] SortArguments(string command, CompilerState state, object[] args, ParameterInfo[] parameters)
+        public static object?[] SortArguments(string command, CompilerState state, object?[] args, ParameterInfo[] parameters)
         {
             // Guard for when the command does not require any arguments
             if (parameters.Length == 0)
@@ -30,7 +30,7 @@ namespace Scriber.Engine
                 return Array.Empty<object>();
             }
 
-            List<object> objects = new List<object>();
+            List<object?> objects = new List<object?>();
 
             CountParameters(parameters, out var hasState, out int required, out int optional);
 
@@ -62,7 +62,7 @@ namespace Scriber.Engine
         /// </summary>
         /// <param name="args"></param>
         /// <param name="parameters"></param>
-        public static void MatchArguments(CompilerState state, object[] args, ParameterInfo[] parameters)
+        public static void MatchArguments(CompilerState state, object?[] args, ParameterInfo[] parameters)
         {
             for (int i = 0; i < args.Length; i++)
             {

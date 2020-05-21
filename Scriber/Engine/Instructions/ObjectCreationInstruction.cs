@@ -20,7 +20,7 @@ namespace Scriber.Engine.Instructions
                 }
                 else if (next != null)
                 {
-                    throw new CompilerException();
+                    throw new CompilerException(origin);
                 }
             }
             else

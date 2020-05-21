@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Scriber.Layout.Document;
+﻿using System.Reflection;
 
 namespace Scriber.Engine
 {
@@ -22,7 +19,7 @@ namespace Scriber.Engine
             return InvokeDynamic;
 
             // inline method for better debugging
-            object? InvokeDynamic(CompilerState state, object[] args)
+            object? InvokeDynamic(CompilerState state, object?[] args)
             {
                 var sorted = DynamicDispatch.SortArguments(command, state, args, param);
                 DynamicDispatch.MatchArguments(state, sorted, param);

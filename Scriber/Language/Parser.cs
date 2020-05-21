@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -155,7 +156,7 @@ namespace Scriber.Language
             }
 
             parent = context.Parents.Peek();
-            var element = new Element(parent, ElementType.ExpliciteBlock, token.Index, context.Line);
+            var element = new Element(parent, ElementType.ExplicitBlock, token.Index, context.Line);
             context.Parents.Push(element);
             return element;
         }
@@ -206,18 +207,6 @@ namespace Scriber.Language
         {
             if (context.PeekParent(1).Type == ElementType.ObjectArray)
             {
-                var block = context.Parents.Peek();
-                if (block.Type == ElementType.Block && block.Children.Count == 0)
-                {
-                    if (context.PeekParent(1).Children.Count > 1)
-                    {
-                        // 
-                        throw new ParserException();
-                    }
-
-                    block.Detach();
-                }
-
                 context.Parents.Pop();
                 context.Parents.Pop();
                 return null;
@@ -231,7 +220,7 @@ namespace Scriber.Language
         private static Element? ParseColon(ParserContext context, Token token, Element previous)
         {
             var parent = context.Parents.Peek();
-            if (context.InCommand() && (parent.Type == ElementType.ExpliciteBlock || parent.Type == ElementType.ObjectCreation))
+            if (context.InCommand() && (parent.Type == ElementType.ExplicitBlock || parent.Type == ElementType.ObjectCreation))
             {
                 parent.Type = ElementType.ObjectCreation;
                 previous.Type = ElementType.ObjectField;
@@ -348,14 +337,34 @@ namespace Scriber.Language
         {
             SetContent(element);
 
-            foreach (var inline in element.Children.ToArray())
+            foreach (var child in element.Children.ToArray())
             {
-                BuildContent(inline);
+                BuildContent(child);
             }
 
             if (element.Type == ElementType.Text && string.IsNullOrEmpty(element.Content))
             {
                 element.Parent?.Children.Remove(element);
+            }
+
+            var children = element.Children.ToArray();
+
+            for (int i = 0; i < children.Length; i++)
+            {
+                var child = children[i];
+                if (child.Type == ElementType.Command && i < children.Length - 1)
+                {
+                    var next = children[i + 1];
+                    if (next.Type == ElementType.ExplicitBlock)
+                    {
+                        child.Type = ElementType.Environment;
+                        next.Detach();
+                        next.Parent = child;
+                        child.Children.AddLast(next);
+                        // Skip the next element
+                        i++;
+                    }
+                }
             }
         }
 
@@ -367,7 +376,8 @@ namespace Scriber.Language
 
                 if (element.Type == ElementType.ObjectField)
                 {
-                    text = text.Trim();
+                    text = text.Trim(out int advance);
+                    element.Index += advance;
                 }
                 else if (element.Type == ElementType.Text)
                 {
@@ -375,11 +385,20 @@ namespace Scriber.Language
 
                     if (previous == null || CutOffType(previous.Type))
                     {
-                        text = text.TrimStart();
+                        text = text.TrimStart(out int advance);
+                        element.Index += advance;
                     }
                     if (next == null || CutOffType(next.Type))
                     {
                         text = text.TrimEnd();
+                    }
+
+                    if (previous != null && previous.Type == ElementType.Command 
+                        && next != null && next.Type == ElementType.ExplicitBlock 
+                        && string.IsNullOrWhiteSpace(text))
+                    {
+                        element.Detach();
+                        return;
                     }
 
                     if (previous == null && next == null && text == "null")

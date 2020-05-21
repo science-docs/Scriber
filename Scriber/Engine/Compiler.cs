@@ -32,15 +32,7 @@ namespace Scriber.Engine
 
             ResolveCallbacks(state.Document.Elements);
 
-            Document? doc = state.Document;
-
-            if (state.Issues.Any(e => e.Type == CompilerIssueType.Error))
-            {
-                doc = null;
-            }
-
-            var result = new CompilerResult(doc);
-            result.Issues.AddRange(state.Issues);
+            var result = new CompilerResult(state.Document, state.Issues);
             return result;
         }
 
@@ -72,12 +64,6 @@ namespace Scriber.Engine
             if (BlockElement(element))
             {
                 state.Blocks.Pop();
-                // If we just created a new block via an environment
-                // in the last instruction push it to the state.
-                if (obj is Block env)
-                {
-                    state.Blocks.Push(env);
-                }
             }
 
             if (obj != null && !(obj is Block))
@@ -93,7 +79,8 @@ namespace Scriber.Engine
             // return element.Children.Count > 0;
             return element.Type == ElementType.Block 
                 || element.Type == ElementType.Command 
-                || element.Type == ElementType.ExpliciteBlock 
+                || element.Type == ElementType.Environment
+                || element.Type == ElementType.ExplicitBlock 
                 || element.Type == ElementType.ObjectArray 
                 || element.Type == ElementType.ObjectCreation 
                 || element.Type == ElementType.ObjectField;

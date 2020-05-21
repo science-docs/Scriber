@@ -102,28 +102,34 @@ namespace Scriber.CLI
             //    sb.AppendLine("\\section{This is a section}");
             //    sb.AppendLine();
             //}
-            //sb.AppendLine("@test({a: d, key: value, next: null})");
             sb.AppendLine("@test(TestValue {a: d, key: value, next: null})");
+            //sb.AppendLine("@figure()\n{ }");
             //sb.AppendLine("@test(null)");
             //sb.Append("@Figure() { }");
             //sb.AppendLine("@includegraphics(\"test-image.png\")");
 
             var tokens = Lexer.Tokenize(sb.ToString());
             Logger logger = new Logger();
+            logger.Logged += Logger_Logged;
             var elements = Parser.Parse(tokens);
             var result = Compiler.Compile(elements, logger);
 
             var document = result.Document;
-            document.Run();
+            document.Run(logger);
 
             var bytes = document.ToPdf();
 
 
 
-            File.WriteAllBytes("test.pdf", bytes);
+            //File.WriteAllBytes("test.pdf", bytes);
 
             watch.Stop();
             Debug.WriteLine($"Created document in {watch.ElapsedMilliseconds}ms");
+        }
+
+        private static void Logger_Logged(Log log)
+        {
+            Debug.WriteLine(string.Join("", log.GetFullMessageParts()));
         }
     }
 }

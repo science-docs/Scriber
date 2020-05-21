@@ -1,6 +1,6 @@
 ﻿using Scriber.Engine.Instructions;
 using Scriber.Language;
-using Scriber.Logging;
+using System.Linq;
 
 namespace Scriber.Engine
 {
@@ -16,19 +16,21 @@ namespace Scriber.Engine
             Blocks = new BlockTree();
         }
 
-
-        public CompilerState(Logger logger) : this()
-        {
-
-        }
-
         public object? Execute(Element element, object?[] arguments)
         {
             var instruction = EngineInstruction.Create(element);
 
-            var result = instruction?.Execute(this, arguments);
+            try
+            {
+                return instruction?.Execute(this, arguments);
+            }
+            catch (CompilerException compilerException)
+            {
+                Issues.Add(compilerException.Origin ?? element, CompilerIssueType.Error, compilerException.Message, compilerException.InnerException);
+            }
 
-            return result;
+
+            return null;
         }
     }
 }

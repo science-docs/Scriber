@@ -7,6 +7,7 @@ using System.Linq;
 using Scriber.Drawing;
 using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Logging;
 
 namespace Scriber
 {
@@ -48,10 +49,20 @@ namespace Scriber
 
         public void Run()
         {
+            Run(null);
+        }
+
+        public void Run(Logger? logger)
+        {
+            logger?.Info("First measuring");
             Measure();
+            logger?.Info("First arranging");
             Arrange();
+            logger?.Info("Interlude");
             Interlude();
+            logger?.Info("Second measuring");
             Measure();
+            logger?.Info("Second arranging");
             Arrange();
         }
 

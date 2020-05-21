@@ -50,6 +50,12 @@ namespace Scriber.Engine.Instructions
                 results.Add(currentParagraph);
             }
 
+            if (results.Count == 0 && Origin.Type == ElementType.ExplicitBlock)
+            {
+                // signaling an empty block
+                results.Add(null);
+            }
+
             return results.ToArray();
         }
 
