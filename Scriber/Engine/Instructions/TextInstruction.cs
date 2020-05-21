@@ -7,18 +7,12 @@ namespace Scriber.Engine.Instructions
     {
         public string Content { get; set; }
 
-        private TextInstruction(string content)
+        public TextInstruction(Element origin) : base(origin)
         {
-            Content = content;
+            Content = origin.Content ?? throw new ArgumentNullException(nameof(origin.Content));
         }
 
-        public static new TextInstruction Create(Element element)
-        {
-            var text = new TextInstruction(element.Content ?? throw new ArgumentNullException(nameof(element.Content)));
-            return text;
-        }
-
-        public override object Execute(CompilerState state, object[] arguments)
+        public override object Execute(CompilerState state, object?[] arguments)
         {
             // ignore arguments, as text nodes cannot contain children.
             return new Layout.Document.TextLeaf

@@ -32,16 +32,17 @@ namespace Scriber.Language
         private static Element ParsePercent(ParserContext context, Token token, Element previous)
         {
             context.Comment = true;
-            return new Element(context.Parents.Peek(), ElementType.Comment, token.Index) { StringBuilder = new StringBuilder() };
+            return new Element(context.Parents.Peek(), ElementType.Comment, token.Index, context.Line) { StringBuilder = new StringBuilder() };
         }
 
         private static Element ParseText(ParserContext context, Token token, Element previous)
         {
-            return AppendText(previous, context.Parents.Peek(), token);
+            return AppendText(context, previous, context.Parents.Peek(), token);
         }
 
         private static Element? ParseNewline(ParserContext context, Token token, Element previous)
         {
+            context.Line++;
             context.Comment = false;
             context.LastLine.Clear();
             context.LastLine.AddRange(context.CurrentLine);
@@ -49,12 +50,12 @@ namespace Scriber.Language
             if (IsLineMixed(context.LastLine) && !context.Newline)
             {
                 context.Newline = true;
-                return AppendText(previous, context.Parents.Peek(), new Token(" ", token.Index));
+                return AppendText(context, previous, context.Parents.Peek(), new Token(" ", token.Index));
             }
             else if (context.Newline)
             {
                 context.Newline = false;
-                return new Element(context.Parents.Peek(), ElementType.Paragraph, token.Index);
+                return new Element(context.Parents.Peek(), ElementType.Paragraph, token.Index, context.Line);
             }
             else
             {
@@ -72,7 +73,7 @@ namespace Scriber.Language
             else
             {
                 context.Quotation = true;
-                return new Element(context.Parents.Peek(), ElementType.Quotation, token.Index) { StringBuilder = new StringBuilder() };
+                return new Element(context.Parents.Peek(), ElementType.Quotation, token.Index, context.Line) { StringBuilder = new StringBuilder() };
             }
         }
 
@@ -83,7 +84,7 @@ namespace Scriber.Language
             if (secondParent.Type == ElementType.Command)
             {
                 context.Parents.Pop();
-                var element = new Element(secondParent, ElementType.Block, token.Index);
+                var element = new Element(secondParent, ElementType.Block, token.Index, context.Line);
                 context.Parents.Push(element);
                 return element;
             }
@@ -96,19 +97,19 @@ namespace Scriber.Language
             else if (secondParent.Type == ElementType.ObjectArray)
             {
                 context.Parents.Pop();
-                var block = new Element(context.Parents.Peek(), ElementType.Block, token.Index);
+                var block = new Element(context.Parents.Peek(), ElementType.Block, token.Index, context.Line);
                 context.Parents.Push(block);
                 return block;
             }
             else
             {
-                return AppendText(previous, context.Parents.Peek(), token);
+                return AppendText(context, previous, context.Parents.Peek(), token);
             }
         }
 
         private static Element ParseCommand(ParserContext context, Token token, Element previous)
         {
-            var command = new Element(context.Parents.Peek(), ElementType.Command, token.Index)
+            var command = new Element(context.Parents.Peek(), ElementType.Command, token.Index, context.Line)
             {
                 Content = token.Content.Substring(1)
             };
@@ -120,13 +121,13 @@ namespace Scriber.Language
             if (previous.Type == ElementType.Command)
             {
                 context.Parents.Push(previous);
-                var element = new Element(previous, ElementType.Block, token.Index);
+                var element = new Element(previous, ElementType.Block, token.Index, context.Line);
                 context.Parents.Push(element);
                 return element;
             }
             else
             {
-                return AppendText(previous, context.Parents.Peek(), token);
+                return AppendText(context, previous, context.Parents.Peek(), token);
             }
         }
 
@@ -140,7 +141,7 @@ namespace Scriber.Language
             }
             else
             {
-                return AppendText(previous, context.Parents.Peek(), token);
+                return AppendText(context, previous, context.Parents.Peek(), token);
             }
         }
 
@@ -154,7 +155,7 @@ namespace Scriber.Language
             }
 
             parent = context.Parents.Peek();
-            var element = new Element(parent, ElementType.ExpliciteBlock, token.Index);
+            var element = new Element(parent, ElementType.ExpliciteBlock, token.Index, context.Line);
             context.Parents.Push(element);
             return element;
         }
@@ -189,15 +190,15 @@ namespace Scriber.Language
                     previous = context.Parents.Peek();
                 }
 
-                var array = new Element(previous, ElementType.ObjectArray, token.Index);
+                var array = new Element(previous, ElementType.ObjectArray, token.Index, context.Line);
                 context.Parents.Push(array);
-                var block = new Element(array, ElementType.Block, token.Index);
+                var block = new Element(array, ElementType.Block, token.Index, context.Line);
                 context.Parents.Push(block);
                 return block;
             }
             else
             {
-                return AppendText(previous, context.Parents.Peek(), token);
+                return AppendText(context, previous, context.Parents.Peek(), token);
             }
         }
 
@@ -223,7 +224,7 @@ namespace Scriber.Language
             }
             else
             {
-                return AppendText(previous, context.Parents.Peek(), token);
+                return AppendText(context, previous, context.Parents.Peek(), token);
             }
         }
 
@@ -235,13 +236,13 @@ namespace Scriber.Language
                 parent.Type = ElementType.ObjectCreation;
                 previous.Type = ElementType.ObjectField;
                 context.Parents.Push(previous);
-                var block = new Element(previous, ElementType.Block, token.Index);
+                var block = new Element(previous, ElementType.Block, token.Index, context.Line);
                 context.Parents.Push(block);
                 return block;
             }
             else
             {
-                return AppendText(previous, parent, token);
+                return AppendText(context, previous, parent, token);
             }
         }
 
@@ -265,7 +266,7 @@ namespace Scriber.Language
             if (items.Length == 0)
                 yield break;
 
-            Element cur = new Element(null, ElementType.Block, 0);
+            Element cur = new Element(null, ElementType.Block, 0, 0);
             var context = new ParserContext();
             context.Parents.Push(cur);
 
@@ -301,7 +302,7 @@ namespace Scriber.Language
                         cur = TopParent(cur);
                         BuildContent(cur);
                         yield return cur;
-                        cur = new Element(null, ElementType.Block, token.Index);
+                        cur = new Element(null, ElementType.Block, token.Index, context.Line);
                         context.Parents.Push(cur);
                     }
                     else
@@ -363,6 +364,7 @@ namespace Scriber.Language
             if (element.StringBuilder != null)
             {
                 var text = element.StringBuilder.ToString();
+
                 if (element.Type == ElementType.ObjectField)
                 {
                     text = text.Trim();
@@ -379,6 +381,11 @@ namespace Scriber.Language
                     {
                         text = text.TrimEnd();
                     }
+
+                    if (previous == null && next == null && text == "null")
+                    {
+                        element.Type = ElementType.Null;
+                    }
                 }
                 element.Content = text;
                 element.StringBuilder = null;
@@ -391,9 +398,9 @@ namespace Scriber.Language
             return !(type == ElementType.Text || type == ElementType.Quotation || type == ElementType.Command); 
         }
 
-        private static Element AppendText(Element previous, Element parent, Token token)
+        private static Element AppendText(ParserContext context, Element previous, Element parent, Token token)
         {
-            var textItem = previous.Type == ElementType.Text ? previous : new Element(parent, ElementType.Text, token.Index);
+            var textItem = previous.Type == ElementType.Text ? previous : new Element(parent, ElementType.Text, token.Index, context.Line);
 
             if (textItem.StringBuilder == null)
             {

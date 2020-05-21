@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Scriber.Engine
 {
@@ -70,9 +71,10 @@ namespace Scriber.Engine
 
                 if (arg == null)
                 {
-                    if (!parm.IsOptional)
+                    var attribute = parm.GetCustomAttribute<ArgumentAttribute>();
+                    if (attribute?.NonNull ?? false || parm.ParameterType.IsValueType)
                     {
-                        throw new CommandInvocationException($"Argument 'null' was supplied for non optional command parameter ({parm.ParameterType.Name} {parm.Name}).");
+                        throw new CommandInvocationException($"Argument 'null' was supplied for non nullable command parameter ({parm.ParameterType.Name} {parm.Name}).");
                     }
                     continue;
                 }

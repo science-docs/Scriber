@@ -1,10 +1,16 @@
-﻿namespace Scriber.Engine.Instructions
+﻿using Scriber.Language;
+
+namespace Scriber.Engine.Instructions
 {
     public class EmptyInstruction : EngineInstruction
     {
+        public EmptyInstruction(Element origin) : base(origin)
+        {
+        }
+
         public static object Object { get; } = new object();
 
-        public override object? Execute(CompilerState state, object[] arguments)
+        public override object? Execute(CompilerState state, object?[] arguments)
         {
             return Object;
         }

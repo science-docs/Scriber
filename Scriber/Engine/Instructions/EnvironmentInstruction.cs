@@ -1,17 +1,25 @@
-﻿namespace Scriber.Engine.Instructions
+﻿using Scriber.Language;
+
+namespace Scriber.Engine.Instructions
 {
     public class EnvironmentInstruction : EngineInstruction
     {
+        
+
         public bool IsEnd { get; set; }
 
-        public override object? Execute(CompilerState state, object[] args)
+        public EnvironmentInstruction(Element origin) : base(origin)
+        {
+        }
+
+        public override object? Execute(CompilerState state, object?[] args)
         {
             if (args.Length == 0)
             {
                 throw new CommandInvocationException("An environment needs an argument specifying its name");
             }
 
-            var firstArg = args[0];
+            var firstArg = args[0] ?? throw new System.Exception();
             var converter = ElementConverters.Find(firstArg.GetType(), typeof(string));
 
             if (converter == null)
@@ -45,11 +53,6 @@
                 newEnv.Arguments.AddRange(args);
                 return newEnv;
             }
-        }
-
-        public static EnvironmentInstruction Create()
-        {
-            return new EnvironmentInstruction();
         }
     }
 }

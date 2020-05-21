@@ -7,17 +7,12 @@ namespace Scriber.Engine.Instructions
     {
         public string Name { get; set; }
 
-        public CommandInstruction(string name)
+        public CommandInstruction(Element origin) : base(origin)
         {
-            Name = name;
+            Name = origin.Content ?? throw new InvalidOperationException("Command with null content was given");
         }
 
-        public static new CommandInstruction Create(Element element)
-        {
-            return new CommandInstruction(element.Content ?? throw new InvalidOperationException("Command with null content was given"));
-        }
-
-        public override object? Execute(CompilerState state, object[] arguments)
+        public override object? Execute(CompilerState state, object?[] arguments)
         {
             var command = CommandCollection.Find(Name);
 

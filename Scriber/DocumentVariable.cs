@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Scriber
@@ -38,22 +39,13 @@ namespace Scriber
 
         }
 
-        public DocumentVariable(object value)
+        public DocumentVariable(object? value)
         {
             this.value = value;
         }
 
-        public T GetValue<T>() where T : struct
-        {
-            if (value is T item)
-            {
-                return item;
-            }
-
-            return default;
-        }
-
-        public T? GetValueNullable<T>() where T : class
+        [return: MaybeNull]
+        public T GetValue<T>()
         {
             if (value is T item)
             {
@@ -72,7 +64,7 @@ namespace Scriber
             return false;
         }
 
-        public void SetValue(object value)
+        public void SetValue(object? value)
         {
             this.value = value;
         }

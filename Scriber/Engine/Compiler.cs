@@ -2,6 +2,7 @@
 using System.Linq;
 using Scriber.Language;
 using Scriber.Layout.Document;
+using Scriber.Logging;
 using Scriber.Util;
 
 namespace Scriber.Engine
@@ -10,7 +11,17 @@ namespace Scriber.Engine
     {
         public static CompilerResult Compile(IEnumerable<Element> elements)
         {
+            return Compile(elements, null);
+        }
+
+        public static CompilerResult Compile(IEnumerable<Element> elements, Logger? logger)
+        {
             var state = new CompilerState();
+
+            if (logger != null)
+            {
+                state.Issues.CollectionChanged += (_, e) => IssuesChanged(logger, e);
+            }
 
             foreach (var element in elements)
             {
@@ -31,6 +42,17 @@ namespace Scriber.Engine
             var result = new CompilerResult(doc);
             result.Issues.AddRange(state.Issues);
             return result;
+        }
+
+        private static void IssuesChanged(Logger logger, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (CompilerIssue issue in e.NewItems.OfType<CompilerIssue>().Where(e => e != null))
+                {
+                    logger.Log((LogLevel)(int)issue.Type, issue.Message);
+                }
+            }
         }
 
         private static void Execute(CompilerState state, Element element)
@@ -68,6 +90,7 @@ namespace Scriber.Engine
 
         private static bool BlockElement(Element element)
         {
+            // return element.Children.Count > 0;
             return element.Type == ElementType.Block 
                 || element.Type == ElementType.Command 
                 || element.Type == ElementType.ExpliciteBlock 

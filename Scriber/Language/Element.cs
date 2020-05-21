@@ -40,15 +40,17 @@ namespace Scriber.Language
         public Element? Parent { get; set; }
         public int Index { get; set; }
         public int Length { get; set; }
+        public int Line { get; set; }
         public string? Content { get; set; }
         public TextType ContentType { get; set; }
         internal StringBuilder? StringBuilder { get; set; }
 
-        public Element(Element? parent, ElementType type, int index)
+        public Element(Element? parent, ElementType type, int index, int line)
         {
             Type = type;
             Parent = parent;
             Index = index;
+            Line = line;
 
             if (parent != null)
             {

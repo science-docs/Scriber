@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Scriber.Engine.Instructions;
+﻿using Scriber.Engine.Instructions;
 using Scriber.Language;
+using Scriber.Logging;
 
 namespace Scriber.Engine
 {
@@ -8,7 +8,7 @@ namespace Scriber.Engine
     {
         public Document Document { get; }
         public BlockTree Blocks { get; }
-        public List<CompilerIssue> Issues { get; } = new List<CompilerIssue>();
+        public CompilerIssueCollection Issues { get; } = new CompilerIssueCollection();
 
         public CompilerState()
         {
@@ -16,7 +16,13 @@ namespace Scriber.Engine
             Blocks = new BlockTree();
         }
 
-        public object? Execute(Element element, object[] arguments)
+
+        public CompilerState(Logger logger) : this()
+        {
+
+        }
+
+        public object? Execute(Element element, object?[] arguments)
         {
             var instruction = EngineInstruction.Create(element);
 
@@ -24,7 +30,5 @@ namespace Scriber.Engine
 
             return result;
         }
-
-        
     }
 }

@@ -1,40 +1,72 @@
-﻿using System;
+﻿using Scriber.Language;
+using SixLabors.ImageSharp.Processing;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Scriber.Engine
 {
-    public class ObjectCreator
+    public class ObjectCreator : Traceable
     {
-        public string? Type { get; set; }
+        public string? TypeName { get; set; }
+        public Element? TypeElement { get; set; }
+        public CompilerState? CompilerState { get; set; }
         public List<ObjectField> Fields { get; } = new List<ObjectField>();
+
+        public ObjectCreator(Element origin) : this(origin, null)
+        {
+        }
+
+        public ObjectCreator(Element origin, CompilerState? compilerState) : base(origin)
+        {
+            CompilerState = compilerState;
+        }
 
         public object Create(ParameterInfo parameter)
         {
-            var obj = CreateEmpty(parameter, out var type);
+            var attribute = parameter.GetCustomAttribute<ArgumentAttribute>();
+            return Create(parameter.ParameterType, attribute?.Overrides);
+        }
 
-            var props = type.GetProperties();
+        public object Create(PropertyInfo property)
+        {
+            var attribute = property.GetCustomAttribute<ObjectFieldAttribute>();
+            return Create(property.PropertyType, attribute?.Overrides);
+        }
 
-            var matched = MatchFields(props, Fields);
+        public object Create(Type defaultType, Type[]? overrides)
+        {
+            var obj = CreateEmpty(defaultType, overrides, out var type);
 
-            foreach (var match in matched)
+            if (obj is DocumentVariable vars)
             {
-                FillField(obj, match.Item1, match.Item2.Value);
+                foreach (var field in Fields)
+                {
+                    FillField(vars, field);
+                }
+            }
+            else
+            {
+                var matched = MatchFields(type, Fields);
+                foreach (var match in matched)
+                {
+                    FillField(obj, match.Item1, match.Item2.Value);
+                }
             }
 
             return obj;
         }
 
-        private object CreateEmpty(ParameterInfo parameter, out Type type)
+        private object CreateEmpty(Type defaultType, Type[]? overrides, out Type type)
         {
             Type? objType = null;
-            var attribute = parameter.GetCustomAttribute<ArgumentAttribute>();
 
-            if (attribute?.Overrides != null && Type != null)
+            if (TypeName != null)
             {
-                foreach (var t in attribute.Overrides)
+                foreach (var t in overrides ?? Array.Empty<Type>())
                 {
-                    if (t.Name == Type || t.FullName == Type)
+                    if (t.Name == TypeName || t.FullName == TypeName)
                     {
                         objType = t;
                         break;
@@ -42,23 +74,74 @@ namespace Scriber.Engine
                 }
                 if (objType == null)
                 {
-                    throw new Exception("Could not find specified type in argument override types");
+                    throw new CompilerException(TypeElement ?? Origin, $"Object of type '{TypeName}' cannot be created. It is not a member of the overrides for type '{defaultType.Name}'");
                 }
             }
             else
             {
-                objType = parameter.ParameterType;
+                objType = defaultType;
             }
 
-            type = objType ?? throw new Exception();
-            
-            return Activator.CreateInstance(type) ?? throw new Exception();
+            type = objType;
+
+            ValidateType(type);
+
+            object? emptyObj;
+
+            try
+            {
+                emptyObj = Activator.CreateInstance(type);
+            }
+            catch
+            {
+                throw new CompilerException(TypeElement ?? Origin, $"An exception occured while creating object of type '{type.Name}'");
+            }
+
+            // An object returned by Activator.CreateInstrance(Type) can be null if the type is e.g. int?. 
+            // Altough these types are not valid by the previous validation we still check for null here.
+            if (emptyObj == null)
+            {
+                throw new InvalidOperationException("Null values created by an ObjectCreator are forbidden");
+            }
+
+            return emptyObj;
         }
 
-        private static List<Tuple<PropertyInfo, ObjectField>> MatchFields(IEnumerable<PropertyInfo> properties, IEnumerable<ObjectField> fields)
+        private void ValidateType(Type type)
         {
-            var list = new List<Tuple<PropertyInfo, ObjectField>>();
+            string? issue = null;
 
+            if (type.IsAbstract)
+            {
+                issue = "is defined as abstract";
+            }
+            else if (type.IsInterface)
+            {
+                issue = "is an interface";
+            }
+            else if (type.IsPrimitive)
+            {
+                issue = "is a primitive";
+            }
+            else if (!type.IsClass && !type.IsValueType)
+            {
+                issue = "is not a data type";
+            }
+            else if (type.GetConstructor(Type.EmptyTypes) == null)
+            {
+                issue = "contains no default constructor";
+            }
+
+            if (issue != null)
+            {
+                throw new CompilerException(TypeElement ?? Origin, $"Type '{type.Name}' {issue}. An object of this type cannot be instantiated.");
+            }
+        }
+
+        private List<Tuple<PropertyInfo, ObjectField>> MatchFields(Type type, IEnumerable<ObjectField> fields)
+        {
+            var properties = type.GetProperties();
+            var list = new List<Tuple<PropertyInfo, ObjectField>>();
             var matched = new List<ObjectField>();
 
             foreach (var prop in properties)
@@ -77,19 +160,50 @@ namespace Scriber.Engine
                 }
             }
 
+            if (CompilerState != null)
+            {
+                foreach (var unmatched in fields.Except(matched))
+                {
+                    CompilerState.Issues.Add(unmatched.Origin, CompilerIssueType.Warning, $"Property '{unmatched.Key}' not found on type '{type.Name}'.");
+                }
+            }
+            
+
             return list;
         }
 
-        private static void FillField(object obj, PropertyInfo info, object value)
+        private static void FillField(object obj, PropertyInfo info, object? value)
         {
             var type = info.PropertyType;
 
-            if (!type.IsAssignableFrom(value.GetType()))
+            if (value is ObjectCreator subCreator)
+            {
+                value = subCreator.Create(info);
+            }
+
+            if (value != null && !type.IsAssignableFrom(value.GetType()))
             {
                 value = ElementConverters.Convert(value, type);
             }
 
             info.SetValue(obj, value);
+        }
+
+        private static void FillField(DocumentVariable vars, ObjectField field)
+        {
+            var value = field.Value;
+            DocumentVariable inner;
+
+            if (value is ObjectCreator subCreator)
+            {
+                inner = (subCreator.Create(typeof(DocumentVariable), null) as DocumentVariable)!;
+            }
+            else
+            {
+                inner = new DocumentVariable(value);
+            }
+
+            vars[field.Key] = inner;
         }
     }
 }

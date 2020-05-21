@@ -1,10 +1,16 @@
-﻿namespace Scriber.Engine.Instructions
+﻿using Scriber.Language;
+
+namespace Scriber.Engine.Instructions
 {
     public class ObjectArrayInstruction : EngineInstruction
     {
-        public override object? Execute(CompilerState state, object[] arguments)
+        public ObjectArrayInstruction(Element origin) : base(origin)
         {
-            return new ObjectArray(arguments);
+        }
+
+        public override object? Execute(CompilerState state, object?[] arguments)
+        {
+            return new ObjectArray(Origin, arguments);
         }
     }
 }

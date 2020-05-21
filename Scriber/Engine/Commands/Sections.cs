@@ -85,7 +85,7 @@ namespace Scriber.Engine.Commands
         private static List<TableEntry> GetEntryTable(DocumentVariable variables)
         {
             var toc = variables[DocumentVariables.TableOfContent]["entries"];
-            var list = toc.GetValueNullable<List<TableEntry>>();
+            var list = toc.GetValue<List<TableEntry>>();
             if (list == null)
             {
                 list = new List<TableEntry>();

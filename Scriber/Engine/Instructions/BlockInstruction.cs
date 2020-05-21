@@ -1,13 +1,18 @@
 ﻿using System.Collections.Generic;
+using Scriber.Language;
 using Scriber.Layout.Document;
 
 namespace Scriber.Engine.Instructions
 {
     public class BlockInstruction : EngineInstruction
     {
-        public override object Execute(CompilerState state, object[] arguments)
+        public BlockInstruction(Element origin) : base(origin)
         {
-            var results = new List<object>();
+        }
+
+        public override object Execute(CompilerState state, object?[] arguments)
+        {
+            var results = new List<object?>();
 
             // Group continueous leafs into one paragraph
             Paragraph? currentParagraph = null;
@@ -26,19 +31,16 @@ namespace Scriber.Engine.Instructions
                 }
                 else if (item == EmptyInstruction.Object)
                 {
-                    if (currentParagraph != null)
-                    {
-                        results.Add(currentParagraph);
-                        currentParagraph = null;
-                    }
+                    ResetParagraph(results, ref currentParagraph);
+                }
+                else if (item == NullInstruction.NullObject)
+                {
+                    ResetParagraph(results, ref currentParagraph);
+                    results.Add(null);
                 }
                 else
                 {
-                    if (currentParagraph != null)
-                    {
-                        results.Add(currentParagraph);
-                        currentParagraph = null;
-                    }
+                    ResetParagraph(results, ref currentParagraph);
                     results.Add(item);
                 }
             }
@@ -49,6 +51,15 @@ namespace Scriber.Engine.Instructions
             }
 
             return results.ToArray();
+        }
+
+        private static void ResetParagraph(List<object?> results, ref Paragraph? paragraph)
+        {
+            if (paragraph != null)
+            {
+                results.Add(paragraph);
+                paragraph = null;
+            }
         }
     }
 }

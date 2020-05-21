@@ -9,6 +9,7 @@ namespace Scriber.Engine
     {
         public string Name { get; }
         public string? Description { get; set; }
+        public Type[]? Overrides { get; set; }
 
         public ObjectFieldAttribute(string name)
         {

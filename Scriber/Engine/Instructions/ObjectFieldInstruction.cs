@@ -7,14 +7,14 @@ namespace Scriber.Engine.Instructions
     {
         public string Key { get; }
 
-        public ObjectFieldInstruction(Element element)
+        public ObjectFieldInstruction(Element element) : base(element)
         {
             Key = element.Content ?? throw new Exception();
         }
 
-        public override object? Execute(CompilerState state, object[] arguments)
+        public override object? Execute(CompilerState state, object?[] arguments)
         {
-            return new ObjectField(Key, arguments[0]);
+            return new ObjectField(Origin, Key, arguments[0]);
         }
     }
 }
