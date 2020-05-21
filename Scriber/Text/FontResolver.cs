@@ -11,7 +11,7 @@ namespace Scriber.Text
         public byte[] GetFont(string faceName)
         {
             var asm = typeof(Font).Assembly;
-            var fullName = $"Tex.Net.Resources.Fonts.{faceName}.ttf";
+            var fullName = $"Scriber.Resources.Fonts.{faceName}.ttf";
             using var stream = asm.GetManifestResourceStream(fullName);
 
             if (stream == null)

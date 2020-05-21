@@ -42,7 +42,7 @@ namespace Scriber.Text
 
             private string GetResourcePath(string langCode, string pat)
             {
-                return $"Tex.Net.Resources.Hyphenator.hyph-{langCode}.{pat}.txt";
+                return $"Scriber.Resources.Hyphenator.hyph-{langCode}.{pat}.txt";
             }
 
             private string GetResourceStringContent(string path)

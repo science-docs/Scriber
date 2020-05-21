@@ -44,7 +44,7 @@ namespace Scriber.Text
         private static Stream LoadFont(string name)
         {
             var asm = typeof(Font).Assembly;
-            var fullName = $"Tex.Net.Resources.Fonts.{name}.ttf";
+            var fullName = $"Scriber.Resources.Fonts.{name}.ttf";
             using var stream = asm.GetManifestResourceStream(fullName);
 
             if (stream == null)
