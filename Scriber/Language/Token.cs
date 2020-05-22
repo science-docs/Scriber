@@ -41,25 +41,29 @@ namespace Scriber.Language
         public TokenType Type { get; set; }
         public int Index { get; set; }
         public int Length => Content.Length;
+        public int Line { get; set; }
 
-        public Token(string content, int index)
+        public Token(string content, int index, int line)
         {
             Content = content;
             Index = index;
+            Line = line;
             Type = TokenType.Text;
         }
 
-        public Token(TokenType type, int index)
+        public Token(TokenType type, int index, int line)
         {
             Type = type;
             Index = index;
+            Line = line;
             Content = null ?? string.Empty;
         }
 
-        public Token(TokenType type, int index, string content)
+        public Token(TokenType type, int index, int line, string content)
         {
             Type = type;
             Index = index;
+            Line = line;
             Content = content;
         }
     }

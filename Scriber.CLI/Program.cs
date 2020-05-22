@@ -111,8 +111,8 @@ namespace Scriber.CLI
             var tokens = Lexer.Tokenize(sb.ToString());
             Logger logger = new Logger();
             logger.Logged += Logger_Logged;
-            var elements = Parser.Parse(tokens);
-            var result = Compiler.Compile(elements, logger);
+            var parserResult = Parser.Parse(tokens, logger);
+            var result = Compiler.Compile(parserResult.Elements, logger);
 
             var document = result.Document;
             document.Run(logger);

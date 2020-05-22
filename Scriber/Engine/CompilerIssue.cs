@@ -13,8 +13,9 @@ namespace Scriber.Engine
 
     public class CompilerIssue
     {
-        public int Index { get; set; }
-        public int Length { get; set; }
+        public int Index => Origin.Index;
+        public int Length => Origin.Length;
+        public int Line => Origin.Line;
         public string Message { get; set; }
         public Element Origin { get; set; }
         public Exception? InnerException { get; set; }

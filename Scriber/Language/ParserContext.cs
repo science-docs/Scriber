@@ -15,6 +15,7 @@ namespace Scriber.Language
         public List<Element> CurrentLine { get; } = new List<Element>();
 
         public List<Element> LastLine { get; } = new List<Element>();
+        public ParserIssueCollection Issues { get; } = new ParserIssueCollection();
 
         public bool InCommand()
         {

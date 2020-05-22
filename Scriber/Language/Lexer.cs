@@ -18,6 +18,7 @@ namespace Scriber.Language
         {
             int code;
             int index = 0;
+            int line = 0;
             //bool ignore = false;
             char c;
             Token? cur = null;
@@ -31,6 +32,11 @@ namespace Scriber.Language
                 {
                     index++;
                     continue;
+                }
+
+                if (c == '\n')
+                {
+                    line++;
                 }
 
                 //if (ignore)
@@ -69,11 +75,11 @@ namespace Scriber.Language
                         var type = GetTokenType(c);
                         if (IsSingleToken(type))
                         {
-                            yield return new Token(type, index, c.ToString());
+                            yield return new Token(type, index, line, c.ToString());
                         }
                         else
                         {
-                            cur = new Token(GetTokenType(c), index);
+                            cur = new Token(GetTokenType(c), index, line);
                             sb.Append(c);
                         }
 
@@ -86,7 +92,7 @@ namespace Scriber.Language
                     }
                     else
                     {
-                        cur = new Token(TokenType.Text, index);
+                        cur = new Token(TokenType.Text, index, line);
                         sb.Append(c);
                     }
 

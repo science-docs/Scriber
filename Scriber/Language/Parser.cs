@@ -1,4 +1,5 @@
-﻿using Scriber.Util;
+﻿using Scriber.Logging;
+using Scriber.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +52,7 @@ namespace Scriber.Language
             if (IsLineMixed(context.LastLine) && !context.Newline)
             {
                 context.Newline = true;
-                return AppendText(context, previous, context.Parents.Peek(), new Token(" ", token.Index));
+                return AppendText(context, previous, context.Parents.Peek(), new Token(" ", token.Index, token.Line));
             }
             else if (context.Newline)
             {
@@ -177,7 +178,8 @@ namespace Scriber.Language
             else
             {
                 // Too many closing brackets
-                throw new ParserException("");
+                context.Issues.Add(token, ParserIssueType.Error, "No block to close exists.");
+                return null;
             }
         }
 
@@ -235,17 +237,27 @@ namespace Scriber.Language
             }
         }
 
-        public static Element[] Parse(IEnumerable<Token> tokens)
+        public static ParserResult Parse(IEnumerable<Token> tokens)
         {
-            return ParseInternal(tokens).ToArray();
+            return Parse(tokens, null);
         }
 
-        public static Element[] ParseFromString(string text)
+        public static ParserResult Parse(IEnumerable<Token> tokens, Logger? logger)
         {
-            return Parse(Lexer.Tokenize(text));
+            return ParseInternal(tokens, logger);
         }
 
-        private static IEnumerable<Element> ParseInternal(IEnumerable<Token> tokens)
+        public static ParserResult ParseFromString(string text)
+        {
+            return ParseFromString(text, null);
+        }
+
+        public static ParserResult ParseFromString(string text, Logger? logger)
+        {
+            return Parse(Lexer.Tokenize(text), logger);
+        }
+
+        private static ParserResult ParseInternal(IEnumerable<Token> tokens, Logger? logger)
         {
             if (tokens == null)
                 throw new ArgumentNullException(nameof(tokens));
@@ -253,10 +265,17 @@ namespace Scriber.Language
             var items = tokens.ToArray();
 
             if (items.Length == 0)
-                yield break;
+                return ParserResult.Empty();
 
             Element cur = new Element(null, ElementType.Block, 0, 0);
             var context = new ParserContext();
+            var elements = new List<Element>();
+
+            if (logger != null)
+            {
+                context.Issues.CollectionChanged += (_, e) => IssuesChanged(logger, e);
+            }
+
             context.Parents.Push(cur);
 
             foreach (var token in items)
@@ -290,7 +309,7 @@ namespace Scriber.Language
                     {
                         cur = TopParent(cur);
                         BuildContent(cur);
-                        yield return cur;
+                        elements.Add(cur);
                         cur = new Element(null, ElementType.Block, token.Index, context.Line);
                         context.Parents.Push(cur);
                     }
@@ -313,12 +332,25 @@ namespace Scriber.Language
             // If blocks or commands where left hanging open
             if (context.Parents.Count > 2)
             {
-                throw new ParserException("");
+                context.Issues.Add(items[^1], ParserIssueType.Error, "A block was left hanging open");
             }
 
             cur = TopParent(cur);
             BuildContent(cur);
-            yield return cur;
+            elements.Add(cur);
+
+            return new ParserResult(elements, context.Issues);
+        }
+
+        private static void IssuesChanged(Logger logger, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (ParserIssue issue in e.NewItems.OfType<ParserIssue>().Where(e => e != null))
+                {
+                    logger.Log((LogLevel)(int)issue.Type, issue.Message);
+                }
+            }
         }
 
         private static Element TopParent(Element element)
