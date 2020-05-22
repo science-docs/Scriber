@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Language;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
@@ -18,14 +19,14 @@ namespace Scriber.Engine
         /// <param name="parameters"></param>
         /// <returns></returns>
         /// <exception cref="CommandInvocationException"/>
-        public static object?[] SortArguments(string command, CompilerState state, object?[] args, ParameterInfo[] parameters)
+        public static object?[] SortArguments(string command, Element element, CompilerState state, object?[] args, ParameterInfo[] parameters)
         {
             // Guard for when the command does not require any arguments
             if (parameters.Length == 0)
             {
                 if (args.Length != 0)
                 {
-                    throw new CommandInvocationException($"Command {command} does not expect any arguments. Received: {args.Length}");
+                    throw new CompilerException(element, $"Command {command} does not expect any arguments. Received: {args.Length}");
                 }
                 return Array.Empty<object>();
             }
@@ -36,7 +37,7 @@ namespace Scriber.Engine
 
             if (args.Length < required || args.Length > required + optional)
             {
-                throw new CommandInvocationException($"Command {command} expects between {required} and {required + optional} arguments. {args.Length} arguments where supplied");
+                throw new CompilerException(element, $"Command {command} expects between {required} and {required + optional} arguments. {args.Length} arguments where supplied");
             }
 
             if (hasState)
@@ -44,11 +45,8 @@ namespace Scriber.Engine
                 objects.Add(state);
             }
 
-            var suppliedOptional = args.Length - required;
-
-            // switch positions of optional and required arguments with ranges
-            objects.AddRange(args[suppliedOptional..^0]);
-            objects.AddRange(args[0..suppliedOptional]);
+            // add all given arguments
+            objects.AddRange(args);
             // pad missing optional arguments
             var padArray = new object[required + optional - args.Length];
             objects.AddRange(padArray);
@@ -62,7 +60,7 @@ namespace Scriber.Engine
         /// </summary>
         /// <param name="args"></param>
         /// <param name="parameters"></param>
-        public static void MatchArguments(CompilerState state, object?[] args, ParameterInfo[] parameters)
+        public static void MatchArguments(CompilerState state, Element element, object?[] args, ParameterInfo[] parameters)
         {
             for (int i = 0; i < args.Length; i++)
             {
@@ -74,18 +72,19 @@ namespace Scriber.Engine
                     var attribute = parm.GetCustomAttribute<ArgumentAttribute>();
                     if (attribute?.NonNull ?? false || parm.ParameterType.IsValueType)
                     {
-                        throw new CommandInvocationException($"Argument 'null' was supplied for non nullable command parameter ({parm.ParameterType.Name} {parm.Name}).");
+                        throw new CompilerException(element, $"Argument 'null' was supplied for non nullable command parameter ({parm.ParameterType.Name} {attribute?.Name ?? parm.Name}).");
                     }
                     continue;
                 }
 
                 if (!IsAssignableFrom(state, parm, arg, out var transformed))
                 {
-                    throw new CommandInvocationException($"Object of type {arg.GetType().Name} cannot be assigned or transformed to parameter of type {parm.ParameterType.Name}");
+                    throw new CompilerException(element, $"Object of type '{arg.GetType().Name}' cannot be assigned or transformed to parameter of type '{parm.ParameterType.Name}'.");
                 }
                 else
                 {
-                    args[i] = transformed ?? throw new CommandInvocationException("Transformed element cannot be null");
+                    args[i] = transformed ?? throw new CompilerException(element, "Transformed element cannot be null.");
+                    state.Issues.Log(element, $"Transformed element of type '{arg.GetType().Name}' to '{transformed.GetType().Name}'");
                 }
             }
         }

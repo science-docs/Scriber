@@ -1,5 +1,4 @@
 ﻿using Scriber.Language;
-using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +53,8 @@ namespace Scriber.Engine
                     FillField(obj, match.Item1, match.Item2.Value);
                 }
             }
+
+            CompilerState?.Issues.Log(Origin, $"Created object of type '{obj.GetType().Name}'");
 
             return obj;
         }

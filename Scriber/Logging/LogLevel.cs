@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Scriber.Logging
+﻿namespace Scriber.Logging
 {
     public enum LogLevel
     {

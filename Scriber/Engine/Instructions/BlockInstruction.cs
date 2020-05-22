@@ -31,38 +31,37 @@ namespace Scriber.Engine.Instructions
                 }
                 else if (item == EmptyInstruction.Object)
                 {
-                    ResetParagraph(results, ref currentParagraph);
+                    ResetParagraph(state, results, ref currentParagraph);
                 }
                 else if (item == NullInstruction.NullObject)
                 {
-                    ResetParagraph(results, ref currentParagraph);
+                    ResetParagraph(state, results, ref currentParagraph);
                     results.Add(null);
                 }
                 else
                 {
-                    ResetParagraph(results, ref currentParagraph);
+                    ResetParagraph(state, results, ref currentParagraph);
                     results.Add(item);
                 }
             }
 
-            if (currentParagraph != null)
-            {
-                results.Add(currentParagraph);
-            }
+            ResetParagraph(state, results, ref currentParagraph);
 
             if (results.Count == 0 && Origin.Type == ElementType.ExplicitBlock)
             {
                 // signaling an empty block
                 results.Add(null);
+                state.Issues.Log(Origin, "Empty explicit block found. Adding null element");
             }
 
             return results.ToArray();
         }
 
-        private static void ResetParagraph(List<object?> results, ref Paragraph? paragraph)
+        private void ResetParagraph(CompilerState state, List<object?> results, ref Paragraph? paragraph)
         {
             if (paragraph != null)
             {
+                state.Issues.Log(Origin, $"Grouping {paragraph.Leaves.Count} leaves into a paragraph.");
                 results.Add(paragraph);
                 paragraph = null;
             }

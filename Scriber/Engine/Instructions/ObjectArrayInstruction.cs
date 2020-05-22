@@ -10,7 +10,7 @@ namespace Scriber.Engine.Instructions
 
         public override object? Execute(CompilerState state, object?[] arguments)
         {
-            return new ObjectArray(Origin, arguments);
+            return new ObjectArray(Origin, state, arguments);
         }
     }
 }

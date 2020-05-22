@@ -1,8 +1,9 @@
-﻿using System.Reflection;
+﻿using Scriber.Language;
+using System.Reflection;
 
 namespace Scriber.Engine
 {
-    public delegate object? EnvironmentExecution(CompilerState state, object?[] objects, object?[] arguments);
+    public delegate object? EnvironmentExecution(Element origin, CompilerState state, object?[] objects, object?[] arguments);
 
     public class Environment
     {

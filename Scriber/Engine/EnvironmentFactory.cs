@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using Scriber.Language;
+using System.Reflection;
 
 namespace Scriber.Engine
 {
@@ -19,11 +20,11 @@ namespace Scriber.Engine
             return InvokeDynamic;
 
             // inline method for better debugging
-            object? InvokeDynamic(CompilerState state, object?[] content, object?[] args)
+            object? InvokeDynamic(Element element, CompilerState state, object?[] content, object?[] args)
             {
                 var embedded = Embed(args, content);
-                var sorted = DynamicDispatch.SortArguments(command, state, embedded, param);
-                DynamicDispatch.MatchArguments(state, sorted, param);
+                var sorted = DynamicDispatch.SortArguments(command, element, state, embedded, param);
+                DynamicDispatch.MatchArguments(state, element, sorted, param);
                 return method.Invoke(null, sorted);
             }
         }

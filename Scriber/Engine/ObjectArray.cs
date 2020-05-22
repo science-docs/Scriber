@@ -7,8 +7,11 @@ namespace Scriber.Engine
     {
         private readonly object?[] array;
 
-        public ObjectArray(Element origin, object?[] objects) : base(origin)
+        public CompilerState? CompilerState { get; }
+
+        public ObjectArray(Element origin, CompilerState? compilerState, object?[] objects) : base(origin)
         {
+            CompilerState = compilerState;
             array = objects;
         }
 
@@ -16,12 +19,12 @@ namespace Scriber.Engine
         {
             if (type.IsArray)
             {
-                throw new CompilerException("Cannot ");
+                throw new CompilerException(Origin, "Cannot create nested arrays.");
             }
 
             var arrType = type.MakeArrayType();
             var arr = Activator.CreateInstance(arrType, new object[] { array.Length }) as Array 
-                ?? throw new Exception("Could not create array of type " + type.Name);
+                ?? throw new InvalidOperationException($"Could not create array of type '{type.Name}'.");
 
             for (int i = 0; i < arr.Length; i++)
             {
@@ -41,15 +44,17 @@ namespace Scriber.Engine
                     var converter = ElementConverters.Find(value.GetType(), type);
                     if (converter != null)
                     {
-                        var transformed = converter.Convert(value, type, new CompilerState());
+                        var transformed = converter.Convert(value, type, CompilerState ?? new CompilerState());
                         arr.SetValue(transformed, i);
                     }
                     else
                     {
-                        throw new Exception();
+                        throw new CompilerException(Origin, $"Cannot convert element of type '{value.GetType().Name}' to '{type.Name}' because no appropriate converter was found.");
                     }
                 }
             }
+
+            CompilerState?.Issues.Log(Origin, $"Created array of type {type.Name}.");
 
             return arr;
         }

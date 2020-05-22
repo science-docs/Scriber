@@ -109,7 +109,7 @@ namespace Scriber.CLI
             //sb.AppendLine("@includegraphics(\"test-image.png\")");
 
             var tokens = Lexer.Tokenize(sb.ToString());
-            Logger logger = new Logger();
+            Logger logger = new Logger { Level = LogLevel.Debug };
             logger.Logged += Logger_Logged;
             var parserResult = Parser.Parse(tokens, logger);
             var result = Compiler.Compile(parserResult.Elements, logger);

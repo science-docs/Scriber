@@ -30,7 +30,21 @@ namespace Scriber.Engine.Instructions
             var envArgs = args[0..^1];
             var envObjs = args[^1].ConvertToFlatArray();
 
-            return env.Execution(state, envObjs, envArgs);
+            try
+            {
+                var obj = env.Execution(Origin, state, envObjs, envArgs);
+                state.Issues.Log(Origin, $"Successfully executed environment '{Name}'.");
+                return obj;
+            }
+            catch (CompilerException e)
+            {
+                e.Origin ??= Origin;
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new CompilerException(Origin, $"Unhandled exception occured during execution of command '{Name}'.", ex);
+            }
         }
     }
 }

@@ -2,12 +2,17 @@
 {
     public class Logger
     {
+        public LogLevel Level { get; set; } = LogLevel.Info;
+
         public event LogEvent? Logged;
 
         public void Log(LogLevel level, string message)
         {
             Log log = new Log(level, message);
-            Logged?.Invoke(log);
+            if ((int)level >= (int)Level)
+            {
+                Logged?.Invoke(log);
+            }
         }
 
         public void Debug(string message)
