@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,7 +18,7 @@ namespace Scriber.Language
             int code;
             int index = 0;
             int line = 0;
-            //bool ignore = false;
+            bool ignore = false;
             char c;
             Token? cur = null;
             StringBuilder sb = new StringBuilder();
@@ -38,19 +37,29 @@ namespace Scriber.Language
                 {
                     line++;
                 }
+                else
+                {
+                    if (ignore)
+                    {
+                        if (!IsSpecialCharacter(c))
+                        {
+                            sb.Append('\\');
+                        }
 
-                //if (ignore)
-                //{
-                //    sb.Append(c);
-                //    index++;
-                //    continue;
-                //}
-                //else if (c == '\\')
-                //{
-                //    ignore = true;
-                //    index++;
-                //    continue;
-                //}
+                        sb.Append(c);
+                        index++;
+                        ignore = false;
+                        continue;
+                    }
+                    else if (c == '\\')
+                    {
+                        ignore = true;
+                        index++;
+                        continue;
+                    }
+                }
+
+                ignore = false;
 
                 if (cur != null)
                 {
@@ -81,13 +90,6 @@ namespace Scriber.Language
                         {
                             cur = new Token(GetTokenType(c), index, line);
                             sb.Append(c);
-                        }
-
-                        var next = reader.Peek();
-
-                        if (cur != null && cur.Type == TokenType.Backslash && next == '-')
-                        {
-                            cur.Type = TokenType.Text;
                         }
                     }
                     else
