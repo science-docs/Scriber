@@ -66,12 +66,22 @@ namespace Scriber.Engine
                 state.Blocks.Pop();
             }
 
-            if (obj != null && !(obj is Block))
+            if (obj != null)
             {
                 // basically pass the returned object to the previous environment
                 var flattened = obj.ConvertToFlatArray();
+                if (IsEnvironmentArgument(element))
+                {
+                    flattened = new object[] { flattened };
+                }
                 state.Blocks.Current.Objects.AddRange(flattened);
             }
+        }
+
+        private static bool IsEnvironmentArgument(Element element)
+        {
+            element.Siblings(out var _, out var next);
+            return element.Type == ElementType.ExplicitBlock && element.Parent != null && element.Parent.Type == ElementType.Environment && next == null;
         }
 
         private static bool BlockElement(Element element)

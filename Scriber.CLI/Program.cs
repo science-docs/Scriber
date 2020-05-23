@@ -1,9 +1,12 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Scriber.Engine;
 using Scriber.Language;
 using Scriber.Logging;
+using Scriber.Util;
 
 namespace Scriber.CLI
 {
@@ -72,11 +75,11 @@ namespace Scriber.CLI
             //sb.AppendLine("\\caption{Second Test Image}");
             //sb.AppendLine("\\end{figure}");
 
-            //sb.AppendLine("\\begin{figure}");
-            //sb.AppendLine("\\centering");
-            //sb.AppendLine("\\includegraphics{test-image.png}");
-            //sb.AppendLine("\\caption{Second Test Image}");
-            //sb.AppendLine("\\end{figure}");
+            sb.AppendLine("@Figure() {");
+            sb.AppendLine("@Centering()");
+            sb.AppendLine("@IncludeGraphics(test-image.png)");
+            sb.AppendLine("@Caption(Second Test Image)");
+            sb.AppendLine("}");
 
             //sb.AppendLine();
             //sb.AppendLine("1 1 1 1 1 1 1 1 1 1");

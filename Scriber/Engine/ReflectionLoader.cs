@@ -101,8 +101,10 @@ namespace Scriber.Engine
 
         private static bool IsEnvironment(MethodInfo method, out EnvironmentAttribute? environment)
         {
+            var objArray = new Type[] { typeof(object[]) };
+            var stateObjArray = new Type[] { typeof(CompilerState), typeof(object[]) };
             environment = method.GetCustomAttribute<EnvironmentAttribute>();
-            return environment != null && method.IsStatic;
+            return environment != null && method.IsStatic && MatchesArgs(method, objArray, stateObjArray);
         }
 
         private static void FindConverter(Type type)
@@ -118,6 +120,32 @@ namespace Scriber.Engine
 
                 ElementConverters.Add(instance, attribute.Source, attribute.Targets);
             }
+        }
+
+        private static bool MatchesArgs(MethodInfo method, params Type[][] types)
+        {
+            var args = method.GetParameters();
+            foreach (var typeList in types)
+            {
+                bool matches = true;
+                if (args.Length >= typeList.Length)
+                {
+                    for (int i = 0; i < typeList.Length; i++)
+                    {
+                        if (args[i].ParameterType != typeList[i])
+                        {
+                            matches = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (matches)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

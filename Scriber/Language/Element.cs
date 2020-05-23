@@ -67,9 +67,17 @@ namespace Scriber.Language
 
         public void Siblings(out Element? previous, out Element? next)
         {
-            var node = Parent!.Children.Find(this)!;
-            previous = node.Previous?.Value;
-            next = node.Next?.Value;
+            if (Parent == null)
+            {
+                previous = null;
+                next = null;
+            }
+            else
+            {
+                var node = Parent!.Children.Find(this)!;
+                previous = node.Previous?.Value;
+                next = node.Next?.Value;
+            }
         }
 
         string DebuggerDisplay
