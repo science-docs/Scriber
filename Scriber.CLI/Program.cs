@@ -105,7 +105,7 @@ namespace Scriber.CLI
             //    sb.AppendLine("\\section{This is a section}");
             //    sb.AppendLine();
             //}
-            //sb.AppendLine("\\@test(TestValue \\{a: d, key: value, next: null})");
+            sb.AppendLine("@test({a: d, key: value, enum: One})");
             //sb.AppendLine("@figure()\n{ }");
             //sb.AppendLine("@test(null)");
             //sb.Append("@Figure() { }");

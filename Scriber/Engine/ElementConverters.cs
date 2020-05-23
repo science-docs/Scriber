@@ -27,6 +27,11 @@ namespace Scriber.Engine
                 throw new ArgumentNullException(nameof(target));
             }
 
+            if (target.IsEnum)
+            {
+                target = typeof(Enum);
+            }
+
             converters.TryGetValue(new Tuple<Type, Type>(source, target), out var converter);
             return converter;
         }

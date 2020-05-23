@@ -3,6 +3,8 @@ using Scriber.Engine;
 
 namespace Scriber.CLI
 {
+
+
     [Package("test")]
     public static class TestPackage
     {
@@ -20,6 +22,13 @@ namespace Scriber.CLI
             //Debug.WriteLine(string.Join(", ", array) + ", " + value);
         }
 
+        public enum TestEnum
+        {
+            One,
+            Two,
+            Three
+        }
+
         public class TestObject
         {
             [ObjectField("a")]
@@ -28,6 +37,8 @@ namespace Scriber.CLI
             public string B { get; set; }
             [ObjectField("next")]
             public TestObject Next { get; set; }
+            [ObjectField("enum")]
+            public TestEnum Enum { get; set; }
         }
     }
 }

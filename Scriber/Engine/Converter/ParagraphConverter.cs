@@ -6,7 +6,7 @@ using Scriber.Util;
 
 namespace Scriber.Engine.Converter
 {
-    [CommandArgumentConverter(typeof(Paragraph), typeof(string), typeof(IEnumerable<Leaf>))]
+    [CommandArgumentConverter(typeof(Paragraph), typeof(string), typeof(IEnumerable<Leaf>), typeof(Enum))]
     public class ParagraphConverter : IElementConverter
     {
         public object Convert(object source, Type targetType, CompilerState state)
@@ -29,21 +29,19 @@ namespace Scriber.Engine.Converter
                 }
                 else if (targetType == typeof(string))
                 {
-                    StringBuilder sb = new StringBuilder();
-
-                    foreach (var leaf in paragraph.Leaves)
+                    return ConvertToString(paragraph);
+                }
+                else if (targetType.IsEnum)
+                {
+                    var text = ConvertToString(paragraph);
+                    if (long.TryParse(text, out long enumValue))
                     {
-                        if (leaf is ITextLeaf text)
-                        {
-                            sb.Append(text.Content);
-                        }
-                        else
-                        {
-                            throw new ConverterException("Could not convert paragraph to string. Paragraph contains non string content");
-                        }
+                        return Enum.ToObject(targetType, enumValue);
                     }
-
-                    return sb.ToString();
+                    else
+                    {
+                        return Enum.Parse(targetType, text, true);
+                    }
                 }
                 else
                 {
@@ -54,8 +52,26 @@ namespace Scriber.Engine.Converter
             {
                 throw new ConverterException($"Object of type {source.GetType().FormattedName()} cannot be processed by this converter.");
             }
+
+        }
+
+        private static string ConvertToString(Paragraph paragraph)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var leaf in paragraph.Leaves)
+            {
+                if (leaf is ITextLeaf text)
+                {
+                    sb.Append(text.Content);
+                }
+                else
+                {
+                    throw new ConverterException("Could not convert paragraph to string. Paragraph contains non string content.");
+                }
             }
 
+            return sb.ToString();
         }
     }
 }
