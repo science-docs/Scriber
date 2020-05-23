@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +55,7 @@ namespace Scriber.Engine
                 }
             }
 
-            CompilerState?.Issues.Log(Origin, $"Created object of type '{obj.GetType().Name}'");
+            CompilerState?.Issues.Log(Origin, $"Created object of type '{obj.GetType().FormattedName()}'.");
 
             return obj;
         }
@@ -75,7 +76,7 @@ namespace Scriber.Engine
                 }
                 if (objType == null)
                 {
-                    throw new CompilerException(TypeElement ?? Origin, $"Object of type '{TypeName}' cannot be created. It is not a member of the overrides for type '{defaultType.Name}'");
+                    throw new CompilerException(TypeElement ?? Origin, $"Object of type '{TypeName}' cannot be created. It is not a member of the overrides for type '{defaultType.FormattedName()}'.");
                 }
             }
             else
@@ -95,14 +96,14 @@ namespace Scriber.Engine
             }
             catch (Exception ex)
             {
-                throw new CompilerException(TypeElement ?? Origin, $"An exception occured while creating object of type '{type.Name}'", ex);
+                throw new CompilerException(TypeElement ?? Origin, $"An exception occured while creating object of type '{type.FormattedName()}'.", ex);
             }
 
             // An object returned by Activator.CreateInstrance(Type) can be null if the type is e.g. int?. 
             // Altough these types are not valid by the previous validation we still check for null here.
             if (emptyObj == null)
             {
-                throw new InvalidOperationException("Null values created by an ObjectCreator are forbidden");
+                throw new InvalidOperationException("Null values created by an ObjectCreator are forbidden.");
             }
 
             return emptyObj;
@@ -143,7 +144,7 @@ namespace Scriber.Engine
 
             if (issue != null)
             {
-                throw new CompilerException(TypeElement ?? Origin, $"Type '{type.Name}' {issue}. An object of this type cannot be instantiated.");
+                throw new CompilerException(TypeElement ?? Origin, $"Type '{type.FormattedName()}' {issue}. An object of this type cannot be instantiated.");
             }
         }
 

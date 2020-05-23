@@ -61,10 +61,15 @@ namespace Scriber.Engine.Instructions
         {
             if (paragraph != null)
             {
-                state.Issues.Log(Origin, $"Grouping {paragraph.Leaves.Count} leaves into a paragraph.");
+                state.Issues.Log(Origin, $"Grouping {paragraph.Leaves.Count} {LeafString(paragraph.Leaves.Count)} into a paragraph.");
                 results.Add(paragraph);
                 paragraph = null;
             }
+        }
+
+        private static string LeafString(int count)
+        {
+            return count == 1 ? "leaf" : "leaves";
         }
     }
 }

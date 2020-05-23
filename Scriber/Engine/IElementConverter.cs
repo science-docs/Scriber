@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Util;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,7 +14,7 @@ namespace Scriber.Engine
         }
 
         public ConverterException(Type source, Type target, Exception? innerException)
-            : this($"Could not convert element of type {source.Name} to {target.Name}", innerException)
+            : this($"Could not convert element of type {source.FormattedName()} to {target.FormattedName()}.", innerException)
         {
 
         }

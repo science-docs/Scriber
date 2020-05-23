@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -115,7 +116,7 @@ namespace Scriber.Engine
             {
                 if (!(Activator.CreateInstance(type) is IElementConverter instance))
                 {
-                    throw new Exception("Could not create converter instance from type " + type.Name);
+                    throw new Exception($"Could not create converter instance from type '{type.FormattedName()}'.");
                 }
 
                 ElementConverters.Add(instance, attribute.Source, attribute.Targets);

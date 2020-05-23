@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Util;
 using System;
 
 namespace Scriber.Engine
@@ -24,7 +25,7 @@ namespace Scriber.Engine
 
             var arrType = type.MakeArrayType();
             var arr = Activator.CreateInstance(arrType, new object[] { array.Length }) as Array 
-                ?? throw new InvalidOperationException($"Could not create array of type '{type.Name}'.");
+                ?? throw new InvalidOperationException($"Could not create array of type '{type.FormattedName()}'.");
 
             for (int i = 0; i < arr.Length; i++)
             {
@@ -49,12 +50,12 @@ namespace Scriber.Engine
                     }
                     else
                     {
-                        throw new CompilerException(Origin, $"Cannot convert element of type '{value.GetType().Name}' to '{type.Name}' because no appropriate converter was found.");
+                        throw new CompilerException(Origin, $"Cannot convert element of type '{value.GetType().FormattedName()}' to '{type.FormattedName()}' because no appropriate converter was found.");
                     }
                 }
             }
 
-            CompilerState?.Issues.Log(Origin, $"Created array of type {type.Name}.");
+            CompilerState?.Issues.Log(Origin, $"Created array of type {type.FormattedName()}.");
 
             return arr;
         }

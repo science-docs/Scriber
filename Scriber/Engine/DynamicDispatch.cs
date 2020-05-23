@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Util;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -72,14 +73,14 @@ namespace Scriber.Engine
                     var attribute = parm.GetCustomAttribute<ArgumentAttribute>();
                     if (attribute?.NonNull ?? false || parm.ParameterType.IsValueType)
                     {
-                        throw new CompilerException(element, $"Argument 'null' was supplied for non nullable command parameter ({parm.ParameterType.Name} {attribute?.Name ?? parm.Name}).");
+                        throw new CompilerException(element, $"Argument 'null' was supplied for non nullable command parameter ({parm.ParameterType.FormattedName()} {attribute?.Name ?? parm.Name}).");
                     }
                     continue;
                 }
 
                 if (!IsAssignableFrom(state, parm, arg, out var transformed))
                 {
-                    throw new CompilerException(element, $"Object of type '{arg.GetType().Name}' cannot be assigned or transformed to parameter of type '{parm.ParameterType.Name}'.");
+                    throw new CompilerException(element, $"Object of type '{arg.GetType().FormattedName()}' cannot be assigned or transformed to parameter of type '{parm.ParameterType.FormattedName()}'.");
                 }
                 else
                 {
@@ -87,7 +88,7 @@ namespace Scriber.Engine
 
                     if (arg.GetType() != transformed.GetType())
                     {
-                        state.Issues.Log(element, $"Transformed element of type '{arg.GetType().Name}' to '{transformed.GetType().Name}'");
+                        state.Issues.Log(element, $"Transformed element of type '{arg.GetType().FormattedName()}' to '{transformed.GetType().FormattedName()}'.");
                     }
                 }
             }
@@ -116,7 +117,7 @@ namespace Scriber.Engine
 
                 if (!(Activator.CreateInstance(target) is ICommandArgument argument))
                 {
-                    throw new InvalidCastException($"Could not create object of type {nameof(ICommandArgument)} from type {target.Name}");
+                    throw new InvalidCastException($"Could not create object of type {nameof(ICommandArgument)} from type {target.FormattedName()}.");
                 }
 
                 argument.Parse(str);
@@ -125,7 +126,7 @@ namespace Scriber.Engine
             }
             else if (target.IsArray && obj is ObjectArray list)
             {
-                transformed = list.Get(target.GetElementType() ?? throw new Exception("Could not convert array type to simple type"));
+                transformed = list.Get(target.GetElementType() ?? throw new Exception("Could not convert array type to simple type."));
                 return true;
             }
             else if (obj is ObjectCreator creator)
