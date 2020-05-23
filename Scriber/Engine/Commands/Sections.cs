@@ -19,7 +19,7 @@ namespace Scriber.Engine.Commands
             Level1, Level2, Level3
         };
 
-        [Command("section")]
+        [Command("Section")]
         public static Paragraph Section(CompilerState state, Paragraph content)
         {
             const int level = 1;
@@ -43,7 +43,7 @@ namespace Scriber.Engine.Commands
             return SectionStar(state, content);
         }
 
-        [Command("section*")]
+        [Command("Section*")]
         public static Paragraph SectionStar(CompilerState state, Paragraph content)
         {
             content.FontSize = 18;

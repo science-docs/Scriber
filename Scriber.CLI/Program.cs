@@ -31,9 +31,9 @@ namespace Scriber.CLI
             //sb.AppendLine();
             //sb.AppendLine();
             //sb.AppendLine();
-            //sb.AppendLine("@section(This is a section)");
+            sb.AppendLine("@Section(This is a section)");
             //sb.AppendLine();
-            //sb.AppendLine("Aft\\-er the @color(beige, first) section [follows]@footnote(Some Paragraph Content) a pagebreak");
+            sb.AppendLine("Aft\\-er the @Color(blue, first) section [follows]@Footnote(Some Paragraph Content, \"1\") a pagebreak");
             //sb.AppendLine();
             //sb.AppendLine();
             //sb.AppendLine();
@@ -102,7 +102,7 @@ namespace Scriber.CLI
             //    sb.AppendLine("\\section{This is a section}");
             //    sb.AppendLine();
             //}
-            sb.AppendLine("@test(TestValue {a: d, key: value, next: null})");
+            //sb.AppendLine("\\@test(TestValue \\{a: d, key: value, next: null})");
             //sb.AppendLine("@figure()\n{ }");
             //sb.AppendLine("@test(null)");
             //sb.Append("@Figure() { }");
@@ -121,7 +121,7 @@ namespace Scriber.CLI
 
 
 
-            //File.WriteAllBytes("test.pdf", bytes);
+            File.WriteAllBytes("test.pdf", bytes);
 
             watch.Stop();
             Debug.WriteLine($"Created document in {watch.ElapsedMilliseconds}ms");

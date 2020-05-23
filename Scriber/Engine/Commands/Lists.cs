@@ -8,7 +8,7 @@ namespace Scriber.Engine.Commands
     [Package]
     public static class Lists
     {
-        [Command("item", RequiredEnvironment = "itemize")]
+        [Command("Item", RequiredEnvironment = "itemize")]
         public static Paragraph Item(CompilerState state, Paragraph content)
         {
             return content;

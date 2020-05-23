@@ -8,7 +8,7 @@ namespace Scriber.Engine.Commands
     [Package]
     public static class Fonts
     {
-        [Command("fontfamily")]
+        [Command("FontFamily")]
         public static Paragraph Fontfamily(CompilerState state, string fontName, Paragraph paragraph)
         {
             return paragraph;

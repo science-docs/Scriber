@@ -8,16 +8,19 @@ namespace Scriber.Engine
     {
         public Document Document { get; }
         public BlockTree Blocks { get; }
+        public Element CurrentElement { get; private set; }
         public CompilerIssueCollection Issues { get; } = new CompilerIssueCollection();
 
         public CompilerState()
         {
+            CurrentElement = new Element(null, ElementType.Null, 0, 0);
             Document = new Document();
             Blocks = new BlockTree();
         }
 
         public object? Execute(Element element, object?[] arguments)
         {
+            CurrentElement = element;
             var instruction = EngineInstruction.Create(element);
 
             try

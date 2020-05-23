@@ -6,7 +6,7 @@ namespace Scriber.Engine.Environments
     [Package]
     public static class FigureEnvironment
     {
-        [Environment("figure")]
+        [Environment("Figure")]
         public static object Figure(CompilerState state, object[] content)
         {
             var section = new Region

@@ -8,13 +8,13 @@ namespace Scriber.Engine.Commands
     [Package]
     public static class Pagination
     {
-        [Command("pagebreak")]
+        [Command("Pagebreak")]
         public static Pagebreak Pagebreak()
         {
             return new Pagebreak();
         }
 
-        [Command("thepage")]
+        [Command("ThePage")]
         public static PageReference Thepage()
         {
             // Create self referencing element

@@ -84,7 +84,11 @@ namespace Scriber.Engine
                 else
                 {
                     args[i] = transformed ?? throw new CompilerException(element, "Transformed element cannot be null.");
-                    state.Issues.Log(element, $"Transformed element of type '{arg.GetType().Name}' to '{transformed.GetType().Name}'");
+
+                    if (arg.GetType() != transformed.GetType())
+                    {
+                        state.Issues.Log(element, $"Transformed element of type '{arg.GetType().Name}' to '{transformed.GetType().Name}'");
+                    }
                 }
             }
         }

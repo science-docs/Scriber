@@ -6,7 +6,7 @@ namespace Scriber.Engine.Commands
     [Package]
     public static class Graphics
     {
-        [Command("caption")]
+        [Command("Caption")]
         public static Paragraph Caption(Paragraph paragraph)
         {
             paragraph.Tag = "caption";
@@ -14,7 +14,7 @@ namespace Scriber.Engine.Commands
             return paragraph;
         }
 
-        [Command("includegraphics")]
+        [Command("IncludeGraphics")]
         public static ImageElement IncludeGraphics(CompilerState state, string imagePath, DocumentVariable? variables = null)
         {
             var bytes = File.ReadAllBytes(imagePath);

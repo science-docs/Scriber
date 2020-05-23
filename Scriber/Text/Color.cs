@@ -30,6 +30,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Scriber.Text
 {
@@ -227,6 +228,26 @@ namespace Scriber.Text
             {
                 return null;
             }
+        }
+
+        private static readonly Regex colorCodeRegex = new Regex("^#([0-9A-Fa-f]{3}(?:[0-9A-Fa-f]{3})?)$", RegexOptions.Compiled);
+
+        public static bool IsColorCode(string code)
+        {
+            return colorCodeRegex.IsMatch(code);
+        }
+
+        public static Color? FromCode(string code)
+        {
+            var matches = colorCodeRegex.Matches(code);
+
+            if (matches.Count == 1)
+            {
+                var hex = matches[0].Groups[1].Value;
+                hex = DuplicateTriples(hex);
+                return FromArgb(ToInt(hex[0..2]), ToInt(hex[2..4]), ToInt(hex[4..6]));
+            }
+            return null;
         }
 
         /// <summary>
@@ -659,6 +680,42 @@ namespace Scriber.Text
         {
             if (val < 0 || val > 0xFF)
                 throw new ArgumentException(name);
+        }
+
+        private static string DuplicateTriples(string trip)
+        {
+            if (trip.Length == 3)
+            {
+                return new string(new char[] { trip[0], trip[0], trip[1], trip[1], trip[2], trip[2] });
+            }
+            return trip;
+        }
+
+        private static int ToInt(string color)
+        {
+            var first = ToInt(color[0]);
+            var second = ToInt(color[1]);
+            return first * 16 + second;
+        }
+
+        private static int ToInt(char c)
+        {
+            if (c >= '0' && c <= '9')
+            {
+                return c - '0';
+            }
+            else if (c >= 'A' && c <= 'F')
+            {
+                return c - 'A';
+            }
+            else if (c >= 'a' && c <= 'f')
+            {
+                return c - 'a';
+            }
+            else
+            {
+                throw new ArgumentException(nameof(c));
+            }
         }
 
         ColorSpace _cs;

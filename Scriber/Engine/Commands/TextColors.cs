@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Scriber.Layout.Document;
 using Scriber.Text;
 
@@ -8,14 +7,24 @@ namespace Scriber.Engine.Commands
     [Package]
     public static class TextColors
     {
-        [Command("color")]
-        public static IEnumerable<Leaf> ColorText(string colorName, IEnumerable<Leaf> leaves)
+        [Command("Color")]
+        public static IEnumerable<Leaf> ColorText(CompilerState state, string colorName, IEnumerable<Leaf> leaves)
         {
-            var color = Color.FromName(colorName) ?? Colors.Black;
-            return ApplyColor(color, leaves);
+            var color = Color.FromCode(colorName);
+
+            if (color == null)
+            {
+                color = Color.FromName(colorName);
+                if (color == null)
+                {
+                    state.Issues.Add(state.CurrentElement, CompilerIssueType.Warning, $"Cannot find color with name '{colorName}'. Applying default color.");
+                    return leaves;
+                }
+            }
+            return ApplyColor(color.Value, leaves);
         }
 
-        [Command("red")]
+        [Command("Red")]
         public static IEnumerable<Leaf> Red(IEnumerable<Leaf> leaves)
         {
             return ApplyColor(Colors.Red, leaves);

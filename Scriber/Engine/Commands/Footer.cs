@@ -5,15 +5,16 @@ namespace Scriber.Engine.Commands
     [Package]
     public static class Footer
     {
-        [Command("footnote")]
-        public static FootnoteLeaf Footnote(Paragraph content)
+        [Command("Footnote")]
+        public static FootnoteLeaf Footnote(Paragraph content, string? name = null)
         {
-            var footnote = new FootnoteLeaf("0", content);
+            name ??= "0";
+            var footnote = new FootnoteLeaf(name, content);
             content.Parent = footnote;
             return footnote;
         }
 
-        [Command("cfooter")]
+        [Command("CenterFooter")]
         public static void CenterFooter(CompilerState state, Paragraph content)
         {
             SetFixedBlock(state, content, FixedPosition.BottomCenter);
