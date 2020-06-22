@@ -20,7 +20,7 @@ namespace Scriber.Layout
 
             double GetWidth(string value)
             {
-                return font.GetWidth(value, size);
+                return font.GetWidth(value, size, element.FontWeight);
             }
         }
 
@@ -97,7 +97,7 @@ namespace Scriber.Layout
 
             double GetWidth(string value)
             {
-                return font.GetWidth(value, size);
+                return font.GetWidth(value, size, leaf.FontWeight);
             }
         }
 

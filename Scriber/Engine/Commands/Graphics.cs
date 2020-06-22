@@ -15,11 +15,16 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("IncludeGraphics")]
-        public static ImageElement IncludeGraphics(CompilerState state, string imagePath, DocumentVariable? variables = null)
+        public static ImageElement IncludeGraphics(CompilerState state, string imagePath, IncludeImageOptions? options = null)
         {
             var bytes = File.ReadAllBytes(imagePath);
             var image = new ImageElement(bytes, imagePath);
             return image;
+        }
+
+        public class IncludeImageOptions
+        {
+
         }
     }
 }

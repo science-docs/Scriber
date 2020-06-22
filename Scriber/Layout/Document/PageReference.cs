@@ -41,7 +41,7 @@
             }
 
             var height = FontSize;
-            var width = Font.GetWidth(PageNumber, FontSize);
+            var width = Font.GetWidth(PageNumber, FontSize, FontWeight);
             return new Size(width, height);
         }
 

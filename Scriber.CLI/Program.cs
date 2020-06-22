@@ -52,7 +52,7 @@ namespace Scriber.CLI
             //sb.AppendLine();
             sb.AppendLine("@Section(This is a section)");
             //sb.AppendLine();
-            sb.AppendLine("Aft\\-er the @Color(blue, first) section [follows]@Footnote(Some Paragraph Content, \"1\") a pagebreak");
+            sb.AppendLine("Aft\\-er the @Color(blue, first) section [follows]@Footnote(Some Paragraph Content, \"1\") a @Bold(pagebreak).");
             //sb.AppendLine();
             //sb.AppendLine();
             //sb.AppendLine();

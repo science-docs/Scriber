@@ -35,9 +35,9 @@ namespace Scriber.Text
             FontFamily = fontFamily;
         }
 
-        public double GetWidth(string text, double size)
+        public double GetWidth(string text, double size, FontWeight weight)
         {
-            var realizedFont = FontFamily.CreateFont((float)size);
+            var realizedFont = FontFamily.CreateFont((float)size, (SixLabors.Fonts.FontStyle)(int)weight);
             return TextMeasurer.Measure(text, new RendererOptions(realizedFont, Dpi)).Width;
         }
 
