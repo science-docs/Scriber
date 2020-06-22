@@ -14,4 +14,13 @@
     <ProjectReference Include="..\Scriber\Scriber.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ieee.csl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="lib.bib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Text;
+using Scriber.Bibliography;
+using Scriber.Bibliography.BibTex.Language;
+using Scriber.Bibliography.Styling;
+using Scriber.Bibliography.Styling.Specification;
 using Scriber.Engine;
 using Scriber.Language;
 using Scriber.Logging;
-using Scriber.Util;
 
 namespace Scriber.CLI
 {
@@ -14,6 +15,21 @@ namespace Scriber.CLI
     {
         static void Main()
         {
+            var style = File.Load<StyleFile>("ieee.csl");
+            var processor = new Processor(style, LocaleFile.Defaults);
+
+            var bibEntries = BibParser.Parse(System.IO.File.ReadAllText("lib.bib"), out var _);
+
+            var citations = bibEntries.Select(e => e.ToCitation()).ToArray();
+
+            for (int i = 0; i < citations.Length; i++)
+            {
+                citations[i]["citation-number"] = new TextVariable(i.ToString());
+            }
+
+            var runs = processor.Bibliography(new Localization.Culture("de-DE"), citations);
+
+
             Stopwatch watch = Stopwatch.StartNew();
 
             ReflectionLoader.Discover(typeof(TestPackage).Assembly);
@@ -124,7 +140,7 @@ namespace Scriber.CLI
 
 
 
-            File.WriteAllBytes("test.pdf", bytes);
+            System.IO.File.WriteAllBytes("test.pdf", bytes);
 
             watch.Stop();
             Debug.WriteLine($"Created document in {watch.ElapsedMilliseconds}ms");
