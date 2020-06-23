@@ -20,7 +20,7 @@ namespace Scriber.Engine
         /// <param name="parameters"></param>
         /// <returns></returns>
         /// <exception cref="CommandInvocationException"/>
-        public static object?[] SortArguments(string command, Element element, CompilerState state, object?[] args, ParameterInfo[] parameters)
+        public static object[] SortArguments(string command, Element element, CompilerState state, Argument[] args, ParameterInfo[] parameters)
         {
             // Guard for when the command does not require any arguments
             if (parameters.Length == 0)
@@ -32,7 +32,7 @@ namespace Scriber.Engine
                 return Array.Empty<object>();
             }
 
-            List<object?> objects = new List<object?>();
+            List<object> objects = new List<object>();
 
             CountParameters(parameters, out var hasState, out int required, out int optional);
 
@@ -61,89 +61,109 @@ namespace Scriber.Engine
         /// </summary>
         /// <param name="args"></param>
         /// <param name="parameters"></param>
-        public static void MatchArguments(CompilerState state, Element element, object?[] args, ParameterInfo[] parameters)
+        public static void MatchArguments(CompilerState state, object[] args, ParameterInfo[] parameters)
         {
             for (int i = 0; i < args.Length; i++)
             {
                 var arg = args[i];
                 var parm = parameters[i];
 
-                if (arg == null)
+                if (arg is Argument argument)
                 {
-                    var attribute = parm.GetCustomAttribute<ArgumentAttribute>();
-                    if (attribute?.NonNull ?? false || parm.ParameterType.IsValueType)
+                    if (argument.Value == null)
                     {
-                        throw new CompilerException(element, $"Argument 'null' was supplied for non nullable command parameter ({parm.ParameterType.FormattedName()} {attribute?.Name ?? parm.Name}).");
+                        var attribute = parm.GetCustomAttribute<ArgumentAttribute>();
+                        if (attribute?.NonNull ?? false || parm.ParameterType.IsValueType)
+                        {
+                            throw new CompilerException(argument.Source, $"Argument 'null' was supplied for non nullable command parameter ({parm.ParameterType.FormattedName()} {attribute?.Name ?? parm.Name}).");
+                        }
+                        continue;
                     }
-                    continue;
-                }
 
-                if (!IsAssignableFrom(state, parm, arg, out var transformed))
-                {
-                    throw new CompilerException(element, $"Object of type '{arg.GetType().FormattedName()}' cannot be assigned or transformed to parameter of type '{parm.ParameterType.FormattedName()}'.");
-                }
-                else
-                {
-                    args[i] = transformed ?? throw new CompilerException(element, "Transformed element cannot be null.");
-
-                    if (arg.GetType() != transformed.GetType())
+                    if (!IsAssignableFrom(state, parm, argument, out var transformed))
                     {
-                        state.Issues.Log(element, $"Transformed element of type '{arg.GetType().FormattedName()}' to '{transformed.GetType().FormattedName()}'.");
+                        throw new CompilerException(argument.Source, $"Object of type '{argument.Value.GetType().FormattedName()}' cannot be assigned or transformed to parameter of type '{parm.ParameterType.FormattedName()}'.");
+                    }
+                    else
+                    {
+                        args[i] = transformed ?? throw new CompilerException(argument.Source, "Transformed element cannot be null.");
+
+                        if (arg.GetType() != transformed.GetType())
+                        {
+                            state.Issues.Log(argument.Source, $"Transformed element of type '{argument.Value.GetType().FormattedName()}' to '{transformed.GetType().FormattedName()}'.");
+                        }
                     }
                 }
             }
         }
 
-        public static bool IsAssignableFrom(CompilerState state, ParameterInfo parameter, object obj, out object? transformed)
+        public static bool IsAssignableFrom(CompilerState state, ParameterInfo parameter, Argument argument, out object? transformed)
         {
-            var target = parameter.ParameterType;
-            if (target.IsAssignableFrom(obj.GetType()))
+            transformed = null;
+            var paramType = parameter.ParameterType;
+            var isArgument = IsArgument(paramType, out var targetType);
+            var value = argument.Value!;
+            if (paramType == typeof(Argument))
             {
-                transformed = obj;
-                return true;
-            }
-            else if (typeof(ICommandArgument).IsAssignableFrom(target))
-            {
-                var stringConverter = ElementConverters.Find(obj.GetType(), typeof(string));
-                if (stringConverter == null)
-                {
-                    throw new CommandInvocationException("");
-                }
-
-                if (!(stringConverter.Convert(obj, typeof(string), state) is string str))
-                {
-                    throw new Exception();
-                }
-
-                if (!(Activator.CreateInstance(target) is ICommandArgument argument))
-                {
-                    throw new InvalidCastException($"Could not create object of type {nameof(ICommandArgument)} from type {target.FormattedName()}.");
-                }
-
-                argument.Parse(str);
                 transformed = argument;
-                return true;
             }
-            else if (target.IsArray && obj is ObjectArray list)
+            else if (paramType == typeof(object))
             {
-                transformed = list.Get(target.GetElementType() ?? throw new Exception("Could not convert array type to simple type."));
-                return true;
+                transformed = argument.Value;
             }
-            else if (obj is ObjectCreator creator)
+            else if (paramType == typeof(object[]) && argument.Value!.GetType().IsArray)
+            {
+                var array = (Array)argument.Value!;
+                var objArray = new object[array.Length];
+                Array.Copy(array, 0, objArray, 0, array.Length);
+                transformed = objArray;
+            }
+            else if (targetType.IsAssignableFrom(value.GetType()))
+            {
+                transformed = argument.Value;
+            }
+            else if (targetType.IsArray && value is ObjectArray list)
+            {
+                transformed = list.Get(targetType.GetElementType() ?? throw new Exception("Could not convert array type to simple type."));
+            }
+            else if (value is ObjectCreator creator)
             {
                 transformed = creator.Create(parameter);
-                return true;
             }
-
-            var converter = ElementConverters.Find(obj.GetType(), target);
-            if (converter != null)
+            else // in the last instance look for a fitting converter
             {
-                transformed = converter.Convert(obj, target, state);
-                return true;
+                var converter = ElementConverters.Find(value.GetType(), targetType);
+                if (converter != null)
+                {
+                    transformed = converter.Convert(value, targetType, state);
+                }
             }
 
-            transformed = null;
+            if (isArgument && transformed != null)
+            {
+                transformed = MakeArgument(argument, targetType, transformed);
+            }
+            
+            return transformed != null;
+        }
+
+        private static bool IsArgument(Type type, out Type genericType)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Argument<>))
+            {
+                genericType = type.GenericTypeArguments[0];
+                return true;
+            }
+            genericType = type;
             return false;
+        }
+
+        private static object MakeArgument(Argument argument, Type target, object value)
+        {
+            var targetArgType = typeof(Argument<>).MakeGenericType(target);
+            var genericArg = Activator.CreateInstance(targetArgType, argument.Source, value)
+                ?? throw new InvalidOperationException("A newly created argument cannot be null");
+            return genericArg;
         }
 
         private static void CountParameters(ParameterInfo[] parameters, out bool hasState, out int required, out int optional)

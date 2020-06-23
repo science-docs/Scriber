@@ -10,9 +10,9 @@ namespace Scriber.Engine.Instructions
         {
         }
 
-        public override object Execute(CompilerState state, object?[] arguments)
+        public override object Execute(CompilerState state, Argument[] arguments)
         {
-            var results = new List<object?>();
+            var results = new List<Argument>();
 
             // Group continueous leafs into one paragraph
             Paragraph? currentParagraph = null;
@@ -20,49 +20,49 @@ namespace Scriber.Engine.Instructions
             for (int i = 0; i < arguments.Length; i++)
             {
                 var item = arguments[i];
-                if (item is Leaf leaf)
+                if (item.Value is Leaf leaf)
                 {
                     if (currentParagraph == null)
                     {
                         currentParagraph = new Paragraph();
+                        results.Add(new Argument(item.Source, currentParagraph));
                     }
 
                     currentParagraph.Leaves.Add(leaf);
                 }
                 else if (item == EmptyInstruction.Object)
                 {
-                    ResetParagraph(state, results, ref currentParagraph);
+                    ResetParagraph(state, ref currentParagraph);
                 }
                 else if (item == NullInstruction.NullObject)
                 {
-                    ResetParagraph(state, results, ref currentParagraph);
-                    results.Add(null);
+                    ResetParagraph(state, ref currentParagraph);
+                    results.Add(new Argument(item.Source, null));
                 }
                 else
                 {
-                    ResetParagraph(state, results, ref currentParagraph);
+                    ResetParagraph(state, ref currentParagraph);
                     results.Add(item);
                 }
             }
 
-            ResetParagraph(state, results, ref currentParagraph);
+            ResetParagraph(state, ref currentParagraph);
 
             if (results.Count == 0 && Origin.Type == ElementType.ExplicitBlock)
             {
                 // signaling an empty block
-                results.Add(null);
+                results.Add(new Argument(Origin, null));
                 state.Issues.Log(Origin, "Empty explicit block found. Adding null element");
             }
 
             return results.ToArray();
         }
 
-        private void ResetParagraph(CompilerState state, List<object?> results, ref Paragraph? paragraph)
+        private void ResetParagraph(CompilerState state, ref Paragraph? paragraph)
         {
             if (paragraph != null)
             {
                 state.Issues.Log(Origin, $"Grouping {paragraph.Leaves.Count} {LeafString(paragraph.Leaves.Count)} into a paragraph.");
-                results.Add(paragraph);
                 paragraph = null;
             }
         }

@@ -7,7 +7,7 @@ namespace Scriber.Engine.Environments
     public static class FigureEnvironment
     {
         [Environment("Figure")]
-        public static object Figure(CompilerState state, object[] content)
+        public static object Figure(CompilerState state, Argument[] content)
         {
             var section = new Region
             {
@@ -15,7 +15,7 @@ namespace Scriber.Engine.Environments
                 Margin = new Layout.Thickness(12, 0)
             };
 
-            var elements = content.OfType<DocumentElement>().ToArray();
+            var elements = content.Select(e => e.Value).OfType<DocumentElement>().ToArray();
 
             section.Elements.AddRange(elements);
 

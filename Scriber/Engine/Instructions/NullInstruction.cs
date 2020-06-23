@@ -10,7 +10,7 @@ namespace Scriber.Engine.Instructions
         {
         }
 
-        public override object? Execute(CompilerState state, object?[] arguments)
+        public override object? Execute(CompilerState state, Argument[] arguments)
         {
             return NullObject;
         }

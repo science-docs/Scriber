@@ -6,11 +6,11 @@ namespace Scriber.Engine
 {
     public class ObjectArray : Traceable
     {
-        private readonly object?[] array;
+        private readonly Argument[] array;
 
         public CompilerState? CompilerState { get; }
 
-        public ObjectArray(Element origin, CompilerState? compilerState, object?[] objects) : base(origin)
+        public ObjectArray(Element origin, CompilerState? compilerState, Argument[] objects) : base(origin)
         {
             CompilerState = compilerState;
             array = objects;
@@ -29,7 +29,8 @@ namespace Scriber.Engine
 
             for (int i = 0; i < arr.Length; i++)
             {
-                var value = array[i];
+                var argument = array[i];
+                var value = argument.Value;
 
                 if (value is ObjectCreator creator)
                 {
@@ -50,7 +51,7 @@ namespace Scriber.Engine
                     }
                     else
                     {
-                        throw new CompilerException(Origin, $"Cannot convert element of type '{value.GetType().FormattedName()}' to '{type.FormattedName()}' because no appropriate converter was found.");
+                        throw new CompilerException(argument.Source, $"Cannot convert element of type '{value.GetType().FormattedName()}' to '{type.FormattedName()}' because no appropriate converter was found.");
                     }
                 }
             }

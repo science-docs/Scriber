@@ -12,7 +12,7 @@ namespace Scriber.Engine.Instructions
             Key = element.Content ?? throw new Exception();
         }
 
-        public override object? Execute(CompilerState state, object?[] arguments)
+        public override object? Execute(CompilerState state, Argument[] arguments)
         {
             return new ObjectField(Origin, Key, arguments[0]);
         }

@@ -12,7 +12,7 @@ namespace Scriber.Engine.Instructions
             Name = origin.Content ?? throw new InvalidOperationException("Command with null content was given");
         }
 
-        public override object? Execute(CompilerState state, object?[] arguments)
+        public override object? Execute(CompilerState state, Argument[] arguments)
         {
             var command = CommandCollection.Find(Name);
 

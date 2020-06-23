@@ -11,7 +11,7 @@ namespace Scriber.Engine.Instructions
             Origin = origin;
         }
 
-        public abstract object? Execute(CompilerState state, object?[] arguments);
+        public abstract object? Execute(CompilerState state, Argument[] arguments);
 
         public static EngineInstruction? Create(Element element)
         {

@@ -12,7 +12,7 @@ namespace Scriber.Engine.Instructions
             Content = origin.Content ?? throw new ArgumentNullException(nameof(origin.Content));
         }
 
-        public override object Execute(CompilerState state, object?[] arguments)
+        public override object Execute(CompilerState state, Argument[] arguments)
         {
             // ignore arguments, as text nodes cannot contain children.
             return new Layout.Document.TextLeaf

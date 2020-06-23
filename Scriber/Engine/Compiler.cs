@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Scriber.Language;
 using Scriber.Layout.Document;
 using Scriber.Logging;
-using Scriber.Util;
 
 namespace Scriber.Engine
 {
@@ -28,7 +28,7 @@ namespace Scriber.Engine
                 Execute(state, element);
             }
 
-            state.Document.Elements.AddRange(state.Blocks.Current.Objects.OfType<DocumentElement>());
+            state.Document.Elements.AddRange(state.Blocks.Current.Objects.Select(e => e.Value).OfType<DocumentElement>());
 
             ResolveCallbacks(state.Document.Elements);
 
@@ -36,9 +36,9 @@ namespace Scriber.Engine
             return result;
         }
 
-        private static void IssuesChanged(Logger logger, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private static void IssuesChanged(Logger logger, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 foreach (CompilerIssue issue in e.NewItems.OfType<CompilerIssue>().Where(e => e != null))
                 {
@@ -69,10 +69,10 @@ namespace Scriber.Engine
             if (obj != null)
             {
                 // basically pass the returned object to the previous environment
-                var flattened = obj.ConvertToFlatArray();
+                var flattened = obj.Flatten();
                 if (IsEnvironmentArgument(element))
                 {
-                    flattened = new object[] { flattened };
+                    flattened = new Argument[] { new Argument(element, flattened) };
                 }
                 state.Blocks.Current.Objects.AddRange(flattened);
             }

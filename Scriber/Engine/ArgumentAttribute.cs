@@ -3,7 +3,7 @@
 namespace Scriber.Engine
 {
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class ArgumentAttribute : Attribute
+    public sealed class ArgumentAttribute : Attribute
     {
         public string? Name { get; set; }
         public string? Description { get; set; }

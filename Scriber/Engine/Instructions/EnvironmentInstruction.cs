@@ -13,7 +13,7 @@ namespace Scriber.Engine.Instructions
             Name = origin.Content ?? throw new InvalidOperationException();
         }
 
-        public override object? Execute(CompilerState state, object?[] args)
+        public override object? Execute(CompilerState state, Argument[] args)
         {
             if (args.Length == 0)
             {
@@ -28,7 +28,7 @@ namespace Scriber.Engine.Instructions
             }
 
             var envArgs = args[0..^1];
-            var envObjs = args[^1].ConvertToFlatArray();
+            var envObjs = args[^1].Flatten();
 
             try
             {

@@ -18,14 +18,19 @@ namespace Scriber.Engine
             Blocks = new BlockTree();
         }
 
-        public object? Execute(Element element, object?[] arguments)
+        public Argument? Execute(Element element, Argument[] arguments)
         {
             CurrentElement = element;
             var instruction = EngineInstruction.Create(element);
 
             try
             {
-                return instruction?.Execute(this, arguments);
+                var result = instruction?.Execute(this, arguments);
+
+                if (result != null)
+                {
+                    return new Argument(element, result);
+                }
             }
             catch (CompilerException compilerException)
             {

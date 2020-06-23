@@ -51,7 +51,7 @@ namespace Scriber.Engine
                 var matched = MatchFields(type, Fields);
                 foreach (var match in matched)
                 {
-                    FillField(obj, match.Item1, match.Item2.Value);
+                    FillField(obj, match.Item1, match.Item2.Argument.Value);
                 }
             }
 
@@ -99,7 +99,7 @@ namespace Scriber.Engine
                 throw new CompilerException(TypeElement ?? Origin, $"An exception occured while creating object of type '{type.FormattedName()}'.", ex);
             }
 
-            // An object returned by Activator.CreateInstrance(Type) can be null if the type is e.g. int?. 
+            // An object returned by Activator.CreateInstance(Type) can be null if the type is e.g. int?. 
             // Altough these types are not valid by the previous validation we still check for null here.
             if (emptyObj == null)
             {
@@ -201,7 +201,7 @@ namespace Scriber.Engine
 
         private static void FillField(DocumentVariable vars, ObjectField field)
         {
-            var value = field.Value;
+            var value = field.Argument.Value;
             DocumentVariable inner;
 
             if (value is ObjectCreator subCreator)

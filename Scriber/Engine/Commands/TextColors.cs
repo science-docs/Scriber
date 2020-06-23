@@ -8,16 +8,16 @@ namespace Scriber.Engine.Commands
     public static class TextColors
     {
         [Command("Color")]
-        public static IEnumerable<Leaf> ColorText(CompilerState state, string colorName, IEnumerable<Leaf> leaves)
+        public static IEnumerable<Leaf> ColorText(CompilerState state, Argument<string> colorName, IEnumerable<Leaf> leaves)
         {
-            var color = Color.FromCode(colorName);
+            var color = Color.FromCode(colorName.Value);
 
             if (color == null)
             {
-                color = Color.FromName(colorName);
+                color = Color.FromName(colorName.Value);
                 if (color == null)
                 {
-                    state.Issues.Add(state.CurrentElement, CompilerIssueType.Warning, $"Cannot find color with name '{colorName}'. Applying default color.");
+                    state.Issues.Add(colorName.Source, CompilerIssueType.Warning, $"Cannot find color with name '{colorName}'. Applying default color.");
                     return leaves;
                 }
             }

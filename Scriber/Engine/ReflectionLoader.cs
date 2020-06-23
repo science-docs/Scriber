@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Scriber.Engine
 {
@@ -102,10 +101,13 @@ namespace Scriber.Engine
 
         private static bool IsEnvironment(MethodInfo method, out EnvironmentAttribute? environment)
         {
+            var argumentArray = new Type[] { typeof(Argument[]) };
             var objArray = new Type[] { typeof(object[]) };
             var stateObjArray = new Type[] { typeof(CompilerState), typeof(object[]) };
+            var stateArgumentArray = new Type[] { typeof(CompilerState), typeof(Argument[]) };
+
             environment = method.GetCustomAttribute<EnvironmentAttribute>();
-            return environment != null && method.IsStatic && MatchesArgs(method, objArray, stateObjArray);
+            return environment != null && method.IsStatic && MatchesArgs(method, argumentArray, objArray, stateObjArray, stateArgumentArray);
         }
 
         private static void FindConverter(Type type)
@@ -126,6 +128,7 @@ namespace Scriber.Engine
         private static bool MatchesArgs(MethodInfo method, params Type[][] types)
         {
             var args = method.GetParameters();
+
             foreach (var typeList in types)
             {
                 bool matches = true;

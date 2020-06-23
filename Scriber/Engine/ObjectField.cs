@@ -5,12 +5,12 @@ namespace Scriber.Engine
     public class ObjectField : Traceable
     {
         public string Key { get; }
-        public object? Value { get; }
+        public Argument Argument { get; }
 
-        public ObjectField(Element origin, string key, object? value) : base(origin)
+        public ObjectField(Element origin, string key, Argument value) : base(origin)
         {
             Key = key;
-            Value = value;
+            Argument = value;
         }
     }
 }

@@ -20,10 +20,10 @@ namespace Scriber.Engine
             return InvokeDynamic;
 
             // inline method for better debugging
-            object? InvokeDynamic(Element element, CompilerState state, object?[] args)
+            object? InvokeDynamic(Element element, CompilerState state, Argument[] args)
             {
                 var sorted = DynamicDispatch.SortArguments(command, element, state, args, param);
-                DynamicDispatch.MatchArguments(state, element, sorted, param);
+                DynamicDispatch.MatchArguments(state, sorted, param);
                 return method.Invoke(null, sorted);
             }
         }

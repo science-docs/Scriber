@@ -29,7 +29,7 @@ namespace Scriber.Engine.Instructions
             }
         }
 
-        public override object? Execute(CompilerState state, object?[] arguments)
+        public override object? Execute(CompilerState state, Argument[] arguments)
         {
             var parentBlock = state.Blocks.Peek(1);
             var creator = new ObjectCreator(Origin, state);
@@ -46,7 +46,7 @@ namespace Scriber.Engine.Instructions
                 throw new Exception();
             }
 
-            creator.Fields.AddRange(arguments.Cast<ObjectField>());
+            creator.Fields.AddRange(arguments.Select(e => e.Value).Cast<ObjectField>());
             return creator;
         }
     }
