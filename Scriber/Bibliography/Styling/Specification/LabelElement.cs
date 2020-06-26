@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Util;
+using System;
 using System.Xml.Serialization;
 
 namespace Scriber.Bibliography.Styling.Specification
@@ -98,7 +99,7 @@ namespace Scriber.Bibliography.Styling.Specification
 
         public override void EvaluateOverride(Interpreter interpreter, Citation citation)
         {
-            if (Variable == null || !Utility.TryParseEnum<TermName>(Variable, out var term))
+            if (Variable == null || !EnumUtility.TryParseEnum<TermName>(Variable, out var term))
             {
                 throw new Exception();
             }

@@ -1,5 +1,6 @@
 ﻿using Scriber.Bibliography.Styling.Formatting;
 using Scriber.Bibliography.Styling.Renderer;
+using Scriber.Util;
 using System;
 using System.Linq;
 using System.Xml.Serialization;
@@ -97,14 +98,6 @@ namespace Scriber.Bibliography.Styling.Specification
             {
                 throw new ArgumentNullException(nameof(Name));
             }
-            if (EtAl == null)
-            {
-                throw new ArgumentNullException(nameof(EtAl));
-            }
-            if (Label == null)
-            {
-                throw new ArgumentNullException(nameof(Label));
-            }
 
             var variables = Utility.Split(Variable, ' ');
 
@@ -113,7 +106,7 @@ namespace Scriber.Bibliography.Styling.Specification
                 variables[i] = variables[i].ToLower(interpreter.Locale.Culture.GetCultureInfo());
             }
 
-            var terms = variables.Select(e => Utility.ParseEnum<TermName>(e)).ToArray();
+            var terms = variables.Select(e => EnumUtility.ParseEnum<TermName>(e)).ToArray();
 
             var bibliography = interpreter.StyleFile.Bibliography;
 

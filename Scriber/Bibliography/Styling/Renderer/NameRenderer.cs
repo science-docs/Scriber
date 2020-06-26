@@ -17,8 +17,8 @@ namespace Scriber.Bibliography.Styling.Renderer
             string? subsequentAuthorSubstitute,
             SubsequentAuthorSubstituteRules? subsequentAuthorSubstituteRule,
             NameElement name,
-            EtAlElement etAl,
-            LabelElement label,
+            EtAlElement? etAl,
+            LabelElement? label,
             Func<NameElement?, EtAlElement?, LabelElement?, bool>[] substitutes)
         {
             if (!RenderNameGroups(interpreter, formatting, citation, variables, terms, false, subsequentAuthorSubstitute, subsequentAuthorSubstituteRule, name, etAl, label))
@@ -41,8 +41,8 @@ namespace Scriber.Bibliography.Styling.Renderer
             string? subsequentAuthorSubstitute,
             SubsequentAuthorSubstituteRules? subsequentAuthorSubstituteRule,
             NameElement name,
-            EtAlElement etAl,
-            LabelElement label)
+            EtAlElement? etAl,
+            LabelElement? label)
         {
             var groups = new List<NameGroup>();
 
@@ -134,8 +134,8 @@ namespace Scriber.Bibliography.Styling.Renderer
             string? subsequentAuthorSubstitute,
             SubsequentAuthorSubstituteRules? subsequentAuthorSubstituteRule,
             NameElement name,
-            EtAlElement etAl,
-            LabelElement label)
+            EtAlElement? etAl,
+            LabelElement? label)
         {
             var result = false;
 
@@ -218,7 +218,7 @@ namespace Scriber.Bibliography.Styling.Renderer
                 foreach (var part in parts)
                 {
                     // name
-                    if (part.IsLast && etAlActive && !name.EtAlUseLast)
+                    if (part.IsLast && etAlActive && etAl != null && !name.EtAlUseLast)
                     {
                         // add 'et-al' only if any names are rendered (which is not the case when et-al-use-first="0")
                         if (!isFirst)

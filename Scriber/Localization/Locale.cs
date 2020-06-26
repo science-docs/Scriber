@@ -1,4 +1,5 @@
 ﻿using Scriber.Bibliography.Styling.Specification;
+using Scriber.Util;
 using System;
 using System.Linq;
 
@@ -42,7 +43,7 @@ namespace Scriber.Localization
             };
         }
 
-        private static string[][] _RomanNumerals = new string[][]
+        private static readonly string[][] _RomanNumerals = new string[][]
             {
                 new string[]{"", "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix"}, // ones
                 new string[]{"", "x", "xx", "xxx", "xl", "l", "lx", "lxx", "lxxx", "xc"}, // tens
@@ -91,7 +92,7 @@ namespace Scriber.Localization
         private TermName GetOrdinalNumberTerm(int value, bool _long)
         {
             string name = $"{(_long ? "long-" : string.Empty)}ordinal-{value:00}";
-            if (Enum.TryParse<TermName>(name, out var term))
+            if (EnumUtility.TryParseEnum<TermName>(name, out var term))
             {
                 return term;
             }
