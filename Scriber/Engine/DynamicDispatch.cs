@@ -32,7 +32,7 @@ namespace Scriber.Engine
                 return Array.Empty<object>();
             }
 
-            List<object> objects = new List<object>();
+            List<object> objects = new List<object>(parameters.Length);
 
             CountParameters(parameters, out var hasState, out int required, out int optional);
 

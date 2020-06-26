@@ -84,7 +84,7 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             get;
             set;
-        }
+        } = TermFormat.Long;
         /// <summary>
         /// Indicates whether the 'form' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
@@ -185,7 +185,7 @@ namespace Scriber.Bibliography.Styling.Specification
 
             if (QuotesSpecified && Quotes)
             {
-                interpreter.Push("\"", this);
+                interpreter.Push(interpreter.Locale.OpenQuote, this);
             }
 
             if (!string.IsNullOrEmpty(Value))
@@ -219,13 +219,8 @@ namespace Scriber.Bibliography.Styling.Specification
             }
             else if (TermSpecified)
             {
-
-
-                //method.Name = "this.RenderTextByTerm";
-                //method.AddElement(this);
-                //method.AddLiteral(this.Term);
-                //method.AddLiteral(this.FormatSpecified ? this.Format : TermFormat.Long);
-                //method.AddLiteral(this.PluralSpecified ? this.Plural : false);
+                var termValue = interpreter.Locale.GetTerm(Term, Format, Plural);
+                interpreter.Push(termValue, this);
             }
             else
             {
@@ -234,7 +229,7 @@ namespace Scriber.Bibliography.Styling.Specification
 
             if (QuotesSpecified && Quotes)
             {
-                interpreter.Push("\"", this);
+                interpreter.Push(interpreter.Locale.CloseQuote, this);
             }
         }
 

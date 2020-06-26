@@ -114,7 +114,7 @@ namespace Scriber.Bibliography.Styling
             {
                 var count = Run.Children.Count;
                 runs[i].Evaluate(this, citation);
-                if (delimiter != null && i < runs.Length - 1 && count < Run.Children.Count)
+                if (delimiter != null && count < Run.Children.Count)
                 {
                     if (anyAdded)
                     {

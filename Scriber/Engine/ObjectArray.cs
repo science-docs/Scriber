@@ -41,18 +41,14 @@ namespace Scriber.Engine
                 {
                     arr.SetValue(value, i);
                 }
+                else if (ElementConverters.Find(value.GetType(), type) is IElementConverter converter)
+                {
+                    var transformed = converter.Convert(value, type, CompilerState ?? new CompilerState());
+                    arr.SetValue(transformed, i);
+                }
                 else
                 {
-                    var converter = ElementConverters.Find(value.GetType(), type);
-                    if (converter != null)
-                    {
-                        var transformed = converter.Convert(value, type, CompilerState ?? new CompilerState());
-                        arr.SetValue(transformed, i);
-                    }
-                    else
-                    {
-                        throw new CompilerException(argument.Source, $"Cannot convert element of type '{value.GetType().FormattedName()}' to '{type.FormattedName()}' because no appropriate converter was found.");
-                    }
+                    throw new CompilerException(argument.Source, $"Cannot convert element of type '{value.GetType().FormattedName()}' to '{type.FormattedName()}' because no appropriate converter was found.");
                 }
             }
 

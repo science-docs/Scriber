@@ -142,7 +142,7 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             if (value != null)
             {
-                foreach (var split in value.Split(' '))
+                foreach (var split in value.ToLowerInvariant().Split(' '))
                 {
                     var result = func(citation, split);
 

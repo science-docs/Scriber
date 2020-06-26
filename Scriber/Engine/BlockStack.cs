@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Scriber.Engine
 {
-    public class BlockTree
+    public class BlockStack
     {
         public Block Current => stack.Peek();
 
@@ -11,7 +11,7 @@ namespace Scriber.Engine
 
         public bool IsRoot => stack.Count == 1;
         
-        public BlockTree()
+        public BlockStack()
         {
             Push();
         }
