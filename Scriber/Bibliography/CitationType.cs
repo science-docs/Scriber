@@ -1,0 +1,41 @@
+﻿namespace Scriber.Bibliography
+{
+    public enum CitationType
+    {
+        Article,
+        ArticleMagazine,
+        ArticleNewspaper,
+        ArticleJournal,
+        Bill,
+        Book,
+        Broadcast,
+        Chapter,
+        Dataset,
+        Entry,
+        EntryDictionary,
+        EntryEncyclopedia,
+        Figure,
+        Graphic,
+        Interview,
+        Legislation,
+        LegalCase,
+        Manuscript,
+        Map,
+        MotionPicture,
+        MusicalScore,
+        Pamphlet,
+        PaperConference,
+        Patent,
+        Post,
+        PostWeblog,
+        PersonalCommunication,
+        Report,
+        Review,
+        ReviewBook,
+        Song,
+        Speech,
+        Thesis,
+        Treaty,
+        Webpage
+    }
+}

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Scriber.Layout.Document;
+using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -30,29 +30,439 @@ namespace Scriber.Bibliography.BibTex
 
         public string? Abstract
         {
-            get { return Get(); }
-            set { Set(value); }
+            get => Get();
+            set => Set(value);
         }
 
-        public string? Address
+
+        public string? Addendum
         {
-            get { return Get(); }
-            set { Set(value); }
+            get => Get();
+            set => Set(value);
         }
 
-        public string? Annote
+
+        public string? Afterword
         {
-            get { return Get(); }
-            set { Set(value); }
+            get => Get();
+            set => Set(value);
         }
+
+
+        public string? Annotation
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Annotator
+        {
+            get => Get();
+            set => Set(value);
+        }
+
 
         public string? Author
         {
-            get { return Get(); }
-            set { Set(value); }
+            get => Get();
+            set => Set(value);
         }
 
-        public string? Booktitle
+
+        public string? BookAuthor
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? BookTitle
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Commentator
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Date
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Doi
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Edition
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Editor
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Eid
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? EntrySubType
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? EPrint
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? EPrintType
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? EventDate
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? EventTitle
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? File
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Forward
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Holder
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? HowPublished
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? IndexTitle
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Institution
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Introduction
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Isan
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Isbn
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Ismn
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Isrn
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Issn
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Issue
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? IssueTitle
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Iswc
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? JournalTitle
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Label
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Language
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Library
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Location
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Maintitle
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Note
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Number
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Organization
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Pages
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? PageTotal
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Pagination
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Part
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Publisher
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? PubState
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? ReprintTitle
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Series
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Shorthand
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? ShorthandIntro
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Title
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Translator
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Url
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? UrlDate
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Venue
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Version
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Volume
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+
+        public string? Volumes
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+        // BibText entries
+
+        public string? Address
+        {
+            get => Get();
+            set => Set(value);
+        }
+
+        public string? Annote
         {
             get { return Get(); }
             set { Set(value); }
@@ -70,25 +480,7 @@ namespace Scriber.Bibliography.BibTex
             set { Set(value); }
         }
 
-        public string? Edition
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Editor
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
         public string? Howpublished
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Institution
         {
             get { return Get(); }
             set { Set(value); }
@@ -100,61 +492,13 @@ namespace Scriber.Bibliography.BibTex
             set { Set(value); }
         }
 
-        public string? Mouth
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Note
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Number
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Organization
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Pages
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Publisher
+        public string? Month
         {
             get { return Get(); }
             set { Set(value); }
         }
 
         public string? School
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Series
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Title
-        {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        public string? Volume
         {
             get { return Get(); }
             set { Set(value); }
@@ -169,11 +513,11 @@ namespace Scriber.Bibliography.BibTex
         /// <summary>
         /// Entry's type
         /// </summary>
-        public string? Type
+        public string Type
         {
             get
             {
-                return Enum.GetName(typeof(EntryType), _type);
+                return Enum.GetName(typeof(EntryType), _type) ?? "Misc";
             }
             set
             {
@@ -232,7 +576,8 @@ namespace Scriber.Bibliography.BibTex
             get
             {
                 index = index.ToLowerInvariant();
-                return _tags.ContainsKey(index) ? _tags[index] : null;
+                _tags.TryGetValue(index, out var value);
+                return value;
             }
             set
             {
@@ -252,21 +597,166 @@ namespace Scriber.Bibliography.BibTex
 
         public Citation ToCitation()
         {
-            var citation = new Citation();
-            if (Title != null)
-                citation[nameof(Title)] = new TextVariable(Title);
-            if (Author != null)
-                citation[nameof(Author)] = NamesVariable.Parse(Author, "and", ",");
-            if (Volume != null && NumberVariable.TryParse(Volume, out var volumeVariable))
-                citation[nameof(Volume)] = volumeVariable;
-            if (Number != null && NumberVariable.TryParse(Number, out var numberVariable))
-                citation[nameof(Number)] = numberVariable;
-            if (Pages != null && NumberVariable.TryParse(Pages, out var pagesVariable))
-                citation[nameof(Pages)] = pagesVariable;
-            if (Abstract != null)
-                citation[nameof(Abstract)] = new TextVariable(Abstract);
+            var citationType = GetCitationType();
+            var cb = new CitationBuilder(Key, citationType);
 
-            return citation;
+            if (!string.IsNullOrWhiteSpace(Abstract))
+                cb.Abstract(new TextVariable(Abstract));
+
+            if (!string.IsNullOrWhiteSpace(Annote))
+                cb.Annote(new TextVariable(Annote));
+
+            if (!string.IsNullOrWhiteSpace(Location))
+            {
+                cb.EventPlace(new TextVariable(Location));
+                cb.PublisherPlace(new TextVariable(Location));
+            }
+            else if (!string.IsNullOrWhiteSpace(Address))
+            {
+                cb.EventPlace(new TextVariable(Address));
+                cb.PublisherPlace(new TextVariable(Address));
+            }
+            if (!string.IsNullOrWhiteSpace(Venue))
+            {
+                cb.EventPlace(new TextVariable(Venue));
+            }
+
+            if (!string.IsNullOrWhiteSpace(Author))
+                cb.Author(NamesVariable.Parse(Author, "and", ","));
+            else if (!string.IsNullOrWhiteSpace(BookAuthor))
+                cb.Author(NamesVariable.Parse(BookAuthor, "and", ","));
+
+            if (!string.IsNullOrWhiteSpace(Editor))
+                cb.Editor(NamesVariable.Parse(Editor, "and", ","));
+
+            if (UrlDate != null && DateVariable.TryParse(UrlDate, out var urlDateVariable))
+            {
+                cb.Accessed(urlDateVariable);
+            }
+
+            if (Date != null && DateVariable.TryParse(Date, out var dateVariable))
+            {
+                cb.Issued(dateVariable);
+                cb.EventDate(dateVariable);
+            }
+            else if (Year != null && DateVariable.TryParse(Year, Month, out var yearMonthVariable))
+            {
+                cb.Issued(yearMonthVariable);
+                cb.EventDate(yearMonthVariable);
+            }
+
+            if (!string.IsNullOrWhiteSpace(Journal))
+            {
+                var journalVariable = new TextVariable(Journal);
+                cb.ContainerTitle(journalVariable);
+                cb.CollectionTitle(journalVariable);
+            }
+            else if (!string.IsNullOrWhiteSpace(JournalTitle))
+            {
+                var journalTitleVariable = new TextVariable(JournalTitle);
+                cb.ContainerTitle(journalTitleVariable);
+                cb.CollectionTitle(journalTitleVariable);
+            }
+            else if (!string.IsNullOrWhiteSpace(BookTitle))
+            {
+                var bookTitleVariable = new TextVariable(BookTitle);
+                cb.ContainerTitle(bookTitleVariable);
+                cb.CollectionTitle(bookTitleVariable);
+            }
+            else if (!string.IsNullOrWhiteSpace(Series))
+            {
+                var seriesVariable = new TextVariable(Series);
+                cb.ContainerTitle(seriesVariable);
+                cb.CollectionTitle(seriesVariable);
+            }
+
+
+            if (Number != null && NumberVariable.TryParse(Number, out var numberVariable))
+            {
+                cb.Number(numberVariable);
+            }
+
+            if (Issue != null && NumberVariable.TryParse(Issue, out var issueVariable))
+            {
+                cb.Issue(issueVariable);
+            }
+            else if (Number != null && NumberVariable.TryParse(Number, out var numberIssueVariable))
+            {
+                cb.Issue(numberIssueVariable);
+            }
+            
+            if (!string.IsNullOrWhiteSpace(Publisher))
+            {
+                cb.Publisher(new TextVariable(Publisher));
+            }
+            else if (!string.IsNullOrWhiteSpace(Organization))
+            {
+                cb.Publisher(new TextVariable(Organization));
+            }
+            else if (!string.IsNullOrWhiteSpace(Institution))
+            {
+                cb.Publisher(new TextVariable(Institution));
+            }
+            else if (!string.IsNullOrWhiteSpace(School))
+            {
+                cb.Publisher(new TextVariable(School));
+            }
+
+            if (!string.IsNullOrWhiteSpace(Title))
+            {
+                cb.Title(new TextVariable(Title));
+            }
+
+            if (!string.IsNullOrWhiteSpace(Version))
+                cb.Version(new TextVariable(Version));
+
+            if (!string.IsNullOrWhiteSpace(Doi))
+                cb.Doi(new TextVariable(Doi));
+
+            if (!string.IsNullOrWhiteSpace(Isbn))
+                cb.Isbn(new TextVariable(Isbn));
+
+            if (!string.IsNullOrWhiteSpace(Issn))
+                cb.Issn(new TextVariable(Issn));
+
+            if (!string.IsNullOrWhiteSpace(Translator))
+                cb.Translator(NamesVariable.Parse(Translator, "and", ","));
+
+            if (Chapter != null && NumberVariable.TryParse(Chapter, out var chapterVariable))
+                cb.ChapterNumber(chapterVariable);
+
+            if (Edition != null && NumberVariable.TryParseOrdinal(Edition, out var editionVariable))
+                cb.Edition(editionVariable);
+
+            if (Volume != null && NumberVariable.TryParse(Volume, out var volumeVariable))
+                cb.Volume(volumeVariable);
+
+            if (Volumes != null && NumberVariable.TryParse(Volumes, out var volumesVariable))
+                cb.NumberOfVolumes(volumesVariable);
+
+            bool hasPageTotal = false;
+            if (PageTotal != null && NumberVariable.TryParse(PageTotal, out var pageTotalVariable))
+            {
+                hasPageTotal = true;
+                cb.NumberOfPages(pageTotalVariable);
+            }
+
+            if (Pages != null && NumberVariable.TryParse(Pages, out var pagesVariable))
+            {
+                cb.Page(pagesVariable);
+                if (pagesVariable.Max != pagesVariable.Min)
+                {
+                    cb.PageFirst(new NumberVariable(pagesVariable.Min));
+
+                    if (!hasPageTotal)
+                    {
+                        cb.NumberOfPages(new NumberVariable(pagesVariable.Max - pagesVariable.Min));
+                    }
+                }
+            }
+                
+
+            return cb.Build();
         }
 
         private string? Get([CallerMemberName] string? name = null)
@@ -280,6 +770,32 @@ namespace Scriber.Bibliography.BibTex
             {
                 this[name] = value;
             }
+        }
+
+        private CitationType GetCitationType()
+        {
+            return _type switch
+            {
+                EntryType.Article => CitationType.ArticleJournal,
+                EntryType.Proceedings => CitationType.Book,
+                EntryType.Manual => CitationType.Book,
+                EntryType.Book => CitationType.Book,
+                EntryType.Periodical => CitationType.Book,
+                EntryType.Booklet => CitationType.Pamphlet,
+                EntryType.InBook => CitationType.Chapter,
+                EntryType.InCollection => CitationType.Chapter,
+                EntryType.InProceedings => CitationType.PaperConference,
+                EntryType.Conference => CitationType.PaperConference,
+                EntryType.Mastersthesis => CitationType.Thesis,
+                EntryType.PhDThesis => CitationType.Thesis,
+                EntryType.Thesis => CitationType.Thesis,
+                EntryType.TechReport => CitationType.Report,
+                EntryType.Patent => CitationType.Patent,
+                EntryType.Electronic => CitationType.Webpage,
+                EntryType.Online => CitationType.Webpage,
+                EntryType.Unpublished => CitationType.Manuscript,
+                _ => CitationType.Article
+            };
         }
     }
 
@@ -308,23 +824,41 @@ namespace Scriber.Bibliography.BibTex
 
     public enum EntryType
     {
-        Article,
-        Book,
-        Booklet,
-        Conference,
-        InBook,
+        // BibLaTex types
+        Article, 
+        Book, 
+        BookInBook, 
+        Booklet, 
+        Collection, 
+        InBook, 
         InCollection,
-        InProceedings,
-        Manual,
+        InProceedings, 
+        InReference, 
+        Manual, 
+        Misc, 
+        MVBook, 
+        MVCollection, 
+        MVProceedings, 
+        MVReference, 
+        Online, 
+        Patent, 
+        Periodical, 
+        Proceedings, 
+        Reference, 
+        Report, 
+        Set, 
+        SuppBook, 
+        SuppCollection, 
+        SuppPeriodical, 
+        Thesis, 
+        Unpublished, 
+        XData,
+
+        // Leftover BibTex types
+        Conference,
         Mastersthesis,
-        Misc,
         PhDThesis,
-        Patent,
-        Collection,
         Electronic,
-        Proceedings,
         TechReport,
-        Unpublished,
-        Online
     }
 }

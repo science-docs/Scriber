@@ -4,6 +4,8 @@ namespace Scriber.Bibliography
 {
     public class Citation
     {
+        public string Key { get; set; }
+
         private readonly Dictionary<string, IVariable> variables = new Dictionary<string, IVariable>();
 
         public IVariable? this[string name]
@@ -20,6 +22,11 @@ namespace Scriber.Bibliography
                     variables.Remove(name.ToLowerInvariant());
                 }
             }
+        }
+
+        public Citation(string key)
+        {
+            Key = key;
         }
 
         public void CopyTo(IDictionary<string, IVariable> variables)
