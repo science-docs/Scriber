@@ -29,7 +29,6 @@ namespace Scriber.Layout.Document
                 if (nodes.Length > 0)
                 {
                     lineNodes.AddRange(nodes);
-                    //lineNodes.Add(LineNodeTransformer.GetDefaultGlue(leaf));
                 }
             }
             for (int i = 0; i < lineNodes.Count - 1; i++)
@@ -39,9 +38,8 @@ namespace Scriber.Layout.Document
                     lineNodes.RemoveAt(i);
                 }
             }
-            if (lineNodes.Count > 1)
+            if (lineNodes.Count > 0)
             {
-                //lineNodes.RemoveAt(lineNodes.Count - 1);
                 var linebreak = new Linebreak();
                 var breaks = linebreak.BreakLines(lineNodes, new double[] { availableSize.Width }, new LinebreakOptions());
                 var positionedItems = linebreak.PositionItems(lineNodes, new double[] { availableSize.Width }, breaks, false);

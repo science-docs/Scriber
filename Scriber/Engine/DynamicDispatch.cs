@@ -135,7 +135,7 @@ namespace Scriber.Engine
                 var converter = ElementConverters.Find(value.GetType(), targetType);
                 if (converter != null)
                 {
-                    transformed = converter.Convert(value, targetType, state);
+                    transformed = converter.Convert(value, targetType);
                 }
             }
 

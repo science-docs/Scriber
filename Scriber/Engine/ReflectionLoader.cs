@@ -55,6 +55,7 @@ namespace Scriber.Engine
             {
                 FindConverter(converter);
             }
+            ElementConverters.ResolvePaths();
         }
 
         private static bool IsPackage(Type type)

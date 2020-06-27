@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO.Abstractions;
 using System.Linq;
 using Scriber.Language;
 using Scriber.Layout.Document;
@@ -11,12 +12,12 @@ namespace Scriber.Engine
     {
         public static CompilerResult Compile(IEnumerable<Element> elements)
         {
-            return Compile(elements, null);
+            return Compile(elements, null, null);
         }
 
-        public static CompilerResult Compile(IEnumerable<Element> elements, Logger? logger)
+        public static CompilerResult Compile(IEnumerable<Element> elements, Logger? logger, IFileSystem? fileSystem)
         {
-            var state = new CompilerState();
+            var state = new CompilerState(fileSystem ?? new FileSystem());
 
             if (logger != null)
             {

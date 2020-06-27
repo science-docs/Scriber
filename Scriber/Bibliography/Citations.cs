@@ -33,6 +33,11 @@ namespace Scriber.Bibliography
             }
         }
 
+        public bool ContainsKey(string key)
+        {
+            return citations.ContainsKey(key);
+        }
+
         public Run Cite(params string[] keys)
         {
             return Cite((IEnumerable<string>)keys);

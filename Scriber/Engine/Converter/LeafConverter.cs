@@ -7,7 +7,7 @@ namespace Scriber.Engine.Converter
     [CommandArgumentConverter(typeof(Leaf), typeof(Paragraph))]
     class LeafConverter : IElementConverter
     {
-        public object Convert(object source, Type targetType, CompilerState state)
+        public object Convert(object source, Type targetType)
         {
             if (source is null)
             {

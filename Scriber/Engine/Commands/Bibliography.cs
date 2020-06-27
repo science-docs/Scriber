@@ -4,9 +4,8 @@ using Scriber.Bibliography.Styling;
 using Scriber.Bibliography.Styling.Formatting;
 using Scriber.Bibliography.Styling.Specification;
 using Scriber.Layout.Document;
-using Scriber.Text;
+using Scriber.Util;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,36 +15,60 @@ namespace Scriber.Engine.Commands
     public static class Bibliography
     {
         [Command("BibliographyStyle")]
-        public static void SetBibliographyStyle(CompilerState state, string source)
+        public static void SetBibliographyStyle(CompilerState state, Argument<string> style)
         {
-            var styleFile = File.Load<StyleFile>(source);
-            state.Document.Citations = new Citations(new Processor(styleFile, LocaleFile.Defaults), state.Document.Locale.File);
+            var fileInfo = state.FileSystem.TryFindFile(style.Value, "csl");
+            if (fileInfo != null)
+            {
+                using var sourceStream = fileInfo.OpenRead();
+                var styleFile = File.Load<StyleFile>(sourceStream);
+                state.Document.Citations = new Citations(new Processor(styleFile, LocaleFile.Defaults), state.Document.Locale.File);
+            }
+            else
+            {
+                throw new CompilerException(style.Source, $"Could not find resource '{style.Value}'");
+            }
         }
 
         [Command("Bibliography")]
-        public static void AddBibliography(CompilerState state, string source)
+        public static void AddBibliography(CompilerState state, Argument<string> bibliographyPath)
         {
             if (state.Document.Citations == null)
             {
                 return;
             }
 
-            if (source.EndsWith(".bib"))
+            var sourceInfo = state.FileSystem.TryFindFile(bibliographyPath.Value, "bib");
+
+            if (sourceInfo != null)
             {
-                var bibEntries = BibParser.Parse(System.IO.File.ReadAllText(source), out var _);
-                state.Document.Citations.AddRange(bibEntries.Select(e => e.ToCitation()));
+                if (sourceInfo.Extension == ".bib")
+                {
+                    var text = state.FileSystem.File.ReadAllText(sourceInfo.FullName);
+                    var bibEntries = BibParser.Parse(text, out var _);
+                    state.Document.Citations.AddRange(bibEntries.Select(e => e.ToCitation()));
+                }
+            }
+            else
+            {
+                throw new CompilerException(bibliographyPath.Source, $"Could not find resource '{bibliographyPath.Value}'");
             }
         }
 
         [Command("Cite")]
-        public static IEnumerable<Leaf> Cite(CompilerState state, string citationKey)
+        public static IEnumerable<Leaf> Cite(CompilerState state, Argument<string> citationKey)
         {
             if (state.Document.Citations == null)
             {
-                return Array.Empty<Leaf>();
+                throw new CompilerException(null, "Cannot cite without citations loaded.");
             }
 
-            var cited = state.Document.Citations.Cite(citationKey);
+            if (!state.Document.Citations.ContainsKey(citationKey.Value))
+            {
+                throw new CompilerException(citationKey.Source, $"No citation with key '{citationKey.Value}' exists.");
+            }
+
+            var cited = state.Document.Citations.Cite(citationKey.Value);
 
             if (cited != null)
             {

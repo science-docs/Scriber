@@ -1,6 +1,7 @@
 ﻿using Scriber.Language;
 using Scriber.Util;
 using System;
+using System.IO.Abstractions;
 
 namespace Scriber.Engine
 {
@@ -43,7 +44,7 @@ namespace Scriber.Engine
                 }
                 else if (ElementConverters.Find(value.GetType(), type) is IElementConverter converter)
                 {
-                    var transformed = converter.Convert(value, type, CompilerState ?? new CompilerState());
+                    var transformed = converter.Convert(value, type);
                     arr.SetValue(transformed, i);
                 }
                 else

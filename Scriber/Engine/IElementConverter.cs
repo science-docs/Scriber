@@ -34,6 +34,6 @@ namespace Scriber.Engine
 
     public interface IElementConverter
     {
-        object Convert(object source, Type targetType, CompilerState state);
+        object Convert(object source, Type targetType);
     }
 }

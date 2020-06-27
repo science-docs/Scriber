@@ -6,10 +6,10 @@ using Scriber.Util;
 
 namespace Scriber.Engine.Converter
 {
-    [CommandArgumentConverter(typeof(Paragraph), typeof(string), typeof(IEnumerable<Leaf>), typeof(Enum))]
+    [CommandArgumentConverter(typeof(Paragraph), typeof(string), typeof(IEnumerable<Leaf>))]
     public class ParagraphConverter : IElementConverter
     {
-        public object Convert(object source, Type targetType, CompilerState state)
+        public object Convert(object source, Type targetType)
         {
             if (source is null)
             {

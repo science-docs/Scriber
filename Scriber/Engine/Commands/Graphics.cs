@@ -1,5 +1,6 @@
-﻿using System.IO;
+﻿using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Util;
 
 namespace Scriber.Engine.Commands
 {
@@ -10,21 +11,45 @@ namespace Scriber.Engine.Commands
         public static Paragraph Caption(Paragraph paragraph)
         {
             paragraph.Tag = "caption";
-            paragraph.Margin = new Layout.Thickness(16, 0, 0, 0);
+            paragraph.Margin = new Thickness(16, 0, 0, 0);
             return paragraph;
         }
 
         [Command("IncludeGraphics")]
-        public static ImageElement IncludeGraphics(CompilerState state, string imagePath, IncludeImageOptions? options = null)
+        public static AbstractElement IncludeGraphics(CompilerState state, string imagePath, IncludeImageOptions? options = null)
         {
-            var bytes = File.ReadAllBytes(imagePath);
-            var image = new ImageElement(bytes, imagePath);
-            return image;
+            var imagePathInfo = state.FileSystem.TryFindFile(imagePath, "png", "jpg", "gif", "bmp");
+            
+            if (imagePathInfo != null && (options == null || !options.Draft))
+            {
+                var bytes = state.FileSystem.File.ReadAllBytes(imagePathInfo.FullName);
+                var image = new ImageElement(bytes, imagePath);
+
+                if (options != null)
+                {
+                    image.Angle = options.Angle;
+                    image.Scale = options.Scale;
+                    image.Height = options.Height;
+                    image.Width = options.Width;
+                }
+
+                return image;
+            }
+            else
+            {
+                var paragraph = new Paragraph();
+                paragraph.Leaves.Add(new TextLeaf(imagePath));
+                return paragraph;
+            }
         }
 
         public class IncludeImageOptions
         {
-
+            public double Angle { get; set; }
+            public bool Draft { get; set; }
+            public double Scale { get; set; }
+            public Unit Height { get; set; }
+            public Unit Width { get; set; }
         }
     }
 }

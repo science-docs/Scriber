@@ -95,11 +95,11 @@ namespace Scriber.CLI
             //sb.AppendLine("\\caption{Second Test Image}");
             //sb.AppendLine("\\end{figure}");
 
-            //sb.AppendLine("@Figure() {");
-            //sb.AppendLine("@Centering()");
-            //sb.AppendLine("@IncludeGraphics(test-image.png)");
-            //sb.AppendLine("@Caption(Second Test Image)");
-            //sb.AppendLine("}");
+            sb.AppendLine("@Figure() {");
+            sb.AppendLine("@Centering()");
+            sb.AppendLine("@IncludeGraphics(test-image.png, { Draft: true })");
+            sb.AppendLine("@Caption(Second Test Image)");
+            sb.AppendLine("}");
 
             sb.AppendLine();
             sb.AppendLine("@PrintBibliography()");
@@ -138,7 +138,7 @@ namespace Scriber.CLI
             Logger logger = new Logger { Level = LogLevel.Debug };
             logger.Logged += Logger_Logged;
             var parserResult = Parser.Parse(tokens, logger);
-            var result = Compiler.Compile(parserResult.Elements, logger);
+            var result = Compiler.Compile(parserResult.Elements, logger, null);
 
             var document = result.Document;
             document.Run(logger);
