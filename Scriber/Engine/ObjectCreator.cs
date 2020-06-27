@@ -37,7 +37,7 @@ namespace Scriber.Engine
 
         public object Create(Type defaultType, Type[]? overrides)
         {
-            var obj = CreateEmpty(defaultType, overrides, out var type);
+            var obj = CreateEmpty(defaultType, overrides);
 
             if (obj is DocumentVariable vars)
             {
@@ -48,10 +48,11 @@ namespace Scriber.Engine
             }
             else
             {
-                var matched = MatchFields(type, Fields);
-                foreach (var match in matched)
+                var objToFill = AsArgumentValue(obj);
+                var matched = MatchFields(objToFill.GetType(), Fields);
+                foreach (var (property, field) in matched)
                 {
-                    FillField(obj, match.Item1, match.Item2.Argument.Value);
+                    FillField(objToFill, property, field.Argument.Value);
                 }
             }
 
@@ -60,7 +61,16 @@ namespace Scriber.Engine
             return obj;
         }
 
-        private object CreateEmpty(Type defaultType, Type[]? overrides, out Type type)
+        private object AsArgumentValue(object value)
+        {
+            if (Argument.IsArgumentType(value.GetType()) && value is Argument argument && argument.Value != null)
+            {
+                value = argument.Value;
+            }
+            return value;
+        }
+
+        private object CreateEmpty(Type defaultType, Type[]? overrides)
         {
             Type? objType = null;
 
@@ -84,19 +94,35 @@ namespace Scriber.Engine
                 objType = defaultType;
             }
 
-            type = objType;
-
-            ValidateType(type);
-
-            object? emptyObj;
+            if (Argument.IsArgumentType(objType, out var genericType))
+            {
+                ValidateType(genericType);
+            }
+            else
+            {
+                ValidateType(objType);
+            }
 
             try
             {
-                emptyObj = Activator.CreateInstance(type);
+                return CreateInstance(objType);
             }
             catch (Exception ex)
             {
-                throw new CompilerException(TypeElement ?? Origin, $"An exception occured while creating object of type '{type.FormattedName()}'.", ex);
+                throw new CompilerException(TypeElement ?? Origin, $"An exception occured while creating object of type '{objType.FormattedName()}'.", ex);
+            }
+        }
+
+        private object CreateInstance(Type type)
+        {
+            object? emptyObj;
+            if (Argument.IsArgumentType(type))
+            {
+                emptyObj = Activator.CreateInstance(type, null, Activator.CreateInstance(type));
+            }
+            else
+            {
+                emptyObj = Activator.CreateInstance(type);
             }
 
             // An object returned by Activator.CreateInstance(Type) can be null if the type is e.g. int?. 
@@ -148,10 +174,10 @@ namespace Scriber.Engine
             }
         }
 
-        private List<Tuple<PropertyInfo, ObjectField>> MatchFields(Type type, IEnumerable<ObjectField> fields)
+        private List<(PropertyInfo property, ObjectField field)> MatchFields(Type type, IEnumerable<ObjectField> fields)
         {
             var properties = type.GetProperties();
-            var list = new List<Tuple<PropertyInfo, ObjectField>>();
+            var list = new List<(PropertyInfo, ObjectField)>();
             var matched = new List<ObjectField>();
 
             foreach (var prop in properties)
@@ -164,7 +190,7 @@ namespace Scriber.Engine
                     if (field.Key == name)
                     {
                         matched.Add(field);
-                        list.Add(new Tuple<PropertyInfo, ObjectField>(prop, field));
+                        list.Add((prop, field));
                         break;
                     }
                 }

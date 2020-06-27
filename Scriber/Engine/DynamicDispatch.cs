@@ -32,11 +32,11 @@ namespace Scriber.Engine
                 return Array.Empty<object>();
             }
 
-            List<object> objects = new List<object>(parameters.Length);
+            var objects = new List<object>(parameters.Length);
 
             CountParameters(parameters, out var hasState, out int required, out int optional);
 
-            if (args.Length < required || args.Length > required + optional)
+            if (args.Length < required || args.Length > required + optional && !IsParams(parameters[^1]))
             {
                 throw new CompilerException(element, $"Command {command} expects between {required} and {required + optional} arguments. {args.Length} arguments where supplied");
             }
@@ -46,13 +46,43 @@ namespace Scriber.Engine
                 objects.Add(state);
             }
 
-            // add all given arguments
-            objects.AddRange(args);
-            // pad missing optional arguments
-            var padArray = new object[required + optional - args.Length];
-            objects.AddRange(padArray);
-
+            if (IsParams(parameters[^1]) && args.Length >= required + optional)
+            {
+                objects.AddRange(TransformParamsArray(state, required + optional, args));
+            }
+            else
+            {
+                // add all given arguments
+                objects.AddRange(args);
+                // pad missing optional arguments
+                var padArray = new object[required + optional - args.Length];
+                objects.AddRange(padArray);
+            }
+            
             return objects.ToArray();
+        }
+
+        private static Argument[] TransformParamsArray(CompilerState state, int count, Argument[] source)
+        {
+            if (source.Length < count)
+            {
+                return source;
+            }
+
+            var args = new Argument[count];
+            var index = count - 1;
+
+            for (int i = 0; i < index; i++)
+            {
+                args[i] = source[i];
+            }
+
+            var restArgs = source[index..];
+
+            var lastArg = new Argument(restArgs[0].Source, new ObjectArray(restArgs[0].Source, state, restArgs));
+            args[^1] = lastArg;
+
+            return args;
         }
 
         /// <summary>
@@ -101,7 +131,7 @@ namespace Scriber.Engine
         {
             transformed = null;
             var paramType = parameter.ParameterType;
-            var isArgument = IsArgument(paramType, out var targetType);
+            var isArgument = Argument.IsArgumentType(paramType, out var targetType);
             var value = argument.Value!;
             if (paramType == typeof(Argument))
             {
@@ -147,15 +177,9 @@ namespace Scriber.Engine
             return transformed != null;
         }
 
-        private static bool IsArgument(Type type, out Type genericType)
+        private static bool IsParams(ParameterInfo parameter)
         {
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Argument<>))
-            {
-                genericType = type.GenericTypeArguments[0];
-                return true;
-            }
-            genericType = type;
-            return false;
+            return parameter.IsDefined(typeof(ParamArrayAttribute));
         }
 
         private static object MakeArgument(Argument argument, Type target, object value)

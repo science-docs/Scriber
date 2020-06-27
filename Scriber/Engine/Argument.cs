@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -20,6 +21,25 @@ namespace Scriber.Engine
             var list = new List<Argument>();
             Flatten(this, list);
             return list.ToArray();
+        }
+
+        public static bool IsArgumentType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Argument<>);
+        }
+
+        public static bool IsArgumentType(Type type, out Type genericType)
+        {
+            if (IsArgumentType(type))
+            {
+                genericType = type.GenericTypeArguments[0];
+                return true;
+            }
+            else
+            {
+                genericType = type;
+                return false;
+            }
         }
 
         private static void Flatten(Argument argument, List<Argument> list)
