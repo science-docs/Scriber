@@ -18,7 +18,7 @@ namespace Scriber
             vars[Page][Margin].SetValue(new Thickness(57));
 
             vars[Length]["parindent"].SetValue(0.0);
-            vars[Length]["parskip"].SetValue(0.0);
+            vars[Length]["parskip"].SetValue(8.0);
             vars[Length][BaselineStretch].SetValue(1.2);
         }
     }

@@ -33,32 +33,12 @@ namespace Scriber.Bibliography.Styling.Specification
                 })
                 .Select(l =>
                 {
-                    // fix bad naming convention
-                    if (l.XmlLang == "en-US")
+                    // split
+                    var parts = l.XmlLang!.Split('-');
+                    if (parts.Length == 2 && parts[0].Length == 2 && string.Compare(parts[0], parts[1], true) == 0)
                     {
-                        l.XmlLang = "";
-                    }
-                    else if (l.XmlLang == "de-DE")
-                    {
-                        l.XmlLang = "de";
-                    }
-                    else if (l.XmlLang == "pt-PT")
-                    {
-                        l.XmlLang = "pt";
-                    }
-                    else if (l.XmlLang == "zh-CN")
-                    {
-                        l.XmlLang = "zh";
-                    }
-                    else
-                    {
-                        // split
-                        var parts = l.XmlLang!.Split('-');
-                        if (parts.Length == 2 && parts[0].Length == 2 && string.Compare(parts[0], parts[1], true) == 0)
-                        {
-                            // default
-                            l.XmlLang = parts[0].ToLowerInvariant();
-                        }
+                        // default
+                        l.XmlLang = parts[0].ToLowerInvariant();
                     }
                     // done
                     return l;

@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Scriber.Engine
@@ -28,6 +29,13 @@ namespace Scriber.Engine
                 foreach (var arg in arguments)
                 {
                     Flatten(arg, list);
+                }
+            }
+            else if (argument.Value is IEnumerable elements)
+            {
+                foreach (var element in elements)
+                {
+                    Flatten(new Argument(argument.Source, element), list);
                 }
             }
             else

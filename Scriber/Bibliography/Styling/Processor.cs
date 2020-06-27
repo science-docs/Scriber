@@ -66,7 +66,7 @@ namespace Scriber.Bibliography.Styling
             return Bibliography(GetLocale(culture), citations);
         }
 
-        private IEnumerable<Run> Bibliography(LocaleFile locale, IEnumerable<Citation> citations)
+        public IEnumerable<Run> Bibliography(LocaleFile locale, IEnumerable<Citation> citations)
         {
             Interpreter interpreter = new Interpreter(Style, locale)
             {

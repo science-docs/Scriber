@@ -32,6 +32,13 @@ namespace Scriber.Layout.Document
                     //lineNodes.Add(LineNodeTransformer.GetDefaultGlue(leaf));
                 }
             }
+            for (int i = 0; i < lineNodes.Count - 1; i++)
+            {
+                if (lineNodes[i].Type == LineNodeType.Glue && lineNodes[i + 1].Type == LineNodeType.Glue)
+                {
+                    lineNodes.RemoveAt(i);
+                }
+            }
             if (lineNodes.Count > 1)
             {
                 //lineNodes.RemoveAt(lineNodes.Count - 1);

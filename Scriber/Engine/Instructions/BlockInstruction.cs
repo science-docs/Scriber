@@ -25,6 +25,9 @@ namespace Scriber.Engine.Instructions
                     if (currentParagraph == null)
                     {
                         currentParagraph = new Paragraph();
+                        var margin = currentParagraph.Margin;
+                        margin.Bottom = state.Document.Variables["length", "parskip"].GetValue<double>();
+                        currentParagraph.Margin = margin;
                         results.Add(new Argument(item.Source, currentParagraph));
                     }
 

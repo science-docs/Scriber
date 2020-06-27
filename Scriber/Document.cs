@@ -8,6 +8,8 @@ using Scriber.Drawing;
 using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Logging;
+using Scriber.Bibliography;
+using Scriber.Localization;
 
 namespace Scriber
 {
@@ -33,8 +35,15 @@ namespace Scriber
         public Size PageBoxSize { get; private set; }
         public Thickness PageMargin { get; private set; }
 
+        public Culture Culture { get; set; } = new Culture("en-US");
+
+        public Locale Locale { get; set; }
+
+        public Citations? Citations { get; set; }
+
         public Document()
         {
+            Locale = new Locale(Culture);
             Elements = new ElementCollection<DocumentElement>(this);
             PageItems = new ElementCollection<DocumentElement>(this);
             Measurements = new Measurements();

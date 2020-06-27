@@ -47,12 +47,16 @@ namespace Scriber.CLI
             //sb.AppendLine("\\caption{First Test Image}");
             //sb.AppendLine("\\end{figure}");
 
+            sb.AppendLine("@BibliographyStyle(ieee.csl)");
+            sb.AppendLine("@Bibliography(lib.bib)");
+
             //sb.AppendLine();
             //sb.AppendLine();
             //sb.AppendLine();
-            sb.AppendLine("@Section(This is a section)");
+            //sb.AppendLine("@Section(This is a section)");
             //sb.AppendLine();
-            sb.AppendLine("Aft\\-er the @Color(blue, first) section [follows]@Footnote(Some Paragraph Content, \"1\") a @Bold(pagebreak).");
+            //sb.AppendLine("Aft\\-er the @Color(blue, first) section [follows]@Footnote(Some Paragraph Content, \"1\") a @Bold(pagebreak).@Cite(Zanoni.2015)");
+            sb.AppendLine("The following is a citation: @Cite(\"Zanoni.2015\")");
             //sb.AppendLine();
             //sb.AppendLine();
             //sb.AppendLine();
@@ -91,11 +95,14 @@ namespace Scriber.CLI
             //sb.AppendLine("\\caption{Second Test Image}");
             //sb.AppendLine("\\end{figure}");
 
-            sb.AppendLine("@Figure() {");
-            sb.AppendLine("@Centering()");
-            sb.AppendLine("@IncludeGraphics(test-image.png)");
-            sb.AppendLine("@Caption(Second Test Image)");
-            sb.AppendLine("}");
+            //sb.AppendLine("@Figure() {");
+            //sb.AppendLine("@Centering()");
+            //sb.AppendLine("@IncludeGraphics(test-image.png)");
+            //sb.AppendLine("@Caption(Second Test Image)");
+            //sb.AppendLine("}");
+
+            sb.AppendLine();
+            sb.AppendLine("@PrintBibliography()");
 
             //sb.AppendLine();
             //sb.AppendLine("1 1 1 1 1 1 1 1 1 1");
