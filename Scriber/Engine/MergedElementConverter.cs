@@ -6,7 +6,7 @@ namespace Scriber.Engine
     public class MergedElementConverter : IElementConverter
     {
         private readonly IElementConverter first;
-        private readonly List<Tuple<Type, IElementConverter>> converters = new List<Tuple<Type, IElementConverter>>();
+        private readonly List<(Type type, IElementConverter converter)> converters = new List<(Type, IElementConverter)>();
 
         public MergedElementConverter(IElementConverter first)
         {
@@ -15,7 +15,7 @@ namespace Scriber.Engine
 
         public void Add(Type converterSourceType, IElementConverter converter)
         {
-            converters.Add(new Tuple<Type, IElementConverter>(converterSourceType, converter));
+            converters.Add((converterSourceType, converter));
         }
 
         public object Convert(object source, Type targetType)
@@ -30,10 +30,10 @@ namespace Scriber.Engine
 
             converterList.Add(first);
 
-            foreach (var tuple in converters)
+            foreach (var (type, converter) in converters)
             {
-                typeList.Add(tuple.Item1);
-                converterList.Add(tuple.Item2);
+                typeList.Add(type);
+                converterList.Add(converter);
             }
 
             typeList.Add(targetType);

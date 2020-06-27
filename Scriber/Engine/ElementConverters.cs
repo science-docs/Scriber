@@ -6,7 +6,7 @@ namespace Scriber.Engine
 {
     public static class ElementConverters
     {
-        private static readonly Dictionary<Tuple<Type, Type>, IElementConverter> converters = new Dictionary<Tuple<Type, Type>, IElementConverter>();
+        private static readonly Dictionary<(Type, Type), IElementConverter> converters = new Dictionary<(Type, Type), IElementConverter>();
         private static readonly Dictionary<Type, List<Type>> types = new Dictionary<Type, List<Type>>();
 
         public static void Add(IElementConverter converter, Type source, params Type[] targets)
@@ -22,7 +22,7 @@ namespace Scriber.Engine
                     targetTypes.Add(target);
                 }
 
-                converters[new Tuple<Type, Type>(source, target)] = converter;
+                converters[(source, target)] = converter;
             }
         }
 
@@ -49,7 +49,7 @@ namespace Scriber.Engine
             {
                 foreach (var childType in childTypes)
                 {
-                    var tuple = new Tuple<Type, Type>(type, childType);
+                    var tuple = (type, childType);
                     if (converters.ContainsKey(tuple) && tree.CanAddType(childType))
                     {
                         var node = new TypeTreeNode(tree, childType);
@@ -60,13 +60,13 @@ namespace Scriber.Engine
             }
         }
 
-        private static MergedElementConverter ConvertBranchToConverter(List<Tuple<Type, IElementConverter>> branch)
+        private static MergedElementConverter ConvertBranchToConverter(List<(Type node, IElementConverter converter)> branch)
         {
-            var converter = new MergedElementConverter(branch[0].Item2);
+            var converter = new MergedElementConverter(branch[0].converter);
 
             for (int i = 1; i < branch.Count; i++)
             {
-                converter.Add(branch[i - 1].Item1, branch[i].Item2);
+                converter.Add(branch[i - 1].node, branch[i].converter);
             }
 
             return converter;
@@ -89,7 +89,7 @@ namespace Scriber.Engine
                 target = typeof(Enum);
             }
 
-            converters.TryGetValue(new Tuple<Type, Type>(source, target), out var converter);
+            converters.TryGetValue((source, target), out var converter);
             return converter;
         }
 
@@ -118,7 +118,7 @@ namespace Scriber.Engine
             public TypeTreeNode? Parent { get; }
             public Type From { get; }
 
-            private readonly Dictionary<Type, Tuple<TypeTreeNode, IElementConverter>> nodes = new Dictionary<Type, Tuple<TypeTreeNode, IElementConverter>>();
+            private readonly Dictionary<Type, (TypeTreeNode node, IElementConverter converter)> nodes = new Dictionary<Type, (TypeTreeNode, IElementConverter)>();
 
             public TypeTreeNode(TypeTreeNode? parent, Type from)
             {
@@ -128,7 +128,7 @@ namespace Scriber.Engine
 
             public void Add(TypeTreeNode node, IElementConverter converter)
             {
-                nodes.Add(node.From, new Tuple<TypeTreeNode, IElementConverter>(node, converter));
+                nodes.Add(node.From, (node, converter));
             }
 
             public bool CanAddType(Type type)
@@ -149,18 +149,18 @@ namespace Scriber.Engine
                 return true;
             }
 
-            public List<List<Tuple<Type, IElementConverter>>> GetBranches()
+            public List<List<(Type, IElementConverter)>> GetBranches()
             {
-                var branches = new List<List<Tuple<Type, IElementConverter>>>();
+                var branches = new List<List<(Type, IElementConverter)>>();
                 
                 foreach (var child in nodes)
                 {
-                    var node = child.Value.Item1;
+                    var node = child.Value.node;
                     var type = child.Key;
-                    var converter = child.Value.Item2;
+                    var converter = child.Value.converter;
 
                     var childBranches = node.GetBranches();
-                    var tuple = new Tuple<Type, IElementConverter>(type, converter);
+                    var tuple = (type, converter);
 
                     foreach (var childBranch in childBranches)
                     {
@@ -170,7 +170,7 @@ namespace Scriber.Engine
 
                     if (childBranches.Count == 0)
                     {
-                        branches.Add(new List<Tuple<Type, IElementConverter>>
+                        branches.Add(new List<(Type, IElementConverter)>
                         {
                             tuple
                         });
