@@ -7,7 +7,7 @@
         Subscript
     }
 
-    public class FontStyler
+    public static class FontStyler
     {
         public static double ScaleSize(FontStyle style, double size)
         {

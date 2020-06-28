@@ -14,22 +14,17 @@ namespace Scriber.Engine.Instructions
 
         public override object? Execute(CompilerState state, Argument[] arguments)
         {
-            var command = CommandCollection.Find(Name);
+            var command = state.Commands.Find(Name);
 
             if (command == null)
             {
                 throw new CompilerException(Origin, $"Could not find command '{Name}'.");
             }
 
-            //if (command.RequiredEnvironment != null && state.Blocks.Current.Name != command.RequiredEnvironment)
-            //{
-            //    throw new CompilerException(Origin, $"Command {command.Name} requires environment {command.RequiredEnvironment}. Current environment is {state.Blocks.Current.Name}");
-            //}
-
             try
             {
                 var obj = command.Execution(Origin, state, arguments);
-                state.Issues.Log(Origin, $"Successfully executed command '{Name}'.");
+                state.Context.Logger.Debug($"Successfully executed command '{Name}'.");
                 return obj;
             }
             catch (CompilerException e)

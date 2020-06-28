@@ -457,12 +457,7 @@ namespace Scriber.Text
 
     internal class KnownColorTable
     {
-        internal static uint[] ColorTable;
-
-        static KnownColorTable()
-        {
-            ColorTable = InitColorTable();
-        }
+        internal static uint[] ColorTable = InitColorTable();
 
         public static uint KnownColorToArgb(KnownColor color)
         {

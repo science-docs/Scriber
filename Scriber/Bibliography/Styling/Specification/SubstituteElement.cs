@@ -24,10 +24,10 @@ namespace Scriber.Bibliography.Styling.Specification
         [XmlElement("names", Type = typeof(NamesElement))]
         [XmlElement("label", Type = typeof(LabelElement))]
         [XmlElement("text", Type = typeof(TextElement))]
-        public RenderingElement[]? Children
+        public List<RenderingElement> Children
         {
             get;
             set;
-        }
+        } = new List<RenderingElement>();
     }
 }

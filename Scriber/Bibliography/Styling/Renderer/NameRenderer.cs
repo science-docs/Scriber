@@ -84,7 +84,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             {
                 // count
                 var count = groups
-                    .Select(x => x.Names!.Length >= name.EtAlMin ? Math.Max(name.EtAlUseFirst, interpreter.DisambiguationContext.MinAddNames) : x.Names.Length)
+                    .Select(x => x.Names!.Count >= name.EtAlMin ? Math.Max(name.EtAlUseFirst, interpreter.DisambiguationContext.MinAddNames) : x.Names.Count)
                     .Sum();
 
                 interpreter.Push(count > 0 ? count.ToString() : string.Empty, formatting);
@@ -105,7 +105,7 @@ namespace Scriber.Bibliography.Styling.Renderer
                     {
                         // todo
                         // find match from previous entry in bibliography
-                        previousGroup = interpreter.Previous == null || interpreter.Previous.FirstBibliographyNameGroups.Length <= i ? null : interpreter.Previous.FirstBibliographyNameGroups[i];
+                        previousGroup = interpreter.Previous == null || interpreter.Previous.FirstBibliographyNameGroups.Count <= i ? null : interpreter.Previous.FirstBibliographyNameGroups[i];
                     }
 
                     // render name group
@@ -142,8 +142,8 @@ namespace Scriber.Bibliography.Styling.Renderer
             // complete subsequent author substitution?
             var isComplete = subsequentAuthorSubstituteRule.HasValue &&
                 previousGroup?.Names != null &&
-                group.Names!.Length == previousGroup.Names.Length &&
-                Enumerable.Range(0, group.Names.Length).All(i => NameGroup.AreNamesEqual(group.Names[i], previousGroup.Names[i]));
+                group.Names!.Count == previousGroup.Names.Count &&
+                Enumerable.Range(0, group.Names.Count).All(i => NameGroup.AreNamesEqual(group.Names[i], previousGroup.Names[i]));
             if (isComplete && subsequentAuthorSubstituteRule!.Value == SubsequentAuthorSubstituteRules.CompleteAll)
             {
                 // substitute subsequent author
@@ -153,13 +153,13 @@ namespace Scriber.Bibliography.Styling.Renderer
             else
             {
                 // render names list
-                var etAlActive = group.Names!.Length >= name.EtAlMin;
-                var count = etAlActive ? Math.Max(name.EtAlUseFirst, interpreter.DisambiguationContext.MinAddNames) + 1 : group.Names.Length;
+                var etAlActive = group.Names!.Count >= name.EtAlMin;
+                var count = etAlActive ? Math.Max(name.EtAlUseFirst, interpreter.DisambiguationContext.MinAddNames) + 1 : group.Names.Count;
                 var delta = etAlActive ? 1 : 0;
 
                 // render names
                 var parts = group.Names
-                    .Where((x, i) => i < count - delta || i == group.Names.Length - 1)
+                    .Where((x, i) => i < count - delta || i == group.Names.Count - 1)
                     .Select((nameItem, index) =>
                     {
                         // invert name?
@@ -181,7 +181,7 @@ namespace Scriber.Bibliography.Styling.Renderer
                         bool substitute = false;
                         if (subsequentAuthorSubstituteRule.HasValue &&
                             previousGroup?.Names != null &&
-                            index < previousGroup.Names.Length &&
+                            index < previousGroup.Names.Count &&
                             NameGroup.AreNamesEqual(nameItem, previousGroup.Names[index]))
                         {
                             switch (subsequentAuthorSubstituteRule.Value)
@@ -307,7 +307,7 @@ namespace Scriber.Bibliography.Styling.Renderer
                     plural = label.Plurilization switch
                     {
                         LabelPluralization.Always => true,
-                        LabelPluralization.Contextual => (group.Names.Length != 1),
+                        LabelPluralization.Contextual => (group.Names.Count != 1),
                         LabelPluralization.Never => false,
                         _ => throw new NotSupportedException(),
                     };
@@ -419,7 +419,7 @@ namespace Scriber.Bibliography.Styling.Renderer
 
         private static IFormatting GetNamePart(NameElement name, int index)
         {
-            if (name.NameParts == null || name.NameParts.Length <= index)
+            if (name.NameParts == null || name.NameParts.Count <= index)
             {
                 return name;
             }

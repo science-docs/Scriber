@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace Scriber.Bibliography.Styling.Specification
@@ -34,11 +35,12 @@ namespace Scriber.Bibliography.Styling.Specification
         /// Two localized date formats can be defined with cs:date elements: a “numeric” (e.g. “12-15-2005”) and a “text” format.
         /// </summary>
         [XmlElement("date")]
-        public DateElement[]? Dates
+        public List<DateElement> Dates
         {
             get;
             set;
-        }
+        } = new List<DateElement>();
+
         /// <summary>
         /// Terms are localized strings (e.g. by using the “and” term, “Doe and Smith” automatically becomes “Doe und Smith”
         /// when the style locale is switched from English to German). Terms are either directly defined in the content of cs:term,
@@ -47,10 +49,10 @@ namespace Scriber.Bibliography.Styling.Specification
         /// </summary>
         [XmlArray("terms")]
         [XmlArrayItem("term")]
-        public TermElement[]? Terms
+        public List<TermElement> Terms
         {
             get;
             set;
-        }
+        } = new List<TermElement>();
     }
 }

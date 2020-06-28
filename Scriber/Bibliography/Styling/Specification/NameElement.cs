@@ -1,4 +1,5 @@
 ﻿using Scriber.Bibliography.Styling.Formatting;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Scriber.Bibliography.Styling.Specification
@@ -6,11 +7,11 @@ namespace Scriber.Bibliography.Styling.Specification
     public class NameElement : FormattingElement, INameOptions
     {
         [XmlElement("name-part")]
-        public NamePartElement[]? NameParts
+        public List<NamePartElement> NameParts
         {
             get;
             set;
-        }
+        } = new List<NamePartElement>();
 
         [XmlAttribute("and")]
         public And And
@@ -188,35 +189,5 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             return false;
         }
-
-        //internal void Compile(MethodInvoke method)
-        //{
-        //    // init
-        //    method.AddElement(this);
-        //    method.AddCode(method.ParameterName);
-        //    method.AddLiteral(this.Prefix);
-        //    method.AddLiteral(this.Suffix);
-
-        //    // fix
-        //    var family = (this.NameParts == null || !this.NameParts.Any(x => x.Name == NamePartName.Family) ? new NamePartElement() : this.NameParts.Single(x => x.Name == NamePartName.Family));
-        //    var given = (this.NameParts == null || !this.NameParts.Any(x => x.Name == NamePartName.Given) ? new NamePartElement() : this.NameParts.Single(x => x.Name == NamePartName.Given));
-
-        //    // name part parameters
-        //    using (var lambda = method.AddLambdaExpression(false))
-        //    {
-        //        // array
-        //        lambda.AppendArray("NamePartParameters", new NamePartElement[] { family, given }, (part, scope) =>
-        //        {
-        //            // init
-        //            using (var m = scope.AppendMethodInvoke("new NamePartParameters", part))
-        //            {
-        //                part.Compile(m);
-        //            }
-        //        });
-        //    }
-
-        //    // default parameters
-        //    method.AddDefaultParameters();
-        //}
     }
 }

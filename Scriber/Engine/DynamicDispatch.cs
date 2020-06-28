@@ -3,24 +3,22 @@ using Scriber.Util;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Scriber.Engine
 {
     public static class DynamicDispatch
     {
         /// <summary>
-        /// <para>Sorts the given arguments so that they fit the specified parameter infos.</para>
-        /// <para>Converts for example: <code>\x[a]{b}{c}</code> into the call: <code>x(b, c, a);</code></para>
-        /// <para>This requires that the 'a' parameter is marked as optional via :<code>a = default</code></para>
+        /// <para>Pads the given arguments so that they fit the specified parameter infos.</para>
+        /// <para>Also transforms <c>params</c> variable length arrays into CLR Arrays.</para>
         /// </summary>
         /// <param name="command"></param>
         /// <param name="state"></param>
         /// <param name="args"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        /// <exception cref="CommandInvocationException"/>
-        public static object[] SortArguments(string command, Element element, CompilerState state, Argument[] args, ParameterInfo[] parameters)
+        /// <exception cref="CompilerException"/>
+        public static object[] PadArguments(string command, Element element, CompilerState state, Argument[] args, ParameterInfo[] parameters)
         {
             // Guard for when the command does not require any arguments
             if (parameters.Length == 0)
@@ -120,7 +118,7 @@ namespace Scriber.Engine
 
                         if (arg.GetType() != transformed.GetType())
                         {
-                            state.Issues.Log(argument.Source, $"Transformed element of type '{argument.Value.GetType().FormattedName()}' to '{transformed.GetType().FormattedName()}'.");
+                            state.Context.Logger.Debug($"Transformed element of type '{argument.Value.GetType().FormattedName()}' to '{transformed.GetType().FormattedName()}'.");
                         }
                     }
                 }
@@ -160,13 +158,9 @@ namespace Scriber.Engine
             {
                 transformed = creator.Create(parameter);
             }
-            else // in the last instance look for a fitting converter
+            else if (state.Converters.TryConvert(value, targetType, out var convertedValue))
             {
-                var converter = ElementConverters.Find(value.GetType(), targetType);
-                if (converter != null)
-                {
-                    transformed = converter.Convert(value, targetType);
-                }
+                transformed = convertedValue;
             }
 
             if (isArgument && transformed != null)

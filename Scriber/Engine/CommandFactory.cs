@@ -22,7 +22,7 @@ namespace Scriber.Engine
             // inline method for better debugging
             object? InvokeDynamic(Element element, CompilerState state, Argument[] args)
             {
-                var sorted = DynamicDispatch.SortArguments(command, element, state, args, param);
+                var sorted = DynamicDispatch.PadArguments(command, element, state, args, param);
                 DynamicDispatch.MatchArguments(state, sorted, param);
                 return method.Invoke(null, sorted);
             }

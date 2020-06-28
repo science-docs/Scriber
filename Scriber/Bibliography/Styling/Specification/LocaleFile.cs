@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
@@ -19,9 +20,9 @@ namespace Scriber.Bibliography.Styling.Specification
         /// <summary>
         /// Returns an array of all currently available locale files.
         /// </summary>
-        public static LocaleFile[] Defaults => defaults.Value;
+        public static IReadOnlyCollection<LocaleFile> Defaults => defaults.Value;
 
-        private static Lazy<LocaleFile[]> defaults = new Lazy<LocaleFile[]>(() =>
+        private static readonly Lazy<LocaleFile[]> defaults = new Lazy<LocaleFile[]>(() =>
         {
             return typeof(Processor).Assembly
                 .GetManifestResourceNames()
@@ -81,11 +82,11 @@ namespace Scriber.Bibliography.Styling.Specification
         /// Two localized date formats can be defined with cs:date elements: a “numeric” (e.g. “12-15-2005”) and a “text” format.
         /// </summary>
         [XmlElement("date")]
-        public DateElement[]? Dates
+        public List<DateElement> Dates
         {
             get;
             set;
-        }
+        } = new List<DateElement>();
         /// <summary>
         /// Terms are localized strings (e.g. by using the “and” term, “Doe and Smith” automatically becomes “Doe und Smith”
         /// when the style locale is switched from English to German). Terms are either directly defined in the content of cs:term,
@@ -94,11 +95,11 @@ namespace Scriber.Bibliography.Styling.Specification
         /// </summary>
         [XmlArray("terms")]
         [XmlArrayItem("term")]
-        public TermElement[]? Terms
+        public List<TermElement> Terms
         {
             get;
             set;
-        }
+        } = new List<TermElement>();
 
         /// <summary>
         /// Returns a clone of this locale file.

@@ -1,4 +1,6 @@
-﻿namespace Scriber.Layout
+﻿using System;
+
+namespace Scriber.Layout
 {
     public struct Thickness
     {
@@ -41,7 +43,7 @@
 
         public override int GetHashCode()
         {
-            return Top.GetHashCode() + Bottom.GetHashCode() * 13 + Left.GetHashCode() * 31 + Right.GetHashCode() * 37;
+            return HashCode.Combine(Top, Bottom, Left, Right);
         }
 
         public static bool operator ==(Thickness left, Thickness right)

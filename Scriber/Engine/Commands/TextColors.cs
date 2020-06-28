@@ -17,7 +17,7 @@ namespace Scriber.Engine.Commands
                 color = Color.FromName(colorName.Value);
                 if (color == null)
                 {
-                    state.Issues.Add(colorName.Source, CompilerIssueType.Warning, $"Cannot find color with name '{colorName}'. Applying default color.");
+                    state.Issues.Add(colorName.Source, CompilerIssueType.Warning, $"Cannot find color with name '{colorName}'. Applying no color.");
                     return leaves;
                 }
             }

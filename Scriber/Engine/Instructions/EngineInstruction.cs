@@ -2,13 +2,10 @@
 
 namespace Scriber.Engine.Instructions
 {
-    public abstract class EngineInstruction
+    public abstract class EngineInstruction : Traceable
     {
-        public Element Origin { get; set; }
-
-        protected EngineInstruction(Element origin)
+        protected EngineInstruction(Element origin) : base(origin)
         {
-            Origin = origin;
         }
 
         public abstract object? Execute(CompilerState state, Argument[] arguments);

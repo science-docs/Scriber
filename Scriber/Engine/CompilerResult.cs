@@ -11,8 +11,8 @@ namespace Scriber.Engine
 
         public CompilerResult(Document document, IEnumerable<CompilerIssue> issues)
         {
-            Document = document;
-            Issues.AddRange(issues);
+            Document = document ?? throw new System.ArgumentNullException(nameof(document));
+            Issues.AddRange(issues ?? throw new System.ArgumentNullException(nameof(issues)));
         }
     }
 }

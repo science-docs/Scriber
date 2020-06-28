@@ -17,17 +17,14 @@ namespace Scriber.Bibliography.Styling.Renderer
         public string? Variable
         {
             get;
-            private set;
         }
         public TermName? Term
         {
             get;
-            private set;
         }
-        public IName[]? Names
+        public IReadOnlyList<IName>? Names
         {
             get;
-            private set;
         }
 
         public static bool AreNamesEqual(IName name1, IName name2)

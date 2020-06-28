@@ -1,4 +1,6 @@
-﻿namespace Scriber.Layout
+﻿using System;
+
+namespace Scriber.Layout
 {
     public struct Rectangle
     {
@@ -51,7 +53,7 @@
 
         public override int GetHashCode()
         {
-            return X.GetHashCode() + Y.GetHashCode() * 13 + Width.GetHashCode() * 31 + Height.GetHashCode() * 37;
+            return HashCode.Combine(X, Y, Width, Height);
         }
 
         public override string ToString()

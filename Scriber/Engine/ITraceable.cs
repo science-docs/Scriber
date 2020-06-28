@@ -16,7 +16,7 @@ namespace Scriber.Engine
 
         protected Traceable(Element origin)
         {
-            Origin = origin;
+            Origin = origin ?? throw new ArgumentNullException(nameof(origin));
         }
     }
 }

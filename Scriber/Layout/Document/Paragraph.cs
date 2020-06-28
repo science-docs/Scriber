@@ -201,5 +201,17 @@ namespace Scriber.Layout.Document
 
             return paragraph;
         }
+
+        public static Paragraph FromText(string text)
+        {
+            return FromLeaves(new TextLeaf(text));
+        }
+
+        public static Paragraph FromLeaves(params Leaf[] leaves)
+        {
+            var paragraph = new Paragraph();
+            paragraph.Leaves.AddRange(leaves);
+            return paragraph;
+        }
     }
 }

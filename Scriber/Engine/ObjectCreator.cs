@@ -11,26 +11,32 @@ namespace Scriber.Engine
     {
         public string? TypeName { get; set; }
         public Element? TypeElement { get; set; }
-        public CompilerState? CompilerState { get; set; }
+        public CompilerState CompilerState { get; set; }
         public List<ObjectField> Fields { get; } = new List<ObjectField>();
 
-        public ObjectCreator(Element origin) : this(origin, null)
+        public ObjectCreator(Element origin, CompilerState compilerState) : base(origin)
         {
-        }
-
-        public ObjectCreator(Element origin, CompilerState? compilerState) : base(origin)
-        {
-            CompilerState = compilerState;
+            CompilerState = compilerState ?? throw new ArgumentNullException(nameof(compilerState));
         }
 
         public object Create(ParameterInfo parameter)
         {
+            if (parameter is null)
+            {
+                throw new ArgumentNullException(nameof(parameter));
+            }
+
             var attribute = parameter.GetCustomAttribute<ArgumentAttribute>();
             return Create(parameter.ParameterType, attribute?.Overrides);
         }
 
         public object Create(PropertyInfo property)
         {
+            if (property is null)
+            {
+                throw new ArgumentNullException(nameof(property));
+            }
+
             var attribute = property.GetCustomAttribute<ObjectFieldAttribute>();
             return Create(property.PropertyType, attribute?.Overrides);
         }
@@ -56,7 +62,7 @@ namespace Scriber.Engine
                 }
             }
 
-            CompilerState?.Issues.Log(Origin, $"Created object of type '{obj.GetType().FormattedName()}'.");
+            CompilerState.Context.Logger.Debug($"Created object of type '{obj.GetType().FormattedName()}'.");
 
             return obj;
         }
@@ -116,9 +122,9 @@ namespace Scriber.Engine
         private object CreateInstance(Type type)
         {
             object? emptyObj;
-            if (Argument.IsArgumentType(type))
+            if (Argument.IsArgumentType(type, out var genericType))
             {
-                emptyObj = Activator.CreateInstance(type, null, Activator.CreateInstance(type));
+                emptyObj = Activator.CreateInstance(type, Origin, CreateInstance(genericType));
             }
             else
             {
@@ -208,7 +214,7 @@ namespace Scriber.Engine
             return list;
         }
 
-        private static void FillField(object obj, PropertyInfo info, object? value)
+        private void FillField(object obj, PropertyInfo info, object? value)
         {
             var type = info.PropertyType;
 
@@ -219,7 +225,7 @@ namespace Scriber.Engine
 
             if (value != null && !type.IsAssignableFrom(value.GetType()))
             {
-                value = ElementConverters.Convert(value, type);
+                CompilerState.Converters.TryConvert(value, type, out value);
             }
 
             info.SetValue(obj, value);

@@ -10,12 +10,7 @@ namespace Scriber.Logging
         public string Message { get; }
         public DateTime Timestamp { get; }
 
-        private static readonly int LongestLevelName;
-
-        static Log()
-        {
-            LongestLevelName = Enum.GetNames(typeof(LogLevel)).Max(e => e.Length);
-        }
+        private static readonly int LongestLevelName = Enum.GetNames(typeof(LogLevel)).Max(e => e.Length);
 
         public Log(LogLevel level, string message)
         {

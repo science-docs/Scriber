@@ -7,17 +7,17 @@ namespace Scriber.Bibliography.Styling.Renderer
 {
     public static class DateRenderer
     {
-        public static void RenderNonLocalizedDate(Interpreter interpreter, IFormatting? element, IVariable? value, string? delimiter, DatePrecision precision, DatePartElement[]? dateParts)
+        public static void RenderNonLocalizedDate(Interpreter interpreter, IFormatting? element, IVariable? value, string? delimiter, DatePrecision precision, IEnumerable<DatePartElement> dateParts)
         {
             if (dateParts == null)
             {
                 return;
             }
 
-            RenderDate(interpreter, element, value, delimiter, precision, dateParts);
+            RenderDate(interpreter, element, value, delimiter, precision, dateParts.ToArray());
         }
 
-        public static void RenderLocalizedDate(Interpreter interpreter, IFormatting? element, IVariable? value, string? delimiter, DateFormat dateFormat, DatePrecision precision, DatePartElement[]? dateParts)
+        public static void RenderLocalizedDate(Interpreter interpreter, IFormatting? element, IVariable? value, string? delimiter, DateFormat dateFormat, DatePrecision precision, IEnumerable<DatePartElement> dateParts)
         {
             var parts = new List<DatePartElement>();
 
@@ -25,7 +25,7 @@ namespace Scriber.Bibliography.Styling.Renderer
 
             var localeDate = locale.Dates!.FirstOrDefault(e => e.Format == dateFormat);
 
-            parts.AddRange(localeDate.DateParts!);
+            parts.AddRange(localeDate.DateParts);
 
             if (dateParts != null)
             {

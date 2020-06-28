@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Scriber.Bibliography
 {
-    public struct NumberVariable : INumberVariable
+    public struct NumberVariable : INumberVariable, IEquatable<NumberVariable>
     {
         public NumberVariable(uint value)
         {
@@ -95,6 +96,39 @@ namespace Scriber.Bibliography
         public override string ToString()
         {
             return Min == Max ? Min.ToString() :$"{Min}{Separator}{Max}";
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is NumberVariable number)
+            {
+                return Equals(number);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Min, Max, Separator);
+        }
+
+        public bool Equals([AllowNull] NumberVariable other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return Min == other.Min && Max == other.Max && Separator == other.Separator;
+        }
+
+        public static bool operator ==(NumberVariable left, NumberVariable right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(NumberVariable left, NumberVariable right)
+        {
+            return !(left == right);
         }
     }
 }

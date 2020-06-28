@@ -1,5 +1,5 @@
 ﻿using Scriber.Language;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Scriber.Engine
@@ -10,13 +10,13 @@ namespace Scriber.Engine
     {
         public string Name { get; set; }
         public EnvironmentExecution Execution { get; set; }
-        public ReadOnlyCollection<ParameterInfo> Parameters { get; set; }
+        public IReadOnlyList<ParameterInfo> Parameters { get; set; }
 
         public Environment(string name, EnvironmentExecution execution, ParameterInfo[] parameters)
         {
             Name = name;
             Execution = execution;
-            Parameters = new ReadOnlyCollection<ParameterInfo>(parameters);
+            Parameters = parameters;
         }
     }
 }

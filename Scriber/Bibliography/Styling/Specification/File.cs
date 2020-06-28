@@ -183,7 +183,7 @@ namespace Scriber.Bibliography.Styling.Specification
                     // deserialize
                     var xs = new XmlSerializer(type);
                     xs.UnknownNode += XmlSerializer_UnknownNode;
-                    xs.UnknownAttribute += xs_UnknownAttribute;
+                    xs.UnknownAttribute += XS_UnknownAttribute;
                     result = (File)xs.Deserialize(reader);
                 }
             }
@@ -194,10 +194,10 @@ namespace Scriber.Bibliography.Styling.Specification
             }
 
             // done
-            return result;
+            return result ?? throw new InvalidOperationException();
         }
 
-        static void xs_UnknownAttribute(object sender, XmlAttributeEventArgs e)
+        static void XS_UnknownAttribute(object sender, XmlAttributeEventArgs e)
         {
             // unknown attribute encountered
             throw new XmlException(string.Format("Unexpected attribute '{0}' encountered.", e.Attr.LocalName), null, e.LineNumber, e.LinePosition - 2 - e.Attr.Name.Length);
@@ -269,10 +269,8 @@ namespace Scriber.Bibliography.Styling.Specification
         /// <param name="path"></param>
         public void Save(string path)
         {
-            using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
-            {
-                this.Save(fs);
-            }
+            using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+            Save(fs);
         }
         /// <summary>
         /// Saves the content of this file to the given stream.
@@ -280,10 +278,8 @@ namespace Scriber.Bibliography.Styling.Specification
         /// <param name="stream"></param>
         public void Save(Stream stream)
         {
-            using (var xw = XmlWriter.Create(stream))
-            {
-                this.Save(xw);
-            }
+            using var xw = XmlWriter.Create(stream);
+            Save(xw);
         }
         /// <summary>
         /// Saves the content of this file to the given text writer.
@@ -291,10 +287,8 @@ namespace Scriber.Bibliography.Styling.Specification
         /// <param name="writer"></param>
         public void Save(TextWriter writer)
         {
-            using (var xw = XmlWriter.Create(writer))
-            {
-                this.Save(xw);
-            }
+            using var xw = XmlWriter.Create(writer);
+            Save(xw);
         }
         /// <summary>
         /// Saves the content of this file to the xml writer.
@@ -303,7 +297,7 @@ namespace Scriber.Bibliography.Styling.Specification
         public void Save(XmlWriter writer)
         {
             // serialize
-            var xs = new XmlSerializer(this.GetType());
+            var xs = new XmlSerializer(GetType());
             xs.Serialize(writer, this);
         }
 
@@ -317,7 +311,7 @@ namespace Scriber.Bibliography.Styling.Specification
             using var ms = new MemoryStream(2 * 65536);
 
             // save
-            this.Save(ms);
+            Save(ms);
 
             // reset
             ms.Position = 0;
@@ -331,7 +325,7 @@ namespace Scriber.Bibliography.Styling.Specification
         /// <returns></returns>
         object ICloneable.Clone()
         {
-            return this.Clone();
+            return Clone();
         }
 
         /// <summary>
@@ -341,12 +335,12 @@ namespace Scriber.Bibliography.Styling.Specification
         public override string ToString()
         {
             // init
-            var result = new StringBuilder(2 * 65536);
+            var result = new StringBuilder(2 * short.MaxValue);
 
             // save
             using (var sw = new StringWriter(result))
             {
-                this.Save(sw);
+                Save(sw);
             }
 
             // done

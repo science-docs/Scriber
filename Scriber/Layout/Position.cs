@@ -1,4 +1,6 @@
-﻿namespace Scriber.Layout
+﻿using System;
+
+namespace Scriber.Layout
 {
     public struct Position
     {
@@ -22,7 +24,7 @@
 
         public override int GetHashCode()
         {
-            return X.GetHashCode() + Y.GetHashCode() * 13;
+            return HashCode.Combine(X, Y);
         }
 
         public override string ToString()

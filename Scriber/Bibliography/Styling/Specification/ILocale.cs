@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Scriber.Bibliography.Styling.Specification
 {
@@ -30,7 +26,7 @@ namespace Scriber.Bibliography.Styling.Specification
         /// <summary>
         /// Two localized date formats can be defined with cs:date elements: a “numeric” (e.g. “12-15-2005”) and a “text” format.
         /// </summary>
-        DateElement[]? Dates
+        List<DateElement> Dates
         {
             get;
         }
@@ -40,7 +36,7 @@ namespace Scriber.Bibliography.Styling.Specification
         /// or, in cases where singular and plural variants are needed (e.g. “page” and “pages”), in the content of the child
         /// elements cs:single and cs:multiple, respectively.
         /// </summary>
-        TermElement[]? Terms
+        List<TermElement> Terms
         {
             get;
         }

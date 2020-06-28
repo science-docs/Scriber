@@ -1,29 +1,31 @@
 ﻿using Scriber.Engine.Instructions;
 using Scriber.Language;
+using System;
 using System.IO.Abstractions;
-using System.Linq;
 
 namespace Scriber.Engine
 {
     public class CompilerState
     {
+        public Context Context { get; }
         public Document Document { get; }
-        public IFileSystem FileSystem { get; }
         public BlockStack Blocks { get; }
-        public Element CurrentElement { get; private set; }
         public CompilerIssueCollection Issues { get; } = new CompilerIssueCollection();
 
-        public CompilerState(IFileSystem fileSystem)
+        public IFileSystem FileSystem => Context.FileSystem;
+        public CommandCollection Commands => Context.Commands;
+        public ConverterCollection Converters => Context.Converters;
+        public EnvironmentCollection Environments => Context.Environments;
+
+        public CompilerState(Context context)
         {
-            CurrentElement = new Element(null, ElementType.Null, 0, 0);
+            Context = context ?? throw new ArgumentNullException(nameof(context));
             Document = new Document();
             Blocks = new BlockStack();
-            FileSystem = fileSystem;
         }
 
         public Argument? Execute(Element element, Argument[] arguments)
         {
-            CurrentElement = element;
             var instruction = EngineInstruction.Create(element);
 
             try

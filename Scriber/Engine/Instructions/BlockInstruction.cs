@@ -55,7 +55,7 @@ namespace Scriber.Engine.Instructions
             {
                 // signaling an empty block
                 results.Add(new Argument(Origin, null));
-                state.Issues.Log(Origin, "Empty explicit block found. Adding null element");
+                state.Context.Logger.Debug("Empty explicit block found. Adding null element");
             }
 
             return results.ToArray();
@@ -65,7 +65,7 @@ namespace Scriber.Engine.Instructions
         {
             if (paragraph != null)
             {
-                state.Issues.Log(Origin, $"Grouping {paragraph.Leaves.Count} {LeafString(paragraph.Leaves.Count)} into a paragraph.");
+                state.Context.Logger.Debug($"Grouping {paragraph.Leaves.Count} {LeafString(paragraph.Leaves.Count)} into a paragraph.");
                 paragraph = null;
             }
         }

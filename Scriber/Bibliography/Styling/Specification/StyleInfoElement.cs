@@ -54,20 +54,20 @@ namespace Scriber.Bibliography.Styling.Specification
         /// Acknowledges the author(s) of the style.
         /// </summary>
         [XmlElement("author")]
-        public PersonalDetailsElement[]? Authors
+        public List<PersonalDetailsElement> Authors
         {
             get;
             set;
-        }
+        } = new List<PersonalDetailsElement>();
         /// <summary>
         /// Acknowledges contributor(s) to the style.
         /// </summary>
         [XmlElement("contributor")]
-        public PersonalDetailsElement[]? Contributors
+        public List<PersonalDetailsElement> Contributors
         {
             get;
             set;
-        }
+        } = new List<PersonalDetailsElement>();
 
         /// <summary>
         /// Styles may be assigned one or more categories. A single categorie may be used to describe how in-text citations are
@@ -75,21 +75,21 @@ namespace Scriber.Bibliography.Styling.Specification
         /// the discipline categories, to indicate the field(s) for which the style is relevant.
         /// </summary>
         [XmlElement("category")]
-        public CategoryElement[]? Categories
+        public List<CategoryElement> Categories
         {
             get;
             set;
-        }
+        } = new List<CategoryElement>();
         /// <summary>
         /// May be used multiple times. cs:link must carry two attributes: href, set to a URI (usually a URL), and
         /// rel, whose value indicates how the URI relates to the style.
         /// </summary>
         [XmlElement("link")]
-        public LinkElement[]? Links
+        public List<LinkElement> Links
         {
             get;
             set;
-        }
+        } = new List<LinkElement>();
         /// <summary>
         /// The contents of cs:rights specifies the license under which the style file is released. The element 
         /// may carry a license attribute to specify the URI of the license.
@@ -105,11 +105,11 @@ namespace Scriber.Bibliography.Styling.Specification
         /// The cs:issn element may be used multiple times to indicate the ISSN identifier(s) of the journal for which the style was written.
         /// </summary>
         [XmlElement("issn")]
-        public string[]? ISSN
+        public List<string> ISSN
         {
             get;
             set;
-        }
+        } = new List<string>();
         /// <summary>
         /// The cs:eissn element may be used once for the eISSN identifier.
         /// </summary>

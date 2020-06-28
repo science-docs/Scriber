@@ -3,13 +3,11 @@ using Scriber.Engine;
 
 namespace Scriber.CLI
 {
-
-
     [Package("test")]
     public static class TestPackage
     {
         [Command("test")]
-        public static void Test([Argument] TestObject obj)
+        public static void Test([Argument] params Argument<TestObject>[] obj)
         {
             if (obj != null)
             {
