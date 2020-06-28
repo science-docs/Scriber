@@ -1,5 +1,5 @@
 ﻿using Scriber.Language;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Scriber.Engine
@@ -8,17 +8,17 @@ namespace Scriber.Engine
 
     public class Command
     {
-        public string Name { get; set; }
-        public string? RequiredEnvironment { get; set; }
-        public CommandExecution Execution { get; set; }
-        public ReadOnlyCollection<ParameterInfo> Parameters { get; set; }
+        public string Name { get; }
+        public string? RequiredEnvironment { get; }
+        public CommandExecution Execution { get; }
+        public IReadOnlyList<ParameterInfo> Parameters { get; }
 
         public Command(string name, string? requiredEnvironment, CommandExecution execution, ParameterInfo[] parameters)
         {
             Name = name;
             RequiredEnvironment = requiredEnvironment;
             Execution = execution;
-            Parameters = new ReadOnlyCollection<ParameterInfo>(parameters);
+            Parameters = parameters;
         }
     }
 }

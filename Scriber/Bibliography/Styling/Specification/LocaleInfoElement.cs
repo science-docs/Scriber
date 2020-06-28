@@ -16,11 +16,11 @@ namespace Scriber.Bibliography.Styling.Specification
         /// Used to acknowledge locale translators.
         /// </summary>
         [XmlElement("translator")]
-        public PersonalDetailsElement[]? Translators
+        public List<PersonalDetailsElement> Translators
         {
             get;
             set;
-        }
+        } = new List<PersonalDetailsElement>();
 
         /// <summary>
         /// The contents of cs:rights specifies the license under which the locale file is released.

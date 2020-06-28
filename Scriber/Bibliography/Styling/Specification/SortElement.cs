@@ -14,15 +14,15 @@ namespace Scriber.Bibliography.Styling.Specification
         /// The list of sort keys.
         /// </summary>
         [XmlElement("key")]
-        public KeyElement[]? Keys
+        public List<KeyElement> Keys
         {
             get;
             set;
-        }
+        } = new List<KeyElement>();
 
         public IEnumerable<Citation> Sort(Interpreter interpreter, IEnumerable<Citation> citations)
         {
-            if (Keys == null)
+            if (Keys == null || Keys.Count == 0)
             {
                 return citations;
             }

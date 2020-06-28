@@ -1,5 +1,6 @@
 ﻿using Scriber.Bibliography.Styling.Renderer;
 using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Scriber.Bibliography.Styling.Specification
@@ -85,11 +86,11 @@ namespace Scriber.Bibliography.Styling.Specification
         /// to either day, month or year, the order of these elements reflects the display order of respectively the day, month, and year.
         /// </summary>
         [XmlElement("date-part")]
-        public DatePartElement[]? DateParts
+        public List<DatePartElement> DateParts
         {
             get;
             set;
-        }
+        } = new List<DatePartElement>();
 
         /// <summary>
         /// The display attribute (similar the “display” property in CSS) may be used to structure individual bibliographic entries

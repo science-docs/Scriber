@@ -1,4 +1,4 @@
-﻿using Scriber.Bibliography.Styling.Formatting;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -22,11 +22,11 @@ namespace Scriber.Bibliography.Styling.Specification
         /// Represents the subsequent, 'else if' conditional branches.
         /// </summary>
         [XmlElement("else-if")]
-        public IfElement[]? ElseIf
+        public List<IfElement> ElseIf
         {
             get;
             set;
-        }
+        } = new List<IfElement>();
         /// <summary>
         /// Represents the last, 'else' conditional branch.
         /// </summary>

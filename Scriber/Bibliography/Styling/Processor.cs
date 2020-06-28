@@ -10,9 +10,9 @@ namespace Scriber.Bibliography.Styling
     public class Processor
     {
         public StyleFile Style { get; }
-        public LocaleFile[] Locales { get; }
+        public IReadOnlyCollection<LocaleFile> Locales { get; }
 
-        public Processor(StyleFile style, LocaleFile[] locales)
+        public Processor(StyleFile style, IReadOnlyCollection<LocaleFile> locales)
         {
             Style = style;
             Locales = locales;

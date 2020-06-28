@@ -29,6 +29,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Scriber.Layout
@@ -43,7 +44,7 @@ namespace Scriber.Layout
     }
 
     [DebuggerDisplay("{DebuggerDisplay}")]
-    public struct Unit : IFormattable
+    public struct Unit : IFormattable, IEquatable<Unit>
     {
         internal const double PointFactor = 1;
         internal const double InchFactor = 72;
@@ -325,9 +326,7 @@ namespace Scriber.Layout
         /// </summary>
         public static bool operator ==(Unit value1, Unit value2)
         {
-            // ReSharper disable CompareOfFloatsByEqualityOperator
-            return value1.Type == value2.Type && value1.Value == value2.Value;
-            // ReSharper restore CompareOfFloatsByEqualityOperator
+            return value1.Equals(value2);
         }
 
         /// <summary>
@@ -342,19 +341,14 @@ namespace Scriber.Layout
         /// <summary>
         /// Calls base class Equals.
         /// </summary>
-        public override bool Equals(object? obj)
-        {
-            if (obj is Unit)
-                return this == (Unit)obj;
-            return false;
-        }
+        public override bool Equals(object? obj) => obj is Unit unit && Equals(unit);
 
         /// <summary>
         /// Returns the hash code for this instance.
         /// </summary>
         public override int GetHashCode()
         {
-            return Value.GetHashCode() ^ Type.GetHashCode();
+            return HashCode.Combine(Value, Type);
         }
 
         /// <summary>
@@ -395,6 +389,16 @@ namespace Scriber.Layout
                 default:
                     throw new ArgumentException("Unknown unit type: '" + type + "'");
             }
+        }
+
+        public bool Equals([AllowNull] Unit other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            return Type == other.Type && Value == other.Value;
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace Scriber.Bibliography.BibTex.Language
         public int ColCount { get; }
 
         public string MessageId { get; }
-        public object[] MessageArgs { get; }
+        public IReadOnlyList<object> MessageArgs { get; }
 
         public BibParseError(int pos, int len, int line, int col, string message, params object[] args)
         {

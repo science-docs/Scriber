@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace Scriber.Bibliography.Styling.Specification
@@ -32,17 +33,17 @@ namespace Scriber.Bibliography.Styling.Specification
         [XmlElement("names", Type = typeof(NamesElement))]
         [XmlElement("label", Type = typeof(LabelElement))]
         [XmlElement("text", Type = typeof(TextElement))]
-        public RenderingElement[]? Children
+        public List<RenderingElement> Children
         {
             get;
             set;
-        }
+        } = new List<RenderingElement>();
 
         public void Evaluate(Interpreter interpreter, Citation citation)
         {
             if (Children != null)
             {
-                interpreter.Join(citation, Children);
+                interpreter.Join(citation, Children.ToArray());
             }
         }
 

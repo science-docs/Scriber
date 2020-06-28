@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 
 namespace Scriber.Bibliography
 {
-    public struct DateVariable : IDateVariable
+    public struct DateVariable : IDateVariable, IEquatable<DateVariable>
     {
         public DateVariable(DateTime date)
             : this(date, date, false)
@@ -143,6 +144,48 @@ namespace Scriber.Bibliography
 
             // done
             return result != null;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is DateVariable date)
+            {
+                return Equals(date);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(YearFrom, YearTo, SeasonFrom, SeasonTo, MonthFrom, MonthTo, DayFrom, DayTo) + IsApproximate.GetHashCode();
+        }
+
+        public bool Equals([AllowNull] DateVariable other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            return YearFrom == other.YearFrom
+                && YearTo == other.YearTo
+                && SeasonFrom == other.SeasonFrom
+                && SeasonTo == other.SeasonTo
+                && MonthFrom == other.MonthFrom
+                && MonthTo == other.MonthTo
+                && DayFrom == other.DayFrom
+                && DayTo == other.DayTo
+                && IsApproximate && other.IsApproximate;
+        }
+
+        public static bool operator ==(DateVariable left, DateVariable right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(DateVariable left, DateVariable right)
+        {
+            return !(left == right);
         }
     }
 }

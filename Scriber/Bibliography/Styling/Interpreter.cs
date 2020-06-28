@@ -18,7 +18,7 @@ namespace Scriber.Bibliography.Styling
 
         public DisambiguationContext DisambiguationContext { get; } = new DisambiguationContext();
 
-        public NameGroup[] FirstBibliographyNameGroups { get; set; } = Array.Empty<NameGroup>();
+        public IReadOnlyList<NameGroup> FirstBibliographyNameGroups { get; set; } = Array.Empty<NameGroup>();
 
         public ComposedRun Run { get; private set; }
 

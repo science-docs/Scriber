@@ -27,6 +27,7 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
+using Scriber.Util;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -220,11 +221,11 @@ namespace Scriber.Text
 
         public static Color? FromName(string name)
         {
-            try
+            if (EnumUtility.TryParseEnum<KnownColor>(name, out var knownColor))
             {
-                return FromKnownColor((KnownColor)Enum.Parse(typeof(KnownColor), name, true));
+                return new Color(knownColor);
             }
-            catch
+            else
             {
                 return null;
             }

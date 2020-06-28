@@ -1,4 +1,6 @@
-﻿namespace Scriber.Layout
+﻿using System;
+
+namespace Scriber.Layout
 {
     public struct Size
     {
@@ -24,12 +26,12 @@
 
         public override int GetHashCode()
         {
-            return Width.GetHashCode() + Height.GetHashCode() * 13;
+            return HashCode.Combine(Width, Height);
         }
 
         public override string ToString()
         {
-            return $"Width: {Width.ToString("N4")} Height: {Height.ToString("N4")}";
+            return $"Width: {Width:N4} Height: {Height:N4}";
         }
 
         public static bool operator ==(Size left, Size right)

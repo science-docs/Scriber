@@ -1,17 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml;
 
 namespace Scriber.Bibliography.Styling.Formatting
 {
     public abstract class Run
     {
-        internal Run(bool isEmpty)
+        protected Run(bool isEmpty)
         {
             // init
-            this.IsEmpty = isEmpty;
+            IsEmpty = isEmpty;
         }
 
         public virtual bool IsEmpty
@@ -25,8 +23,7 @@ namespace Scriber.Bibliography.Styling.Formatting
         public IEnumerable<TextRun> Flatten()
         {
             // get text runs
-            var texts = this.GetTextRuns()
-                .ToArray();
+            var texts = GetTextRuns().ToArray();
 
             // group by formatting
             var index = 0;
@@ -54,7 +51,7 @@ namespace Scriber.Bibliography.Styling.Formatting
 
         public void ToPlainText(StringBuilder output)
         {
-            foreach (var text in this.GetTextRuns())
+            foreach (var text in GetTextRuns())
             {
                 output.Append(text.Text);
             }
@@ -62,82 +59,18 @@ namespace Scriber.Bibliography.Styling.Formatting
         public string ToPlainText()
         {
             // init
-            var result = new StringBuilder(65536);
+            var result = new StringBuilder(short.MaxValue);
 
             // render
-            this.ToPlainText(result);
+            ToPlainText(result);
 
             // done
             return result.ToString();
-        }
-
-        public string ToHtml()
-        {
-            // init
-            var result = new StringBuilder(65536);
-
-            // to html
-            this.ToHtml(result);
-
-            // done
-            return result.ToString();
-        }
-        public void ToHtml(XmlWriter writer)
-        {
-            using (var hw = new HtmlWriter(writer))
-            {
-                foreach (var text in this.GetTextRuns())
-                {
-                    hw.Add(text);
-                }
-            }
-        }
-        public void ToHtml(TextWriter writer)
-        {
-            // init
-            var settings = new XmlWriterSettings()
-            {
-                ConformanceLevel = ConformanceLevel.Fragment
-            };
-
-            // done
-            using (var xw = XmlWriter.Create(writer, settings))
-            {
-                this.ToHtml(xw);
-            }
-        }
-        public void ToHtml(Stream stream)
-        {
-            // init
-            var settings = new XmlWriterSettings()
-            {
-                ConformanceLevel = ConformanceLevel.Fragment
-            };
-
-            // done
-            using (var xw = XmlWriter.Create(stream, settings))
-            {
-                this.ToHtml(xw);
-            }
-        }
-        public void ToHtml(StringBuilder output)
-        {
-            // init
-            var settings = new XmlWriterSettings()
-            {
-                ConformanceLevel = ConformanceLevel.Fragment
-            };
-
-            // done
-            using (var xw = XmlWriter.Create(output, settings))
-            {
-                this.ToHtml(xw);
-            }
         }
 
         public override string ToString()
         {
-            return this.ToPlainText();
+            return ToPlainText();
         }
     }
 }

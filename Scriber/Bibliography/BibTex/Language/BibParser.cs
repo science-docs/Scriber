@@ -185,7 +185,7 @@ namespace Scriber.Bibliography.BibTex.Language
 
                     case BibBuilderState.Build:
                         Debug.Assert(bib != null, "bib != null");
-                        if (tagName != string.Empty)
+                        if (!string.IsNullOrEmpty(tagName))
                         {
                             bib[tagName] = tagValueBuilder.ToString();
                             tagValueBuilder.Clear();

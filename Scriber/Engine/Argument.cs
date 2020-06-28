@@ -12,7 +12,7 @@ namespace Scriber.Engine
 
         public Argument(Element source, object? value)
         {
-            Source = source;
+            Source = source ?? throw new ArgumentNullException(nameof(source));
             Value = value;
         }
 
@@ -25,11 +25,21 @@ namespace Scriber.Engine
 
         public static bool IsArgumentType(Type type)
         {
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Argument<>);
         }
 
         public static bool IsArgumentType(Type type, out Type genericType)
         {
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
             if (IsArgumentType(type))
             {
                 genericType = type.GenericTypeArguments[0];

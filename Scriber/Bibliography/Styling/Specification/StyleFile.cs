@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
@@ -26,7 +27,7 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             get
             {
-                return (this.Macros == null || this.Macros.Length == 0) && this.Citation == null && this.Bibliography == null;
+                return (Macros == null || Macros.Count == 0) && Citation == null && Bibliography == null;
             }
         }
 
@@ -66,21 +67,21 @@ namespace Scriber.Bibliography.Styling.Specification
         /// Used to specify (overriding) localization data.
         /// </summary>
         [XmlElement("locale")]
-        public LocaleElement[]? Locales
+        public List<LocaleElement> Locales
         {
             get;
             set;
-        }
+        } = new List<LocaleElement>();
 
         /// <summary>
         /// Macros allow formatting instructions to be reused, keeping styles compact and maintainable.
         /// </summary>
         [XmlElement("macro")]
-        public MacroElement[]? Macros
+        public List<MacroElement> Macros
         {
             get;
             set;
-        }
+        } = new List<MacroElement>();
         /// <summary>
         /// Describes the formatting of in-text citations or notes.
         /// </summary>

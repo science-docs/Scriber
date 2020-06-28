@@ -84,7 +84,7 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             get
             {
-                return this.NamesDelimiter;
+                return NamesDelimiter;
             }
         }
 

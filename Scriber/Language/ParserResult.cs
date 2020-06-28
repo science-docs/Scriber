@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Scriber.Language
 {
@@ -16,7 +16,7 @@ namespace Scriber.Language
 
         public static ParserResult Empty()
         {
-            return new ParserResult(new Element[0], new ParserIssue[0]);
+            return new ParserResult(Array.Empty<Element>(), Array.Empty<ParserIssue>());
         }
     }
 }
