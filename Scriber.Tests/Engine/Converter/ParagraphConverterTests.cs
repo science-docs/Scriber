@@ -30,5 +30,24 @@ namespace Scriber.Engine.Converter.Tests
             Assert.NotNull(first);
             Assert.Equal("text", first!.Content);
         }
+
+        [Fact]
+        public void WrongTargetType()
+        {
+            var paragraph = Paragraph.FromText("text");
+            Assert.Throws<ConverterException>(() =>
+            {
+                converter.Convert(paragraph, typeof(int));
+            });
+        }
+
+        [Fact]
+        public void WrongSourceType()
+        {
+            Assert.Throws<ConverterException>(() =>
+            {
+                converter.Convert("123", typeof(int));
+            });
+        }
     }
 }

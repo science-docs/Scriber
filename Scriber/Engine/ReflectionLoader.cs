@@ -115,14 +115,17 @@ namespace Scriber.Engine
         {
             var attribute = type.GetCustomAttribute<CommandArgumentConverterAttribute>();
 
-            if (attribute != null && typeof(IElementConverter).IsAssignableFrom(type))
+            if (attribute != null)
             {
-                if (!(Activator.CreateInstance(type) is IElementConverter instance))
+                if (typeof(IElementConverter).IsAssignableFrom(type) &&
+                    Activator.CreateInstance(type) is IElementConverter instance)
                 {
-                    throw new Exception($"Could not create converter instance from type '{type.FormattedName()}'.");
+                    context.Converters.Add(instance, attribute.Source, attribute.Targets);
                 }
-
-                context.Converters.Add(instance, attribute.Source, attribute.Targets);
+                else
+                {
+                    context.Logger.Warning($"Could not create converter instance from type '{type.FormattedName()}'.");
+                }
             }
         }
 

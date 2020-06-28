@@ -17,5 +17,15 @@ namespace Scriber.Engine.Converter.Tests
             var intValue = (int)value;
             Assert.Equal(123, intValue);
         }
+
+        [Fact]
+        public void SimpleStringToInt()
+        {
+            var mergedConverter = new MergedElementConverter(new StringConverter());
+            var value = mergedConverter.Convert("123", typeof(int));
+            Assert.IsType<int>(value);
+            var intValue = (int)value;
+            Assert.Equal(123, intValue);
+        }
     }
 }

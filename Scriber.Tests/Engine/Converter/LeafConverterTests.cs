@@ -20,5 +20,23 @@ namespace Scriber.Engine.Converter.Tests
             var text = (paragraphLeaf as TextLeaf)!;
             Assert.Equal("text", text.Content);
         }
+
+        [Fact]
+        public void WrongTargetType()
+        {
+            Assert.Throws<ConverterException>(() =>
+            {
+                converter.Convert(new TextLeaf("123"), typeof(int));
+            });
+        }
+
+        [Fact]
+        public void WrongSourceType()
+        {
+            Assert.Throws<ConverterException>(() =>
+            {
+                converter.Convert("123", typeof(int));
+            });
+        }
     }
 }
