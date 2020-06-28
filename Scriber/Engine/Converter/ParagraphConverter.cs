@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Scriber.Layout.Document;
-using Scriber.Util;
 
 namespace Scriber.Engine.Converter
 {
@@ -11,16 +10,6 @@ namespace Scriber.Engine.Converter
     {
         public object Convert(object source, Type targetType)
         {
-            if (source is null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (targetType is null)
-            {
-                throw new ArgumentNullException(nameof(targetType));
-            }
-
             if (source is Paragraph paragraph)
             {
                 if (targetType == typeof(IEnumerable<Leaf>))
@@ -31,28 +20,9 @@ namespace Scriber.Engine.Converter
                 {
                     return ConvertToString(paragraph);
                 }
-                else if (targetType.IsEnum)
-                {
-                    var text = ConvertToString(paragraph);
-                    if (long.TryParse(text, out long enumValue))
-                    {
-                        return Enum.ToObject(targetType, enumValue);
-                    }
-                    else
-                    {
-                        return Enum.Parse(targetType, text, true);
-                    }
-                }
-                else
-                {
-                    throw new ConverterException($"Paragraph cannot be converted to object of type {targetType.FormattedName()} by this converter.");
-                }
-            }
-            else
-            {
-                throw new ConverterException($"Object of type {source.GetType().FormattedName()} cannot be processed by this converter.");
             }
 
+            throw new ConverterException(source.GetType(), targetType);
         }
 
         private static string ConvertToString(Paragraph paragraph)
@@ -67,7 +37,7 @@ namespace Scriber.Engine.Converter
                 }
                 else
                 {
-                    throw new ConverterException("Could not convert paragraph to string. Paragraph contains non string content.");
+                    throw new ConverterException("Could not convert paragraph to string. Paragraph contains non-string content.");
                 }
             }
 

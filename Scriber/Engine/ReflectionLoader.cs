@@ -6,16 +6,16 @@ using System.Reflection;
 
 namespace Scriber.Engine
 {
-    public static class ReflectionLoader
+    public class ReflectionLoader
     {
-        private static readonly List<Assembly> assemblies = new List<Assembly>();
+        private readonly List<Assembly> assemblies = new List<Assembly>();
 
-        static ReflectionLoader()
+        public ReflectionLoader()
         {
             Add(typeof(ReflectionLoader).Assembly);
         }
 
-        public static void Add(Assembly asm)
+        public void Add(Assembly asm)
         {
             lock (assemblies)
             {
@@ -23,7 +23,7 @@ namespace Scriber.Engine
             }
         }
 
-        public static void Discover(params Assembly[] additionalAssemblies)
+        public void Discover(Context context, params Assembly[] additionalAssemblies)
         {
             lock (assemblies)
             {
@@ -31,7 +31,7 @@ namespace Scriber.Engine
 
                 foreach (var asm in assemblies)
                 {
-                    DiscoverAssembly(asm);
+                    DiscoverAssembly(context, asm);
                 }
 
                 // After assemblies have been discovered, remove them
@@ -39,36 +39,36 @@ namespace Scriber.Engine
             }
         }
 
-        private static void DiscoverAssembly(Assembly asm)
+        private void DiscoverAssembly(Context context, Assembly asm)
         {
             var packages = asm.GetTypes().Where(e => IsPackage(e));
 
             foreach (var package in packages)
             {
-                FindCommands(package);
-                FindEnvironments(package);
+                FindCommands(context, package);
+                FindEnvironments(context, package);
             }
 
             var converters = asm.GetTypes().Where(e => IsConverter(e));
 
             foreach (var converter in converters)
             {
-                FindConverter(converter);
+                FindConverter(context, converter);
             }
-            ElementConverters.ResolvePaths();
+            context.Converters.ResolvePaths();
         }
 
-        private static bool IsPackage(Type type)
+        private bool IsPackage(Type type)
         {
             return type.GetCustomAttribute<PackageAttribute>() != null;
         }
 
-        private static bool IsConverter(Type type)
+        private bool IsConverter(Type type)
         {
             return type.GetCustomAttribute<CommandArgumentConverterAttribute>() != null;
         }
 
-        private static void FindCommands(Type type)
+        private void FindCommands(Context context, Type type)
         {
             var methods = type.GetMethods();
 
@@ -76,18 +76,18 @@ namespace Scriber.Engine
             {
                 if (IsCommand(method, out var command) && command != null)
                 {
-                    CommandCollection.Add(CommandFactory.Create(command, method));
+                    context.Commands.Add(CommandFactory.Create(command, method));
                 }
             }
         }
 
-        private static bool IsCommand(MethodInfo method, out CommandAttribute? command)
+        private bool IsCommand(MethodInfo method, out CommandAttribute? command)
         {
             command = method.GetCustomAttribute<CommandAttribute>();
             return command != null && method.IsStatic;
         }
 
-        private static void FindEnvironments(Type type)
+        private void FindEnvironments(Context context, Type type)
         {
             var methods = type.GetMethods();
 
@@ -95,12 +95,12 @@ namespace Scriber.Engine
             {
                 if (IsEnvironment(method, out var environment) && environment != null)
                 {
-                    EnvironmentCollection.Add(EnvironmentFactory.Create(environment, method));
+                    context.Environments.Add(EnvironmentFactory.Create(environment, method));
                 }
             }
         }
 
-        private static bool IsEnvironment(MethodInfo method, out EnvironmentAttribute? environment)
+        private bool IsEnvironment(MethodInfo method, out EnvironmentAttribute? environment)
         {
             var argumentArray = new Type[] { typeof(Argument[]) };
             var objArray = new Type[] { typeof(object[]) };
@@ -111,7 +111,7 @@ namespace Scriber.Engine
             return environment != null && method.IsStatic && MatchesArgs(method, argumentArray, objArray, stateObjArray, stateArgumentArray);
         }
 
-        private static void FindConverter(Type type)
+        private void FindConverter(Context context, Type type)
         {
             var attribute = type.GetCustomAttribute<CommandArgumentConverterAttribute>();
 
@@ -122,11 +122,11 @@ namespace Scriber.Engine
                     throw new Exception($"Could not create converter instance from type '{type.FormattedName()}'.");
                 }
 
-                ElementConverters.Add(instance, attribute.Source, attribute.Targets);
+                context.Converters.Add(instance, attribute.Source, attribute.Targets);
             }
         }
 
-        private static bool MatchesArgs(MethodInfo method, params Type[][] types)
+        private bool MatchesArgs(MethodInfo method, params Type[][] types)
         {
             var args = method.GetParameters();
 

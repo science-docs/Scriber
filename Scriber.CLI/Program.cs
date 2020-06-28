@@ -32,7 +32,9 @@ namespace Scriber.CLI
 
             Stopwatch watch = Stopwatch.StartNew();
 
-            ReflectionLoader.Discover(typeof(TestPackage).Assembly);
+            var context = new Context();
+            context.Logger.Level = LogLevel.Debug;
+            new ReflectionLoader().Discover(context, typeof(TestPackage).Assembly);
 
             StringBuilder sb = new StringBuilder();
 
@@ -46,6 +48,8 @@ namespace Scriber.CLI
             //sb.AppendLine("\\includegraphics{test-image.png}");
             //sb.AppendLine("\\caption{First Test Image}");
             //sb.AppendLine("\\end{figure}");
+
+            sb.AppendLine("@test({a: d, key: value, enum: One}, {a: xD, key: value, enum: One})");
 
             sb.AppendLine("@BibliographyStyle(ieee.csl)");
             sb.AppendLine("@Bibliography(lib.bib)");
@@ -128,20 +132,19 @@ namespace Scriber.CLI
             //    sb.AppendLine("\\section{This is a section}");
             //    sb.AppendLine();
             //}
-            sb.AppendLine("@test({a: d, key: value, enum: One})");
+            
             //sb.AppendLine("@figure()\n{ }");
             //sb.AppendLine("@test(null)");
             //sb.Append("@Figure() { }");
             //sb.AppendLine("@includegraphics(\"test-image.png\")");
 
             var tokens = Lexer.Tokenize(sb.ToString());
-            Logger logger = new Logger { Level = LogLevel.Debug };
-            logger.Logged += Logger_Logged;
-            var parserResult = Parser.Parse(tokens, logger);
-            var result = Compiler.Compile(parserResult.Elements, logger, null);
+            context.Logger.Logged += Logger_Logged;
+            var parserResult = Parser.Parse(tokens, context.Logger);
+            var result = Compiler.Compile(context, parserResult.Elements);
 
             var document = result.Document;
-            document.Run(logger);
+            document.Run(context.Logger);
 
             var bytes = document.ToPdf();
 

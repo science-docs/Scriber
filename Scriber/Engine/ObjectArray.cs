@@ -1,7 +1,6 @@
 ﻿using Scriber.Language;
 using Scriber.Util;
 using System;
-using System.IO.Abstractions;
 
 namespace Scriber.Engine
 {
@@ -9,23 +8,28 @@ namespace Scriber.Engine
     {
         private readonly Argument[] array;
 
-        public CompilerState? CompilerState { get; }
+        public CompilerState CompilerState { get; }
 
-        public ObjectArray(Element origin, CompilerState? compilerState, Argument[] objects) : base(origin)
+        public ObjectArray(Element origin, CompilerState compilerState, Argument[] objects) : base(origin)
         {
-            CompilerState = compilerState;
-            array = objects;
+            CompilerState = compilerState ?? throw new ArgumentNullException(nameof(compilerState));
+            array = objects ?? throw new ArgumentNullException(nameof(objects));
         }
 
         public Array Get(Type type)
         {
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
             if (type.IsArray)
             {
                 throw new CompilerException(Origin, "Cannot create nested arrays.");
             }
 
             var arrType = type.MakeArrayType();
-            var arr = Activator.CreateInstance(arrType, new object[] { array.Length }) as Array 
+            var arr = Activator.CreateInstance(arrType, new object[] { array.Length }) as Array
                 ?? throw new InvalidOperationException($"Could not create array of type '{type.FormattedName()}'.");
 
             for (int i = 0; i < arr.Length; i++)
@@ -42,9 +46,8 @@ namespace Scriber.Engine
                 {
                     arr.SetValue(value, i);
                 }
-                else if (ElementConverters.Find(value.GetType(), type) is IElementConverter converter)
+                else if (CompilerState.Converters.TryConvert(value.GetType(), type, out var transformed))
                 {
-                    var transformed = converter.Convert(value, type);
                     arr.SetValue(transformed, i);
                 }
                 else
@@ -53,7 +56,7 @@ namespace Scriber.Engine
                 }
             }
 
-            CompilerState?.Issues.Log(Origin, $"Created array of type {type.FormattedName()}.");
+            CompilerState.Context.Logger.Debug($"Created array of type {type.FormattedName()}.");
 
             return arr;
         }

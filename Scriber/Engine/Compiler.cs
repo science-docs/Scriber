@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO.Abstractions;
 using System.Linq;
 using Scriber.Language;
 using Scriber.Layout.Document;
@@ -10,19 +9,10 @@ namespace Scriber.Engine
 {
     public static class Compiler
     {
-        public static CompilerResult Compile(IEnumerable<Element> elements)
+        public static CompilerResult Compile(Context context, IEnumerable<Element> elements)
         {
-            return Compile(elements, null, null);
-        }
-
-        public static CompilerResult Compile(IEnumerable<Element> elements, Logger? logger, IFileSystem? fileSystem)
-        {
-            var state = new CompilerState(fileSystem ?? new FileSystem());
-
-            if (logger != null)
-            {
-                state.Issues.CollectionChanged += (_, e) => IssuesChanged(logger, e);
-            }
+            var state = new CompilerState(context);
+            state.Issues.CollectionChanged += (_, e) => IssuesChanged(context.Logger, e);
 
             foreach (var element in elements)
             {

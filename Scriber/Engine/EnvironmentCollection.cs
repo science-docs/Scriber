@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Scriber.Engine
 {
-    public static class EnvironmentCollection
+    public class EnvironmentCollection
     {
-        private static readonly Dictionary<string, Environment> environments = new Dictionary<string, Environment>();
+        private readonly Dictionary<string, Environment> environments = new Dictionary<string, Environment>();
 
-        public static void Add(Environment environment)
+        public void Add(Environment environment)
         {
             environments[environment.Name] = environment;
         }
 
-        public static Environment? Find(string name)
+        public Environment? Find(string name)
         {
             environments.TryGetValue(name, out var environment);
             return environment;

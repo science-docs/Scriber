@@ -23,7 +23,7 @@ namespace Scriber.Engine
             object? InvokeDynamic(Element element, CompilerState state, Argument[] content, Argument[] args)
             {
                 var embedded = Embed(args, content);
-                var sorted = DynamicDispatch.SortArguments(command, element, state, embedded, param);
+                var sorted = DynamicDispatch.PadArguments(command, element, state, embedded, param);
                 DynamicDispatch.MatchArguments(state, sorted, param);
                 return method.Invoke(null, sorted);
             }

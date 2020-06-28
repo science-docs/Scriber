@@ -1,5 +1,6 @@
 ﻿using Scriber.Layout;
 using System;
+using System.Globalization;
 
 namespace Scriber.Engine.Converter
 {
@@ -32,11 +33,50 @@ namespace Scriber.Engine.Converter
                 {
                     return int.Parse(value);
                 }
+                else if (targetType == typeof(uint))
+                {
+                    return uint.Parse(value);
+                }
+                else if (targetType == typeof(float))
+                {
+                    return float.Parse(value, CultureInfo.InvariantCulture);
+                }
+                else if (targetType == typeof(double))
+                {
+                    return double.Parse(value, CultureInfo.InvariantCulture);
+                }
+                else if (targetType == typeof(byte))
+                {
+                    return byte.Parse(value);
+                }
+                else if (targetType == typeof(sbyte))
+                {
+                    return sbyte.Parse(value);
+                }
+                else if (targetType == typeof(short))
+                {
+                    return short.Parse(value);
+                }
+                else if (targetType == typeof(ushort))
+                {
+                    return ushort.Parse(value);
+                }
+                else if (targetType == typeof(long))
+                {
+                    return long.Parse(value);
+                }
+                else if (targetType == typeof(ulong))
+                {
+                    return ulong.Parse(value);
+                }
+                else if (targetType == typeof(decimal))
+                {
+                    return decimal.Parse(value, CultureInfo.InvariantCulture);
+                }
                 else if (targetType == typeof(bool))
                 {
                     return bool.Parse(value);
                 }
-                
             }
             
             throw new ConverterException(source.GetType(), targetType);

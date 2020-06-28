@@ -37,9 +37,7 @@ namespace Scriber.Engine.Commands
             }
             else
             {
-                var paragraph = new Paragraph();
-                paragraph.Leaves.Add(new TextLeaf(imagePath));
-                return paragraph;
+                return Paragraph.FromText(imagePath);
             }
         }
 

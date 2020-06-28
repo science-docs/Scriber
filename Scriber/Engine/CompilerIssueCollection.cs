@@ -15,10 +15,5 @@ namespace Scriber.Engine
         {
             Add(new CompilerIssue(origin, type, message, innerException));
         }
-
-        public void Log(Element origin, string message)
-        {
-            Add(origin, CompilerIssueType.Log, message);
-        }
     }
 }

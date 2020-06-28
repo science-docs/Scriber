@@ -20,7 +20,7 @@ namespace Scriber.Engine.Instructions
                 throw new InvalidOperationException("An environment needs to contain at least one child block.");
             }
 
-            var env = EnvironmentCollection.Find(Name);
+            var env = state.Environments.Find(Name);
 
             if (env == null)
             {
@@ -33,7 +33,7 @@ namespace Scriber.Engine.Instructions
             try
             {
                 var obj = env.Execution(Origin, state, envObjs, envArgs);
-                state.Issues.Log(Origin, $"Successfully executed environment '{Name}'.");
+                state.Context.Logger.Debug($"Successfully executed environment '{Name}'.");
                 return obj;
             }
             catch (CompilerException e)
