@@ -29,6 +29,11 @@ namespace Scriber.Engine
 
         public void Push(Block env)
         {
+            if (env is null)
+            {
+                throw new ArgumentNullException(nameof(env));
+            }
+
             stack.Push(env);
         }
 

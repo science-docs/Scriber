@@ -9,6 +9,16 @@ namespace Scriber.Engine.Tests
         private BlockStack Stack => new BlockStack();
 
         [Fact]
+        public void PushNullBlockException()
+        {
+            var stack = Stack;
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                stack.Push((Block)null);
+            });
+        }
+
+        [Fact]
         public void HasDefaultBlock()
         {
             var stack = Stack;

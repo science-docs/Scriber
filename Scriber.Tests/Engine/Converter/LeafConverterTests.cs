@@ -13,11 +13,11 @@ namespace Scriber.Engine.Converter.Tests
             var textLeaf = new TextLeaf("text");
             var paragraph = converter.Convert(textLeaf, typeof(Paragraph));
             Assert.IsType<Paragraph>(paragraph);
-            var par = (paragraph as Paragraph)!;
+            var par = paragraph as Paragraph;
             var paragraphLeaf = par.Leaves[0];
 
             Assert.IsType<TextLeaf>(paragraphLeaf);
-            var text = (paragraphLeaf as TextLeaf)!;
+            var text = paragraphLeaf as TextLeaf;
             Assert.Equal("text", text.Content);
         }
 

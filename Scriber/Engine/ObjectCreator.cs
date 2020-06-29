@@ -124,6 +124,7 @@ namespace Scriber.Engine
             object? emptyObj;
             if (Argument.IsArgumentType(type, out var genericType))
             {
+                ValidateType(genericType);
                 emptyObj = Activator.CreateInstance(type, Origin, CreateInstance(genericType));
             }
             else
@@ -145,13 +146,13 @@ namespace Scriber.Engine
         {
             string? issue = null;
 
-            if (type.IsAbstract)
-            {
-                issue = "is defined as abstract";
-            }
-            else if (type.IsInterface)
+            if (type.IsInterface)
             {
                 issue = "is an interface";
+            }
+            else if (type.IsAbstract)
+            {
+                issue = "is defined as abstract";
             }
             else if (type.IsPrimitive)
             {

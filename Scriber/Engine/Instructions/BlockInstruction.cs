@@ -33,11 +33,11 @@ namespace Scriber.Engine.Instructions
 
                     currentParagraph.Leaves.Add(leaf);
                 }
-                else if (item == EmptyInstruction.Object)
+                else if (item.Value == EmptyInstruction.Object)
                 {
                     ResetParagraph(state, ref currentParagraph);
                 }
-                else if (item == NullInstruction.NullObject)
+                else if (item.Value == NullInstruction.NullObject)
                 {
                     ResetParagraph(state, ref currentParagraph);
                     results.Add(new Argument(item.Source, null));

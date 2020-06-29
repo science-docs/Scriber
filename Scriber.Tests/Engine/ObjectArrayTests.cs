@@ -1,6 +1,7 @@
 ﻿using Scriber.Language;
 using Scriber.Layout.Document;
 using Scriber.Tests.Fixture;
+using System;
 using System.Linq;
 using Xunit;
 
@@ -10,6 +11,43 @@ namespace Scriber.Engine.Tests
     {
         private Element E => ElementFixtures.EmptyElement();
         private CompilerState CS => CompilerStateFixtures.ReflectionLoaded();
+
+        [Fact]
+        public void NullElementConstructorException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new ObjectArray(null, CS, Array.Empty<Argument>());
+            });
+        }
+
+        [Fact]
+        public void NullStateConstructorException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new ObjectArray(E, null, Array.Empty<Argument>());
+            });
+        }
+
+        [Fact]
+        public void NullArgumentsConstructorException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new ObjectArray(E, CS, null);
+            });
+        }
+
+        [Fact]
+        public void NullTypeException()
+        {
+            var objectArray = Create();
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                objectArray.Get(null);
+            });
+        }
 
         [Fact]
         public void ParagraphArray()

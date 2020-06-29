@@ -26,6 +26,24 @@ namespace Scriber.Engine.Tests
         }
 
         [Fact]
+        public void NullArgumentTypeException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                Argument.IsArgumentType(null);
+            });
+        }
+
+        [Fact]
+        public void NullArgumentOutTypeException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                Argument.IsArgumentType(null, out var _);
+            });
+        }
+
+        [Fact]
         public void FlattenSingle()
         {
             var arg = new Argument(E, 1);

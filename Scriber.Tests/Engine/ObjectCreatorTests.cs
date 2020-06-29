@@ -10,10 +10,54 @@ namespace Scriber.Engine.Tests
     public class ObjectCreatorTests
     {
         private ObjectCreator Default => new ObjectCreator(E, CompilerStateFixtures.ReflectionLoaded());
-        private ParameterInfo SimpleParameter => typeof(SimpleObject).GetMethod("SimpleMethod")!.GetParameters()[0];
-        private ParameterInfo OverrideParameter => typeof(SimpleObject).GetMethod("OverrideMethod")!.GetParameters()[0];
+        private ParameterInfo SimpleParameter => typeof(SimpleObject).GetMethod("SimpleMethod").GetParameters()[0];
+        private ParameterInfo OverrideParameter => typeof(SimpleObject).GetMethod("OverrideMethod").GetParameters()[0];
         private Element E => ElementFixtures.EmptyElement();
         
+        [Fact]
+        public void NullElementConstructionException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new ObjectCreator(null, CompilerStateFixtures.ReflectionLoaded());
+            });
+        }
+
+        [Fact]
+        public void NullStateConstructionException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new ObjectCreator(E, null);
+            });
+        }
+
+        [Fact]
+        public void NullParameterCreateException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                Default.Create((ParameterInfo)null);
+            });
+        }
+
+        [Fact]
+        public void NullPropertyCreateException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                Default.Create((PropertyInfo)null);
+            });
+        }
+
+        [Fact]
+        public void NullTypeCreateException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                Default.Create(null, null);
+            });
+        }
 
         [Fact]
         public void CreateWithSimpleParameterInfo()
@@ -30,7 +74,7 @@ namespace Scriber.Engine.Tests
         {
             var creator = Default;
             creator.Fields.Add(new ObjectField(E, "Other", new Argument(E, Default)));
-            var property = typeof(SimpleObject).GetProperty("Other")!;
+            var property = typeof(SimpleObject).GetProperty("Other");
             var nestedObject = creator.Create(property);
             Assert.IsType<SimpleObject>(nestedObject);
         }
@@ -45,7 +89,7 @@ namespace Scriber.Engine.Tests
 
             var top = creator.Create(typeof(DocumentVariable), null) as DocumentVariable;
             Assert.NotNull(top);
-            var nestedVariables = top!["nested"];
+            var nestedVariables = top["nested"];
             Assert.NotNull(nestedVariables);
             var value = nestedVariables["key"];
             Assert.Equal("value", value.GetValue<string>());
@@ -116,6 +160,21 @@ namespace Scriber.Engine.Tests
             {
                 Default.Create(type, null);
             });
+        }
+
+        [Fact]
+        public void CheckTypeNameInException()
+        {
+            var typeNameElement = new Element(null, ElementType.Text, 0, 0);
+            var creator = Default;
+            creator.TypeName = "WrongOverrideObject";
+            creator.TypeElement = typeNameElement;
+
+            var exception = Assert.Throws<CompilerException>(() =>
+            {
+                creator.Create(OverrideParameter);
+            });
+            Assert.Equal(typeNameElement, exception.Origin);
         }
     }
 }

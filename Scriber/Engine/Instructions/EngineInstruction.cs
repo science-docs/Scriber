@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using System;
 
 namespace Scriber.Engine.Instructions
 {
@@ -12,6 +13,11 @@ namespace Scriber.Engine.Instructions
 
         public static EngineInstruction? Create(Element element)
         {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             switch (element.Type)
             {
                 case ElementType.Text:
@@ -34,9 +40,9 @@ namespace Scriber.Engine.Instructions
                     return new ObjectFieldInstruction(element);
                 case ElementType.Null:
                     return new NullInstruction(element);
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(element)}.{nameof(element.Type)}");
             }
-
-            return null;
         }
     }
 }

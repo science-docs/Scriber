@@ -16,6 +16,16 @@ namespace Scriber.Engine.Converter
     {
         public object Convert(object source, Type targetType)
         {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (targetType is null)
+            {
+                throw new ArgumentNullException(nameof(targetType));
+            }
+
             if (source is string value)
             {
                 if (targetType.IsEnum)

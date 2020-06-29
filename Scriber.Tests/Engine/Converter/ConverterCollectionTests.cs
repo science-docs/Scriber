@@ -54,7 +54,7 @@ namespace Scriber.Engine.Converter.Tests
             var resolvedConverter = converters.Find(typeof(Paragraph), typeof(int));
             Assert.NotNull(resolvedConverter);
             var paragraph = Paragraph.FromText("123");
-            var value = resolvedConverter!.Convert(paragraph, typeof(int));
+            var value = resolvedConverter.Convert(paragraph, typeof(int));
             Assert.Equal(123, value);
         }
     }

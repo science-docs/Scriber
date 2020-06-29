@@ -8,6 +8,24 @@ namespace Scriber.Engine.Converter.Tests
     {
         private readonly StringConverter converter = new StringConverter();
 
+        [Fact]
+        public void NullValueException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                converter.Convert(null, typeof(int));
+            });
+        }
+
+        [Fact]
+        public void NullTypeException()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                converter.Convert("notNull", null);
+            });
+        }
+
         [Theory]
         [InlineData(32, "32", typeof(int))]
         [InlineData(-32, "-32", typeof(int))]
