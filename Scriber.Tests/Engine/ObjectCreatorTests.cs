@@ -1,6 +1,7 @@
 ﻿using Scriber.Language;
 using Scriber.Tests.Fixture;
-using System.ComponentModel;
+using Scriber.Text;
+using System;
 using System.Reflection;
 using Xunit;
 
@@ -62,6 +63,26 @@ namespace Scriber.Engine.Tests
         }
 
         [Fact]
+        public void CreateWithArgumentType()
+        {
+            var creator = Default;
+            creator.Fields.Add(new ObjectField(E, "A", new Argument(E, "123")));
+            var simple = creator.Create(SimpleParameter);
+            Assert.IsType<SimpleObject>(simple);
+            Assert.Equal(123, ((SimpleObject)simple).A);
+        }
+
+        [Fact]
+        public void CreateWithGenericArgument()
+        {
+            var creator = Default;
+            creator.Fields.Add(new ObjectField(E, "A", new Argument<string>(E, "123")));
+            var simple = creator.Create(typeof(Argument<SimpleObject>), null);
+            Assert.IsType<Argument<SimpleObject>>(simple);
+            Assert.Equal(123, ((Argument<SimpleObject>)simple).Value.A);
+        }
+
+        [Fact]
         public void CreateWithParameterInfoTypeNameException()
         {
             var creator = Default;
@@ -79,6 +100,22 @@ namespace Scriber.Engine.Tests
             creator.Fields.Add(new ObjectField(E, "unknown", new Argument(E, "unknown")));
             creator.Create(SimpleParameter);
             Assert.Single(creator.CompilerState.Issues);
+        }
+
+        [Theory]
+        [InlineData(typeof(Type))]
+        [InlineData(typeof(IArrangingStrategy))]
+        [InlineData(typeof(int))]
+        [InlineData(typeof(Type[]))]
+        [InlineData(typeof(FontStyle))]
+        [InlineData(typeof(Argument))]
+        [InlineData(typeof(Action))]
+        public void TypeValidationException(Type type)
+        {
+            Assert.Throws<CompilerException>(() =>
+            {
+                Default.Create(type, null);
+            });
         }
     }
 }

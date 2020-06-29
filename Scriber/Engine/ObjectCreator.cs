@@ -165,9 +165,9 @@ namespace Scriber.Engine
             {
                 issue = "is an enum type";
             }
-            else if (!type.IsClass && !type.IsValueType)
+            else if (typeof(Delegate).IsAssignableFrom(type))
             {
-                issue = "is not a data type";
+                issue = "is a delegate type";
             }
             else if (type.GetConstructor(Type.EmptyTypes) == null)
             {

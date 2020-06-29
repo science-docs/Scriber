@@ -106,19 +106,9 @@ namespace Scriber.Engine.Commands
 
         private static IEnumerable<Leaf> ToLeaves(Run run)
         {
-            if (run is TextRun textRun)
+            foreach (var textRun in run.Flatten())
             {
                 yield return ToLeaf(textRun);
-            }
-            else if (run is ComposedRun composedRun)
-            {
-                foreach (var child in composedRun.Children)
-                {
-                    foreach (var leaf in ToLeaves(child))
-                    {
-                        yield return leaf;
-                    }
-                }
             }
         }
 

@@ -70,5 +70,13 @@ namespace Scriber.Engine.Tests
             Assert.Equal(2, flattened[1].Value);
             Assert.Equal(3, flattened[2].Value);
         }
+
+        [Fact]
+        public void GenericArgument()
+        {
+            var arg = new Argument<string>(E, "value");
+            Assert.IsType<string>(arg.Value);
+            Assert.Equal("value", arg.Value);
+        }
     }
 }

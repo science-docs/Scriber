@@ -52,6 +52,18 @@ namespace Scriber.Engine.Tests
         }
 
         [Fact]
+        public void ConvertedArray()
+        {
+            var objectArray = Create("1", "2");
+            var array = objectArray.Get(typeof(int));
+            Assert.IsType<int[]>(array);
+            var objects = (int[])array;
+
+            Assert.Equal(1, objects[0]);
+            Assert.Equal(2, objects[1]);
+        }
+
+        [Fact]
         public void InvalidConversion()
         {
             var objectArray = Create("Simple");
