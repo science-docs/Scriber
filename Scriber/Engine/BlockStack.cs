@@ -27,16 +27,27 @@ namespace Scriber.Engine
             return Current;
         }
 
-        public void Push(Block env)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="block"></param>
+        /// <exception cref="ArgumentNullException"/>
+        public void Push(Block block)
         {
-            if (env is null)
+            if (block is null)
             {
-                throw new ArgumentNullException(nameof(env));
+                throw new ArgumentNullException(nameof(block));
             }
 
-            stack.Push(env);
+            stack.Push(block);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        /// <exception cref="IndexOutOfRangeException"/>
         public Block Peek(int i)
         {
             int level = 0;

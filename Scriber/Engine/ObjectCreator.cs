@@ -14,11 +14,24 @@ namespace Scriber.Engine
         public CompilerState CompilerState { get; set; }
         public List<ObjectField> Fields { get; } = new List<ObjectField>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="compilerState"></param>
+        /// <exception cref="ArgumentNullException"/>
         public ObjectCreator(Element origin, CompilerState compilerState) : base(origin)
         {
             CompilerState = compilerState ?? throw new ArgumentNullException(nameof(compilerState));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="CompilerException"/>
         public object Create(ParameterInfo parameter)
         {
             if (parameter is null)
@@ -30,6 +43,13 @@ namespace Scriber.Engine
             return Create(parameter.ParameterType, attribute?.Overrides);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="CompilerException"/>
         public object Create(PropertyInfo property)
         {
             if (property is null)
@@ -41,8 +61,21 @@ namespace Scriber.Engine
             return Create(property.PropertyType, attribute?.Overrides);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="defaultType"></param>
+        /// <param name="overrides"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="CompilerException"/>
         public object Create(Type defaultType, Type[]? overrides)
         {
+            if (defaultType is null)
+            {
+                throw new ArgumentNullException(nameof(defaultType));
+            }
+
             var obj = CreateEmpty(defaultType, overrides);
 
             if (obj is DocumentVariable vars)

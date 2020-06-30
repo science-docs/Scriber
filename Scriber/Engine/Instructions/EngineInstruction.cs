@@ -5,6 +5,11 @@ namespace Scriber.Engine.Instructions
 {
     public abstract class EngineInstruction : Traceable
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <exception cref="ArgumentNullException"/>
         protected EngineInstruction(Element origin) : base(origin)
         {
         }
@@ -41,7 +46,7 @@ namespace Scriber.Engine.Instructions
                 case ElementType.Null:
                     return new NullInstruction(element);
                 default:
-                    throw new ArgumentOutOfRangeException($"{nameof(element)}.{nameof(element.Type)}");
+                    throw new ArgumentOutOfRangeException(nameof(element), $"Unknown element type '{element.Type}'.");
             }
         }
     }

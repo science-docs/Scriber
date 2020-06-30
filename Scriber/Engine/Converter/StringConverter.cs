@@ -14,6 +14,15 @@ namespace Scriber.Engine.Converter
         typeof(decimal), typeof(bool))]
     public class StringConverter : IElementConverter
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="targetType"></param>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="ConverterException"/>
+        /// <exception cref="FormatException"/>
+        /// <exception cref="OverflowException"/>
         public object Convert(object source, Type targetType)
         {
             if (source is null)

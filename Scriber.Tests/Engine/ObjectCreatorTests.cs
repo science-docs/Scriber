@@ -17,46 +17,51 @@ namespace Scriber.Engine.Tests
         [Fact]
         public void NullElementConstructionException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 new ObjectCreator(null, CompilerStateFixtures.ReflectionLoaded());
             });
+            Assert.Equal("origin", ex.ParamName);
         }
 
         [Fact]
         public void NullStateConstructionException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 new ObjectCreator(E, null);
             });
+            Assert.Equal("compilerState", ex.ParamName);
         }
 
         [Fact]
         public void NullParameterCreateException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 Default.Create((ParameterInfo)null);
             });
+            Assert.Equal("parameter", ex.ParamName);
         }
 
         [Fact]
         public void NullPropertyCreateException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 Default.Create((PropertyInfo)null);
             });
+            Assert.Equal("property", ex.ParamName);
         }
 
         [Fact]
         public void NullTypeCreateException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 Default.Create(null, null);
             });
+            Assert.Equal("defaultType", ex.ParamName);
         }
 
         [Fact]

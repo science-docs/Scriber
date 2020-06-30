@@ -8,6 +8,12 @@ namespace Scriber.Engine.Instructions
     {
         private readonly Element? typeElement;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="CompilerException"/>
         public ObjectCreationInstruction(Element origin) : base(origin)
         {
             var parent = origin.Parent ?? throw new InvalidOperationException("A object creation instruction cannot be a top level element");
@@ -29,8 +35,25 @@ namespace Scriber.Engine.Instructions
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
         public override object? Execute(CompilerState state, Argument[] arguments)
         {
+            if (state is null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
+            if (arguments is null)
+            {
+                throw new ArgumentNullException(nameof(arguments));
+            }
+
             var parentBlock = state.Blocks.Peek(1);
             var creator = new ObjectCreator(Origin, state);
 

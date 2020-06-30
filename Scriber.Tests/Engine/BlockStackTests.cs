@@ -12,10 +12,11 @@ namespace Scriber.Engine.Tests
         public void PushNullBlockException()
         {
             var stack = Stack;
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 stack.Push((Block)null);
             });
+            Assert.Equal("block", ex.ParamName);
         }
 
         [Fact]

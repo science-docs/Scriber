@@ -8,16 +8,40 @@ namespace Scriber.Engine.Instructions
     {
         public string Name { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <exception cref="ArgumentNullException"/>
         public EnvironmentInstruction(Element origin) : base(origin)
         {
-            Name = origin.Content ?? throw new InvalidOperationException();
+            Name = origin.Content ?? throw new ArgumentNullException($"{nameof(origin)}.{nameof(origin.Content)}");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="CompilerException"/>
         public override object? Execute(CompilerState state, Argument[] args)
         {
+            if (state is null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
+            if (args is null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
+
             if (args.Length == 0)
             {
-                throw new InvalidOperationException("An environment needs to contain at least one child block.");
+                throw new ArgumentException("An environment needs to contain at least one child block.", nameof(args));
             }
 
             var env = state.Environments.Find(Name);

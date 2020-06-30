@@ -11,19 +11,21 @@ namespace Scriber.Engine.Converter.Tests
         [Fact]
         public void NullValueException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 converter.Convert(null, typeof(int));
             });
+            Assert.Equal("source", ex.ParamName);
         }
 
         [Fact]
         public void NullTypeException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 converter.Convert("notNull", null);
             });
+            Assert.Equal("targetType", ex.ParamName);
         }
 
         [Theory]

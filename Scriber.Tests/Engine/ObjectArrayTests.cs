@@ -15,38 +15,42 @@ namespace Scriber.Engine.Tests
         [Fact]
         public void NullElementConstructorException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 new ObjectArray(null, CS, Array.Empty<Argument>());
             });
+            Assert.Equal("origin", ex.ParamName);
         }
 
         [Fact]
         public void NullStateConstructorException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 new ObjectArray(E, null, Array.Empty<Argument>());
             });
+            Assert.Equal("compilerState", ex.ParamName);
         }
 
         [Fact]
         public void NullArgumentsConstructorException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 new ObjectArray(E, CS, null);
             });
+            Assert.Equal("objects", ex.ParamName);
         }
 
         [Fact]
         public void NullTypeException()
         {
             var objectArray = Create();
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 objectArray.Get(null);
             });
+            Assert.Equal("type", ex.ParamName);
         }
 
         [Fact]

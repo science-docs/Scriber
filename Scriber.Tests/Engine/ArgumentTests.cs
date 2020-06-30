@@ -28,19 +28,21 @@ namespace Scriber.Engine.Tests
         [Fact]
         public void NullArgumentTypeException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 Argument.IsArgumentType(null);
             });
+            Assert.Equal("type", ex.ParamName);
         }
 
         [Fact]
         public void NullArgumentOutTypeException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 Argument.IsArgumentType(null, out var _);
             });
+            Assert.Equal("type", ex.ParamName);
         }
 
         [Fact]

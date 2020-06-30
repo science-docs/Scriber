@@ -1,4 +1,5 @@
 ﻿using Scriber.Layout.Document;
+using System;
 using Xunit;
 
 namespace Scriber.Engine.Converter.Tests
@@ -6,6 +7,86 @@ namespace Scriber.Engine.Converter.Tests
     public class ConverterCollectionTests
     {
         private readonly ConverterCollection converters = new ConverterCollection();
+
+        [Fact]
+        public void AddConverterNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                converters.Add(null, typeof(string));
+            });
+            Assert.Equal("converter", ex.ParamName);
+        }
+
+        [Fact]
+        public void AddSourceTypeNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                converters.Add(new StringConverter(), null);
+            });
+            Assert.Equal("source", ex.ParamName);
+        }
+
+        [Fact]
+        public void AddTargetTypeNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                converters.Add(new StringConverter(), typeof(string), null);
+            });
+            Assert.Equal("targets", ex.ParamName);
+        }
+
+        [Fact]
+        public void AddTargetTypeNullElementException()
+        {
+            var ex = Assert.Throws<ArgumentException>(() =>
+            {
+                converters.Add(new StringConverter(), typeof(string), new Type[] { null });
+            });
+            Assert.Equal("targets", ex.ParamName);
+        }
+
+        [Fact]
+        public void FindSourceTypeNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                converters.Find(null, typeof(int));
+            });
+            Assert.Equal("source", ex.ParamName);
+        }
+
+        [Fact]
+        public void FindTargetTypeNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                converters.Find(typeof(string), null);
+            });
+            Assert.Equal("target", ex.ParamName);
+        }
+
+        [Fact]
+        public void TryConvertSourceNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                converters.TryConvert(null, typeof(int), out var _);
+            });
+            Assert.Equal("source", ex.ParamName);
+        }
+
+        [Fact]
+        public void TryConvertTypeNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                converters.TryConvert(new object(), null, out var _);
+            });
+            Assert.Equal("target", ex.ParamName);
+        }
 
         [Fact]
         public void AddFindConverter()

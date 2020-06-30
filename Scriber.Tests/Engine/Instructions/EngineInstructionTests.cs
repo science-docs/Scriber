@@ -40,10 +40,11 @@ namespace Scriber.Tests.Engine.Instructions
         [Fact]
         public void NullElementException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 EngineInstruction.Create(null);
             });
+            Assert.Equal("element", ex.ParamName);
         }
 
         [Fact]
@@ -51,10 +52,11 @@ namespace Scriber.Tests.Engine.Instructions
         {
             var element = new Element(null, (ElementType)999, 0, 0);
 
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
                 EngineInstruction.Create(element);
             });
+            Assert.Equal("element", ex.ParamName);
         }
     }
 }

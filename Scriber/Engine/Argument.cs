@@ -10,6 +10,12 @@ namespace Scriber.Engine
         public object? Value { get; }
         public Element Source { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="value"></param>
+        /// <exception cref="ArgumentNullException"/>
         public Argument(Element source, object? value)
         {
             Source = source ?? throw new ArgumentNullException(nameof(source));
@@ -23,6 +29,12 @@ namespace Scriber.Engine
             return list.ToArray();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
         public static bool IsArgumentType(Type type)
         {
             if (type is null)
@@ -33,6 +45,13 @@ namespace Scriber.Engine
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Argument<>);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="genericType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
         public static bool IsArgumentType(Type type, out Type genericType)
         {
             if (type is null)

@@ -260,7 +260,7 @@ namespace Scriber.Text
             set
             {
                 if (!Enum.IsDefined(typeof(ColorSpace), value))
-                    throw new ArgumentException(nameof(value));
+                    throw new ArgumentException("Specified color space is not a defined value.", nameof(value));
                 _cs = value;
             }
         }
@@ -680,7 +680,7 @@ namespace Scriber.Text
         static void CheckByte(int val, string name)
         {
             if (val < 0 || val > 0xFF)
-                throw new ArgumentException(name);
+                throw new ArgumentException(name, nameof(name));
         }
 
         private static string DuplicateTriples(string trip)
@@ -715,7 +715,7 @@ namespace Scriber.Text
             }
             else
             {
-                throw new ArgumentException(nameof(c));
+                throw new ArgumentException("Not a hex character", nameof(c));
             }
         }
 

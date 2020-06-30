@@ -354,41 +354,23 @@ namespace Scriber.Layout
         /// <summary>
         /// Converts an existing object from one unit into another unit type.
         /// </summary>
+        /// <exception cref="ArgumentException"/>
         public void ConvertType(UnitType type)
         {
             if (Type == type)
                 return;
 
-            switch (type)
+            (double value, UnitType type) tuple = type switch
             {
-                case UnitType.Point:
-                    Value = Point;
-                    Type = UnitType.Point;
-                    break;
-
-                case UnitType.Inch:
-                    Value = Inch;
-                    Type = UnitType.Inch;
-                    break;
-
-                case UnitType.Centimeter:
-                    Value = Centimeter;
-                    Type = UnitType.Centimeter;
-                    break;
-
-                case UnitType.Millimeter:
-                    Value = Millimeter;
-                    Type = UnitType.Millimeter;
-                    break;
-
-                case UnitType.Presentation:
-                    Value = Presentation;
-                    Type = UnitType.Presentation;
-                    break;
-
-                default:
-                    throw new ArgumentException("Unknown unit type: '" + type + "'");
-            }
+                UnitType.Point => (Point, UnitType.Point),
+                UnitType.Inch => (Inch, UnitType.Inch),
+                UnitType.Centimeter => (Centimeter, UnitType.Centimeter),
+                UnitType.Millimeter => (Millimeter, UnitType.Millimeter),
+                UnitType.Presentation => (Presentation, UnitType.Presentation),
+                _ => throw new ArgumentException($"Unknown unit type: '{type}'", nameof(type))
+            };
+            Value = tuple.value;
+            Type = tuple.type;
         }
 
         public bool Equals([AllowNull] Unit other)
