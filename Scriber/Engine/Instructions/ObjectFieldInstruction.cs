@@ -10,11 +10,12 @@ namespace Scriber.Engine.Instructions
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="element"></param>
+        /// <param name="origin"></param>
+        /// <exception cref="ArgumentException"/>
         /// <exception cref="ArgumentNullException"/>
-        public ObjectFieldInstruction(Element element) : base(element)
+        public ObjectFieldInstruction(Element origin) : base(origin)
         {
-            Key = element.Content ?? throw new ArgumentNullException($"{nameof(element)}.{nameof(element.Content)}");
+            Key = origin.Content ?? throw new ArgumentException("Element content should not be null", nameof(origin));
         }
 
         /// <summary>
@@ -23,6 +24,7 @@ namespace Scriber.Engine.Instructions
         /// <param name="state"></param>
         /// <param name="arguments"></param>
         /// <returns></returns>
+        /// <exception cref="ArgumentException"/>
         /// <exception cref="ArgumentNullException"/>
         public override object? Execute(CompilerState state, Argument[] arguments)
         {
@@ -34,6 +36,11 @@ namespace Scriber.Engine.Instructions
             if (arguments.Length != 1)
             {
                 throw new ArgumentException("An object field can only hold one argument.", nameof(arguments));
+            }
+
+            if (arguments[0] == null)
+            {
+                throw new ArgumentException("Null arguments are not allowed", nameof(arguments));
             }
 
             return new ObjectField(Origin, Key, arguments[0]);

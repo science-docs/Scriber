@@ -18,6 +18,7 @@ namespace Scriber.Engine.Commands
         [Command("IncludeGraphics")]
         public static AbstractElement IncludeGraphics(CompilerState state, string imagePath, IncludeImageOptions? options = null)
         {
+            // TODO: fetch online files if path starts with "http"
             var imagePathInfo = state.FileSystem.TryFindFile(imagePath, "png", "jpg", "gif", "bmp");
             
             if (imagePathInfo != null && (options == null || !options.Draft))

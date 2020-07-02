@@ -1,9 +1,8 @@
-﻿using Scriber.Engine.Instructions;
-using Scriber.Language;
+﻿using Scriber.Language;
 using System;
 using Xunit;
 
-namespace Scriber.Tests.Engine.Instructions
+namespace Scriber.Engine.Instructions.Tests
 {
     public class EngineInstructionTests
     {
