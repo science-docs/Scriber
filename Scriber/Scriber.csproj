@@ -161,6 +161,8 @@
     <None Remove="Resources\Locales\locales-vi-VN.xml" />
     <None Remove="Resources\Locales\locales-zh-CN.xml" />
     <None Remove="Resources\Locales\locales-zh-TW.xml" />
+    <None Remove="Resources\Messages\exceptions.properties" />
+    <None Remove="Resources\Messages\logging.properties" />
   </ItemGroup>
 
   <ItemGroup>
@@ -319,6 +321,8 @@
     <EmbeddedResource Include="Resources\Locales\locales-vi-VN.xml" />
     <EmbeddedResource Include="Resources\Locales\locales-zh-CN.xml" />
     <EmbeddedResource Include="Resources\Locales\locales-zh-TW.xml" />
+    <EmbeddedResource Include="Resources\Messages\exceptions.properties" />
+    <EmbeddedResource Include="Resources\Messages\logging.properties" />
   </ItemGroup>
 
   <ItemGroup>

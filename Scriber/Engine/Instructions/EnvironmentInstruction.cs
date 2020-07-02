@@ -1,5 +1,5 @@
 ﻿using Scriber.Language;
-using Scriber.Util;
+using Scriber.Logging;
 using System;
 
 namespace Scriber.Engine.Instructions
@@ -41,14 +41,14 @@ namespace Scriber.Engine.Instructions
 
             if (args.Length == 0)
             {
-                throw new ArgumentException("An environment needs to contain at least one child block.", nameof(args));
+                throw new ArgumentException(SR.Get(SRID.EnvironmentNeedsChildren), nameof(args));
             }
 
             var env = state.Environments.Find(Name);
 
             if (env == null)
             {
-                throw new CompilerException(Origin, $"No environment found with name '{Name}'.");
+                throw new CompilerException(Origin, SR.Get(SRID.EnvironmentNotFound, Name));
             }
 
             var envArgs = args[0..^1];

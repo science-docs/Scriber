@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Logging;
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
@@ -116,9 +117,9 @@ namespace Scriber.Engine
                     {
                         args[i] = transformed ?? throw new CompilerException(argument.Source, "Transformed element cannot be null.");
 
-                        if (arg.GetType() != transformed.GetType())
+                        if (!transformed.GetType().IsAssignableFrom(argument.Value.GetType()))
                         {
-                            state.Context.Logger.Debug($"Transformed element of type '{argument.Value.GetType().FormattedName()}' to '{transformed.GetType().FormattedName()}'.");
+                            state.Context.Logger.Debug(SR.Get(SRID.TransformSuccess, argument.Value.GetType().FormattedName(), transformed.GetType().FormattedName()));
                         }
                     }
                 }

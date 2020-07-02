@@ -21,6 +21,26 @@ namespace Scriber.Engine.Instructions.Tests
         }
 
         [Fact]
+        public void StateNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                Block.Execute(null, Array.Empty<Argument>());
+            });
+            Assert.Equal("state", ex.ParamName);
+        }
+
+        [Fact]
+        public void ArgumentsNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                Block.Execute(CS, null);
+            });
+            Assert.Equal("arguments", ex.ParamName);
+        }
+
+        [Fact]
         public void GroupedLeafBlock()
         {
             var firstLeaf = new TextLeaf("first");
