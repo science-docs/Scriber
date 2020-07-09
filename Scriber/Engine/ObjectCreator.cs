@@ -257,6 +257,19 @@ namespace Scriber.Engine
                 value = subCreator.Create(info);
             }
 
+            if (value is ObjectArray objectArray)
+            {
+                var elementType = type.GetElementType();
+                if (type.IsArray && elementType != null)
+                {
+                    value = objectArray.Get(elementType);
+                }
+                else
+                {
+                    throw new CompilerException();
+                }
+            }
+
             if (value != null && !type.IsAssignableFrom(value.GetType()))
             {
                 CompilerState.Converters.TryConvert(value, type, out value);
@@ -275,6 +288,11 @@ namespace Scriber.Engine
                 // We can assume that the returned value is a document variable.
                 // In every other case the Create call throws an exception.
                 inner = (subCreator.Create(typeof(DocumentVariable), null) as DocumentVariable)!;
+            }
+            else if (value is ObjectArray objectArray)
+            {
+                var array = objectArray.Get(typeof(object));
+                inner = new DocumentVariable(array);
             }
             else
             {

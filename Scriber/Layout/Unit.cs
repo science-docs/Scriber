@@ -28,6 +28,7 @@
 #endregion
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -70,10 +71,11 @@ namespace Scriber.Layout
         /// <summary>
         /// Initializes a new instance of the XUnit class.
         /// </summary>
+        /// <exception cref="InvalidEnumArgumentException"/>
         public Unit(double value, UnitType type)
         {
             if (!Enum.IsDefined(typeof(UnitType), type))
-                throw new System.ComponentModel.InvalidEnumArgumentException("type");
+                throw new InvalidEnumArgumentException(nameof(type), (int)type, typeof(UnitType));
             Value = value;
             Type = type;
         }
@@ -214,7 +216,7 @@ namespace Scriber.Layout
         /// Returns the object as string using the format information.
         /// The unit of measure is appended to the end of the string.
         /// </summary>
-        public string ToString(IFormatProvider formatProvider)
+        public string ToString(IFormatProvider? formatProvider)
         {
             string valuestring = Value.ToString(formatProvider) + GetSuffix();
             return valuestring;
@@ -224,7 +226,7 @@ namespace Scriber.Layout
         /// Returns the object as string using the specified format and format information.
         /// The unit of measure is appended to the end of the string.
         /// </summary>
-        string IFormattable.ToString(string? format, IFormatProvider? formatProvider)
+        public string ToString(string? format, IFormatProvider? formatProvider)
         {
             string valuestring = Value.ToString(format, formatProvider) + GetSuffix();
             return valuestring;
@@ -242,9 +244,14 @@ namespace Scriber.Layout
         /// <summary>
         /// Returns the unit of measure of the object as a string like 'pt', 'cm', or 'in'.
         /// </summary>
-        string GetSuffix()
+        private string GetSuffix()
         {
-            return Type switch
+            return GetSuffix(Type);
+        }
+
+        private static string GetSuffix(UnitType type)
+        {
+            return type switch
             {
                 UnitType.Point => "pt",
                 UnitType.Inch => "in",
@@ -367,7 +374,7 @@ namespace Scriber.Layout
                 UnitType.Centimeter => (Centimeter, UnitType.Centimeter),
                 UnitType.Millimeter => (Millimeter, UnitType.Millimeter),
                 UnitType.Presentation => (Presentation, UnitType.Presentation),
-                _ => throw new ArgumentException($"Unknown unit type: '{type}'", nameof(type))
+                _ => throw new InvalidEnumArgumentException(nameof(type), (int)type, typeof(UnitType))
             };
             Value = tuple.value;
             Type = tuple.type;
@@ -387,6 +394,83 @@ namespace Scriber.Layout
         /// Represents a unit with all values zero.
         /// </summary>
         public static readonly Unit Zero = new Unit();
+
+
+        public static bool TryParse(string value, out Unit unit)
+        {
+            // set default type as point
+            UnitType type;
+            unit = Zero;
+            string units = string.Empty;
+            string unitType = string.Empty;
+            int index = 0;
+
+            for (; index < value.Length; index++)
+            {
+                var c = value[index];
+                if (c == '.' || char.IsDigit(c))
+                {
+                    units += c;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (!double.TryParse(units, NumberStyles.Number, CultureInfo.InvariantCulture, out var unitValue))
+            {
+                return false;
+            }
+
+            for (; index < value.Length; index++)
+            {
+                if (!char.IsWhiteSpace(value[index]))
+                {
+                    break;
+                }
+            }
+
+            for (; index < value.Length; index++)
+            {
+                if (char.IsLetter(value[index]))
+                {
+                    unitType += value[index];
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            if (string.IsNullOrEmpty(unitType) || unitType == GetSuffix(UnitType.Point))
+            {
+                type = UnitType.Point;
+            }
+            else if (unitType == GetSuffix(UnitType.Presentation))
+            {
+                type = UnitType.Presentation;
+            }
+            else if (unitType == GetSuffix(UnitType.Millimeter))
+            {
+                type = UnitType.Millimeter;
+            }
+            else if (unitType == GetSuffix(UnitType.Centimeter))
+            {
+                type = UnitType.Centimeter;
+            }
+            else if (unitType == GetSuffix(UnitType.Inch))
+            {
+                type = UnitType.Inch;
+            }
+            else
+            {
+                return false;
+            }
+
+            unit = new Unit(unitValue, type);
+            return true;
+        }
 
         /// <summary>
         /// Gets the DebuggerDisplayAttribute text.

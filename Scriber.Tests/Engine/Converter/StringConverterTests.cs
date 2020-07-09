@@ -1,4 +1,5 @@
-﻿using Scriber.Text;
+﻿using Scriber.Layout;
+using Scriber.Text;
 using System;
 using Xunit;
 
@@ -63,6 +64,15 @@ namespace Scriber.Engine.Converter.Tests
 
             Assert.IsType<decimal>(converted);
             Assert.Equal(32.4m, converted);
+        }
+
+        [Fact]
+        public void StringToUnitSuccess()
+        {
+            var converted = converter.Convert("32.4cm", typeof(Unit));
+
+            Assert.IsType<Unit>(converted);
+            Assert.Equal(new Unit(32.4, UnitType.Centimeter), converted);
         }
 
         private const string TooLargeForLong = "92233720368547758070";

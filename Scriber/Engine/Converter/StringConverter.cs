@@ -96,6 +96,10 @@ namespace Scriber.Engine.Converter
                 {
                     return bool.Parse(value);
                 }
+                else if (targetType == typeof(Unit) && Unit.TryParse(value, out var unit))
+                {
+                    return unit;
+                }
             }
             
             throw new ConverterException(source.GetType(), targetType);
