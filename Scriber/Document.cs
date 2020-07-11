@@ -100,7 +100,7 @@ namespace Scriber
                 var elementSize = PageBoxSize;
                 elementSize.Height -= element.Margin.Height;
                 elementSize.Width -= element.Margin.Width;
-                Measurements.AddInternal(element.Measure(elementSize));
+                Measurements.Add(element.Measure(elementSize));
             }
 
             foreach (var element in PageItems)

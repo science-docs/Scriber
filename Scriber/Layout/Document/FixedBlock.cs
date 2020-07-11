@@ -32,9 +32,9 @@ namespace Scriber.Layout.Document
             Child.Parent = this;
         }
 
-        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
-            Child.OnRender(drawingContext, measurement);
+            Child.Render(drawingContext, measurement);
         }
 
         protected override AbstractElement CloneInternal()
@@ -50,16 +50,16 @@ namespace Scriber.Layout.Document
             Child.Interlude();
         }
 
-        protected override Measurements MeasureOverride(Size availableSize)
+        protected override Measurement MeasureOverride(Size availableSize)
         {
-            var measurements = Child.Measure(availableSize);
+            var measurement = Child.Measure(availableSize);
 
-            foreach (var measurement in measurements)
+            foreach (var sub in measurement.Subs)
             {
-                measurement.Position = new Position(10, 10);
+                sub.Position = new Position(10, 10);
             }
 
-            return measurements;
+            return measurement;
         }
     }
 }

@@ -1,27 +1,38 @@
 ﻿using PdfSharpCore.Drawing;
-using System;
 using Scriber.Layout;
 using Scriber.Text;
+using System;
 
 namespace Scriber.Drawing
 {
-    public class PdfDrawingContext : IDrawingContext
+    public class PdfDrawingContext : DrawingContext
     {
-        public XGraphics? Graphics { get; set; }
-        public Position Offset { get; set; }
-
-        private XGraphics G => Graphics ?? throw new InvalidOperationException("Cannot use pdf drawing context without setting the Graphics property");
-
-        public void DrawImage(Image image, Rectangle rectangle)
+        public XGraphics? Graphics
         {
-            G.DrawImage(XImage.FromStream(() => image.GetStream()), new XRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height));
+            get => graphics;
+            set
+            {
+                graphics = value;
+                graphics?.MultiplyTransform(XMatrix.Identity);
+                ClearTransform();
+            }
         }
 
-        public void DrawText(TextRun run, Color color)
+        private XGraphics G => Graphics ?? throw new InvalidOperationException("Cannot use pdf drawing context without setting the Graphics property");
+        private XGraphics? graphics;
+
+        public override void DrawImage(Image image, Rectangle rectangle)
+        {
+            var tr = rectangle.Transform(GetTransform());
+            G.DrawImage(XImage.FromStream(() => image.GetStream()), new XRect(tr.X, tr.Y, tr.Width, tr.Height));
+        }
+
+        public override void DrawText(TextRun run, Color color)
         {
             double yOffset = FontStyler.ScaleOffset(run.Typeface.Style, run.Typeface.Size);
             double size = FontStyler.ScaleSize(run.Typeface.Style, run.Typeface.Size);
-            G.DrawString(run.Text, ToXFont(run.Typeface.Font, size, run.Typeface.Weight), ToXBrush(color), new XPoint(Offset.X, Offset.Y + yOffset));
+            var transformedOffset = Offset.Transform(GetTransform());
+            G.DrawString(run.Text, ToXFont(run.Typeface.Font, size, run.Typeface.Weight), ToXBrush(color), new XPoint(transformedOffset.X, transformedOffset.Y + yOffset));
         }
 
         private XFont ToXFont(Font font, double size, FontWeight weight)
@@ -35,6 +46,11 @@ namespace Scriber.Drawing
         private XBrush ToXBrush(Color color)
         {
             return new XSolidBrush(XColor.FromArgb(color.Argb));
+        }
+
+        public override void AddLink(Rectangle rectangle, int targetPage)
+        {
+            //Graphics.PdfPage.AddDocumentLink(new PdfSharpCore.Pdf.PdfRectangle())
         }
     }
 }

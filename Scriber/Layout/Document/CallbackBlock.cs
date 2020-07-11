@@ -19,12 +19,12 @@ namespace Scriber.Layout.Document
             return new CallbackBlock(Callback);
         }
 
-        protected override Measurements MeasureOverride(Size availableSize)
+        protected override Measurement MeasureOverride(Size availableSize)
         {
             throw new NotImplementedException();
         }
 
-        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             throw new NotImplementedException();
         }

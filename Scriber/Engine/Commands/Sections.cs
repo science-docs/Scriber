@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using Scriber.Layout;
 using Scriber.Layout.Document;
 
 namespace Scriber.Engine.Commands
@@ -19,19 +21,34 @@ namespace Scriber.Engine.Commands
             Level1, Level2, Level3
         };
 
+        [Command("TableOfContent")]
+        public static CallbackBlock TableOfContent(CompilerState state)
+        {
+            return new CallbackBlock(() =>
+            {
+                var vars = state.Document.Variables;
+                var entries = GetEntryTable(vars);
+
+                var region = new StackPanel() { Orientation = Orientation.Vertical };
+
+                foreach (var entry in entries)
+                {
+                    region.Elements.Add(new TableElement(entry.Preamble, entry.Level, entry.Content, entry.Reference));
+                }
+
+                return region;
+            });
+        }
+
         [Command("Section")]
         public static Paragraph Section(CompilerState state, Paragraph content)
         {
             const int level = 1;
 
             var vars = state.Document.Variables;
+            content.FontSize = 18;
             var pretext = CreatePretext(vars, level);
-            var entry = new TableEntry
-            {
-                Content = content,
-                Preamble = pretext,
-                Page = new PageReference(content)
-            };
+            var entry = new TableEntry(pretext, level, content.Clone(), content);
             GetEntryTable(vars).Add(entry);
             ResetNumbering(vars, level);
             var text = new TextLeaf
@@ -47,7 +64,7 @@ namespace Scriber.Engine.Commands
         public static Paragraph SectionStar(CompilerState state, Paragraph content)
         {
             content.FontSize = 18;
-            content.Margin = new Layout.Thickness(12, 0);
+            content.Margin = new Thickness(12, 0);
             return content;
         }
 
@@ -97,8 +114,19 @@ namespace Scriber.Engine.Commands
 
     public class TableEntry
     {
-        public string Preamble { get; set; }
-        public Paragraph Content { get; set; }
-        public PageReference Page { get; set; }
+        public string? Preamble { get; }
+        public int Level { get; }
+        public Paragraph Reference { get; }
+        public Paragraph Content { get; }
+        public PageReference Page { get; }
+
+        public TableEntry(string? preamble, int level, Paragraph content, Paragraph reference)
+        {
+            Content = content;
+            Level = level;
+            Preamble = preamble;
+            Reference = reference ?? throw new ArgumentNullException(nameof(reference));
+            Page = new PageReference(reference);
+        }
     }
 }

@@ -14,14 +14,14 @@ namespace Scriber.Layout.Document
             return new Pagebreak();
         }
 
-        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
         }
 
-        protected override Measurements MeasureOverride(Size availableSize)
+        protected override Measurement MeasureOverride(Size availableSize)
         {
             // forces a pagebreak by setting infinity as the height
-            return Measurements.Singleton(new Measurement(this, new Size(availableSize.Width, double.PositiveInfinity), Thickness.Zero));
+            return new Measurement(this, new Size(availableSize.Width, double.PositiveInfinity), Thickness.Zero);
         }
     }
 }

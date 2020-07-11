@@ -11,14 +11,14 @@ namespace Scriber.Layout.Document
 
         public abstract void Manipulate(Scriber.Document document);
 
-        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
 
         }
 
-        protected override Measurements MeasureOverride(Size availableSize)
+        protected override Measurement MeasureOverride(Size availableSize)
         {
-            return Measurements.EmptySingleton(this);
+            return new Measurement(this);
         }
 
         protected override void ArrangeOverride(Measurement finalMeasurement)

@@ -16,6 +16,7 @@ namespace Scriber
             boxSize.Width -= margin.Width;
 
             var startOffset = new Position(margin.Left, margin.Top);
+            var extraStartOffset = new Position(margin.Left, pageSize.Height - margin.Bottom);
             var contentArea = new Rectangle(startOffset, boxSize);
 
             var curPage = AddPage(document, pageSize, contentArea);
@@ -23,22 +24,25 @@ namespace Scriber
 
             var flexQueue = new FlexQueue<Measurement>(); //new Queue<Measurement>();
             var enqueueNext = false;
+            var measurements = new List<Measurement>(document.Measurements);
 
             // Stage one:
             // Add measurements to pages
-            foreach (var measurement in document.Measurements)
+            for (int i = 0; i < measurements.Count; i++)
             {
+                var measurement = measurements[i];
+
                 if (enqueueNext)
                 {
                     flexQueue.Enqueue(measurement, measurement.Flexible);
-                    enqueueNext = measurement.PagebreakPenalty > 0;
+                    //enqueueNext = measurement.PagebreakPenalty > 0;
                 }
-                else if (measurement.PagebreakPenalty > 0)
-                {
-                    flexQueue.Enqueue(measurement.Flexible);
-                    flexQueue.Enqueue(measurement, measurement.Flexible);
-                    enqueueNext = true;
-                }
+                //else if (measurement.PagebreakPenalty > 0)
+                //{
+                //    flexQueue.Enqueue(measurement.Flexible);
+                //    flexQueue.Enqueue(measurement, measurement.Flexible);
+                //    enqueueNext = true;
+                //}
                 else
                 {
                     while (flexQueue.Count > 0)
@@ -66,13 +70,27 @@ namespace Scriber
 
                     if (TryFitMeasurement(curPage, measurement, flexQueue, false, ref curHeight) == FitResult.AddPage)
                     {
+                        var split = measurement.Element.Split(measurement, curHeight);
+
+                        if (split.IsSplit)
+                        {
+                            curPage.Measurements.Add(split.Measurement);
+                            if (split.Measurement.Element.Page == null)
+                            {
+                                split.Measurement.Element.Page = curPage;
+                            }
+                            measurements[i] = split.Measurement;
+                            if (split.Next != null)
+                            {
+                                measurements.Insert(i + 1, split.Next);
+                            }
+                        }
+
                         curHeight = boxSize.Height;
                         curPage.Filled = true;
                         curPage = AddPage(document, pageSize, contentArea);
                     }
                 }
-
-                
             }
 
             // Add leftover flexible items
@@ -97,7 +115,16 @@ namespace Scriber
             // Layout measurements on each page
             foreach (var page in document.Pages)
             {
+                var extras = new List<Measurement>();
                 var currentOffset = startOffset;
+                var extraHeight = 0.0;
+
+                foreach (var measurement in page.Measurements)
+                {
+                    var accumulated = measurement.AccumulatedExtra;
+                    extras.AddRange(accumulated.Subs);
+                    extraHeight += accumulated.TotalSize.Height;
+                }
 
                 foreach (var measurement in page.Measurements)
                 {
@@ -114,6 +141,25 @@ namespace Scriber
 
                     currentOffset.Y += size.Height;
                     currentOffset.Y += measurement.Margin.Bottom;
+                }
+
+                var extraOffset = new Position(extraStartOffset.X, extraStartOffset.Y - extraHeight);
+
+                foreach (var extra in extras)
+                {
+                    var size = extra.Size;
+
+                    extraOffset.Y += extra.Margin.Top;
+
+                    var visualOffset = extraOffset;
+                    visualOffset.X += extra.Margin.Left;
+
+                    extra.Position = visualOffset;
+                    Realign(extra, boxSize, pageSize, extra.Element.HorizontalAlignment);
+                    extra.Element.Arrange(extra);
+
+                    extraOffset.Y += size.Height;
+                    extraOffset.Y += extra.Margin.Bottom;
                 }
 
                 // Set number at the end of the page layouting
@@ -152,7 +198,7 @@ namespace Scriber
                 measurement.Element.Page = page;
             }
 
-            height -= size.Height;
+            height -= size.Height + measurement.Extra.TotalSize.Height;
             page.Measurements.Add(measurement);
 
             return FitResult.Continue;

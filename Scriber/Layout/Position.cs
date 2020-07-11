@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Scriber.Layout
 {
@@ -12,6 +13,14 @@ namespace Scriber.Layout
             X = x;
             Y = y;
         }
+
+        public Position Transform(Matrix3x2 matrix)
+        {
+            var vector = new Vector2((float)X, (float)Y);
+            vector = Vector2.Transform(vector, matrix);
+            return new Position(vector.X, vector.Y);
+        }
+
 
         public override bool Equals(object? obj)
         {
@@ -40,6 +49,26 @@ namespace Scriber.Layout
         public static bool operator !=(Position left, Position right)
         {
             return !(left == right);
+        }
+
+        public static Position operator +(Position left, Position right)
+        {
+            return new Position(left.X + right.X, left.Y + right.Y);
+        }
+
+        public static Position operator -(Position left, Position right)
+        {
+            return new Position(left.X - right.X, left.Y - right.Y);
+        }
+
+        public static Position operator +(Position left, Size right)
+        {
+            return new Position(left.X + right.Width, left.Y + right.Height);
+        }
+
+        public static Position operator -(Position left, Size right)
+        {
+            return new Position(left.X - right.Width, left.Y - right.Height);
         }
     }
 }

@@ -8,5 +8,8 @@ namespace Scriber.Drawing
         Position Offset { get; set; }
         void DrawText(TextRun run, Color color);
         void DrawImage(Image image, Rectangle rectangle);
+        void AddLink(Rectangle rectangle, int targetPage);
+        void PushTransform(Transform transform);
+        void PopTransform();
     }
 }

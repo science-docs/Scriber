@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Scriber.Drawing;
+﻿using Scriber.Drawing;
 using Scriber.Layout;
-using Scriber.Layout.Document;
 
 namespace Scriber
 {
@@ -32,7 +28,7 @@ namespace Scriber
                 clone.Page = this;
                 clone.Interlude();
                 var measures = clone.Measure(Size);
-                Measurements.AddInternal(measures);
+                Measurements.Add(measures);
             }
         }
 
@@ -41,7 +37,12 @@ namespace Scriber
             foreach (var measurement in Measurements)
             {
                 drawingContext.Offset = measurement.Position;
-                measurement.Element.OnRender(drawingContext, measurement);
+                measurement.Element.Render(drawingContext, measurement);
+
+                foreach (var accumulatedSub in measurement.AccumulatedExtra.Subs)
+                {
+                    accumulatedSub.Element.Render(drawingContext, accumulatedSub);
+                }
             }
         }
     }

@@ -14,23 +14,21 @@ namespace Scriber.Layout
 
         public Measurement this[int index] => measurements[index];
 
-        private int count = 0;
-
         public void Add(Measurement item)
         {
             if (!IsReadOnly)
             {
-                if (item.Index < 0)
-                {
-                    item.Index = count++;
-                }
                 measurements.Add(item);
             }
         }
 
+        public void AddRange(IEnumerable<Measurement> measurements)
+        {
+            this.measurements.AddRange(measurements);
+        }
+
         public void Clear()
         {
-            count = 0;
             measurements.Clear();
         }
 

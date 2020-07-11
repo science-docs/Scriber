@@ -12,6 +12,7 @@ namespace Scriber.Engine.Environments
             var section = new Region
             {
                 Flexible = true,
+                Glue = true,
                 Margin = new Layout.Thickness(12, 0)
             };
 
