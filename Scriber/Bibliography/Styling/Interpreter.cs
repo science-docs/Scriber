@@ -97,23 +97,23 @@ namespace Scriber.Bibliography.Styling
             Run.Children.Add(nonEmptyRuns[^1]);
         }
 
-        public void Join(Citation citation, IFormatting? formatting, string? delimiter, params IEvaluated[] runs)
+        public void Join(IFormatting? formatting, string? delimiter, params IEvaluated[] runs)
         {
-            Join(citation, Create(delimiter, formatting), runs);
+            Join(Create(delimiter, formatting), runs);
         }
 
-        public void Join(Citation citation, params IEvaluated[] runs)
+        public void Join(params IEvaluated[] runs)
         {
-            Join(citation, null, runs);
+            Join(null, runs);
         }
 
-        public void Join(Citation citation, Run? delimiter, params IEvaluated[] runs)
+        public void Join(Run? delimiter, params IEvaluated[] runs)
         {
             bool anyAdded = false;
             for (int i = 0; i < runs.Length; i++)
             {
                 var count = Run.Children.Count;
-                runs[i].Evaluate(this, citation);
+                runs[i].Evaluate(this);
                 if (delimiter != null && count < Run.Children.Count)
                 {
                     if (anyAdded)

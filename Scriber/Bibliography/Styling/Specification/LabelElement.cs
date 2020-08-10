@@ -97,14 +97,14 @@ namespace Scriber.Bibliography.Styling.Specification
             set;
         }
 
-        public override void EvaluateOverride(Interpreter interpreter, Citation citation)
+        public override void EvaluateOverride(Interpreter interpreter)
         {
             if (Variable == null || !EnumUtility.TryParseEnum<TermName>(Variable, out var term))
             {
                 throw new Exception();
             }
 
-            var value = citation[Variable];
+            var value = interpreter.Variable(Variable);
 
             if (value is INumberVariable number)
             {
@@ -121,11 +121,11 @@ namespace Scriber.Bibliography.Styling.Specification
             }
         }
 
-        public override bool HasVariableDefined(Interpreter interpreter, Citation citation)
+        public override bool HasVariableDefined(Interpreter interpreter)
         {
             if (Variable != null)
             {
-                return citation[Variable] != null;
+                return interpreter.Variable(Variable) != null;
             }
             return false;
         }

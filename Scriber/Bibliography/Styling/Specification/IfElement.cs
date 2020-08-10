@@ -107,44 +107,44 @@ namespace Scriber.Bibliography.Styling.Specification
             set;
         }
 
-        public bool Matches(Citation citation)
+        public bool Matches(Interpreter interpreter)
         {
             List<bool> results = new List<bool>();
 
-            var variableMatch = Matches(citation, Variable, (cit, split) => cit[split] != null);
+            var variableMatch = Matches(interpreter, Variable, (cit, split) => cit.Variable(split) != null);
             if (variableMatch != null)
                 return variableMatch.Value;
 
-            var numericMatch = Matches(citation, IsNumeric, (cit, split) => cit[split] is INumberVariable);
+            var numericMatch = Matches(interpreter, IsNumeric, (cit, split) => cit.Variable(split) is INumberVariable);
             if (numericMatch != null)
                 return numericMatch.Value;
 
-            var typeMatch = Matches(citation, Type, (cit, split) => cit["type"] is ITextVariable text && text.Value == split);
+            var typeMatch = Matches(interpreter, Type, (cit, split) => cit.Variable("type") is ITextVariable text && text.Value == split);
             if (typeMatch != null)
                 return typeMatch.Value;
 
-            var uncertainDateMatch = Matches(citation, IsUncertainDate, (cit, split) => cit[split] is IDateVariable date && date.IsApproximate);
+            var uncertainDateMatch = Matches(interpreter, IsUncertainDate, (cit, split) => cit.Variable(split) is IDateVariable date && date.IsApproximate);
             if (uncertainDateMatch != null)
                 return uncertainDateMatch.Value;
 
-            var locatorMatch = Matches(citation, Locator, (cit, split) => cit["locator"] is ITextVariable text && text.Value == split);
+            var locatorMatch = Matches(interpreter, Locator, (cit, split) => cit.Variable("locator") is ITextVariable text && text.Value == split);
             if (locatorMatch != null)
                 return locatorMatch.Value;
 
-            var positionMatch = Matches(citation, Position, (cit, split) => throw new NotImplementedException());
+            var positionMatch = Matches(interpreter, Position, (cit, split) => throw new NotImplementedException());
             if (positionMatch != null)
                 return positionMatch.Value;
 
             return false;
         }
 
-        private bool? Matches(Citation citation, string? value, Func<Citation, string, bool> func)
+        private bool? Matches(Interpreter interpreter, string? value, Func<Interpreter, string, bool> func)
         {
             if (value != null)
             {
                 foreach (var split in value.ToLowerInvariant().Split(' '))
                 {
-                    var result = func(citation, split);
+                    var result = func(interpreter, split);
 
                     if (Match == Match.All)
                     {

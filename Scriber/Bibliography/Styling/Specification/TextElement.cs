@@ -174,7 +174,7 @@ namespace Scriber.Bibliography.Styling.Specification
             set;
         }
 
-        public override void EvaluateOverride(Interpreter interpreter, Citation citation)
+        public override void EvaluateOverride(Interpreter interpreter)
         {
             var count = Utility.Count(!string.IsNullOrEmpty(Variable), Value != null, Macro != null, TermSpecified);
 
@@ -194,7 +194,7 @@ namespace Scriber.Bibliography.Styling.Specification
             }
             else if (!string.IsNullOrEmpty(Variable))
             {
-                var variable = citation[Variable];
+                var variable = interpreter.Variable(Variable);
                 if (variable != null)
                 {
                     interpreter.Push(variable.ToString(), this);
@@ -215,7 +215,7 @@ namespace Scriber.Bibliography.Styling.Specification
                     throw new Exception($"Could not find macro with name '{Macro}'");
                 }
 
-                macro.Evaluate(interpreter, citation);
+                macro.Evaluate(interpreter);
             }
             else if (TermSpecified)
             {
@@ -233,9 +233,9 @@ namespace Scriber.Bibliography.Styling.Specification
             }
         }
 
-        public override bool HasVariableDefined(Interpreter interpreter, Citation citation)
+        public override bool HasVariableDefined(Interpreter interpreter)
         {
-            if (Variable != null && citation[Variable] is ITextVariable)
+            if (Variable != null && interpreter.Variable(Variable) is ITextVariable)
             {
                 return true;
             }
@@ -246,7 +246,7 @@ namespace Scriber.Bibliography.Styling.Specification
 
                 if (macro != null)
                 {
-                    return macro.HasVariableDefined(interpreter, citation);
+                    return macro.HasVariableDefined(interpreter);
                 }
             }
 

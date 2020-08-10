@@ -39,19 +39,19 @@ namespace Scriber.Bibliography.Styling.Specification
             set;
         } = new List<RenderingElement>();
 
-        public void Evaluate(Interpreter interpreter, Citation citation)
+        public void Evaluate(Interpreter interpreter)
         {
             if (Children != null)
             {
-                interpreter.Join(citation, Children.ToArray());
+                interpreter.Join(Children.ToArray());
             }
         }
 
-        public bool HasVariableDefined(Interpreter interpreter, Citation citation)
+        public bool HasVariableDefined(Interpreter interpreter)
         {
             if (Children != null)
             {
-                return Children.Any(e => e.HasVariableDefined(interpreter, citation));
+                return Children.Any(e => e.HasVariableDefined(interpreter));
             }
             return false;
         }

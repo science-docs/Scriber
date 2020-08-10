@@ -180,12 +180,12 @@ namespace Scriber.Bibliography.Styling.Specification
             set;
         }
 
-        public override void EvaluateOverride(Interpreter interpreter, Citation citation)
+        public override void EvaluateOverride(Interpreter interpreter)
         {
             throw new System.NotSupportedException();
         }
 
-        public override bool HasVariableDefined(Interpreter interpreter, Citation citation)
+        public override bool HasVariableDefined(Interpreter interpreter)
         {
             return false;
         }
