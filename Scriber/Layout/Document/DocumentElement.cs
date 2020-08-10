@@ -68,7 +68,10 @@ namespace Scriber.Layout.Document
 
         public void Render(IDrawingContext drawingContext, Measurement measurement)
         {
-            drawingContext.PushTransform(new TranslateTransform(measurement.Position));
+            var pos = measurement.Position;
+            pos.X += measurement.Margin.Left;
+            pos.Y += measurement.Margin.Top;
+            drawingContext.PushTransform(new TranslateTransform(pos));
 
             if (Transform != null)
             {

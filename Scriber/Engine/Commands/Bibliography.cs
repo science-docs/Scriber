@@ -93,7 +93,10 @@ namespace Scriber.Engine.Commands
             var list = new List<Paragraph>();
             foreach (var bibEntry in bibliography)
             {
-                var paragraph = new Paragraph();
+                var paragraph = new Paragraph
+                {
+                    Margin = new Layout.Thickness(4, 0)
+                };
 
                 var leaves = ToLeaves(bibEntry);
 

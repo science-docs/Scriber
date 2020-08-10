@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Scriber.Layout;
 using Scriber.Layout.Document;
 
 namespace Scriber.Engine.Environments
@@ -9,11 +10,12 @@ namespace Scriber.Engine.Environments
         [Environment("Figure")]
         public static object Figure(CompilerState state, Argument[] content)
         {
-            var section = new Region
+            var section = new StackPanel
             {
+                Orientation = Orientation.Vertical,
                 Flexible = true,
                 Glue = true,
-                Margin = new Layout.Thickness(12, 0)
+                Margin = new Thickness(12, 0)
             };
 
             var elements = content.Select(e => e.Value).OfType<DocumentElement>().ToArray();

@@ -2,8 +2,8 @@
 {
     public enum VerticalAlignment
     {
-        Center = 0,
         Top,
+        Center,
         Bottom
     }
 }

@@ -40,13 +40,10 @@ namespace Scriber.Engine.Commands
             });
         }
 
-        [Command("Section")]
-        public static Paragraph Section(CompilerState state, Paragraph content)
+        [Command("Header")]
+        public static Paragraph Header(CompilerState state, int level, Paragraph content)
         {
-            const int level = 1;
-
             var vars = state.Document.Variables;
-            content.FontSize = 18;
             var pretext = CreatePretext(vars, level);
             var entry = new TableEntry(pretext, level, content.Clone(), content);
             GetEntryTable(vars).Add(entry);
@@ -57,15 +54,45 @@ namespace Scriber.Engine.Commands
             };
             content.Leaves.Insert(0, text);
 
-            return SectionStar(state, content);
+            return HeaderStar(level, content);
+        }
+
+        [Command("Header*")]
+        public static Paragraph HeaderStar(int level, Paragraph content)
+        {
+            content.FontSize = level switch
+            {
+                1 => 18,
+                2 => 16,
+                3 => 14,
+                _ => 12
+            };
+            content.Margin = new Thickness(14 - level * 2, 0);
+            return content;
+        }
+
+        [Command("Section")]
+        public static Paragraph Section(CompilerState state, Paragraph content)
+        {
+            return Header(state, 1, content);
         }
 
         [Command("Section*")]
-        public static Paragraph SectionStar(CompilerState state, Paragraph content)
+        public static Paragraph SectionStar(Paragraph content)
         {
-            content.FontSize = 18;
-            content.Margin = new Thickness(12, 0);
-            return content;
+            return HeaderStar(1, content);
+        }
+
+        [Command("Subsection")]
+        public static Paragraph Subsection(CompilerState state, Paragraph content)
+        {
+            return Header(state, 2, content);
+        }
+
+        [Command("Subsection*")]
+        public static Paragraph SubsectionStar(Paragraph content)
+        {
+            return HeaderStar(2, content);
         }
 
         private static string CreatePretext(DocumentVariable variables, int level)
@@ -80,7 +107,7 @@ namespace Scriber.Engine.Commands
 
             for (int i = 0; i < level; i++)
             {
-                sb.Append(variables[levelString][Number].GetValue<int>());
+                sb.Append(variables[Levels[i]][Number].GetValue<int>());
                 if (i < level - 1)
                 {
                     sb.Append(".");
