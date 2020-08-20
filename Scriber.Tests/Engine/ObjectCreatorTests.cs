@@ -9,7 +9,8 @@ namespace Scriber.Engine.Tests
 {
     public class ObjectCreatorTests
     {
-        private ObjectCreator Default => new ObjectCreator(E, CompilerStateFixtures.ReflectionLoaded());
+        private readonly CompilerState state = CompilerStateFixtures.ReflectionLoaded();
+        private ObjectCreator Default => new ObjectCreator(E, state);
         private ParameterInfo SimpleParameter => typeof(SimpleObject).GetMethod("SimpleMethod").GetParameters()[0];
         private ParameterInfo OverrideParameter => typeof(SimpleObject).GetMethod("OverrideMethod").GetParameters()[0];
         private Element E => ElementFixtures.EmptyElement();
@@ -85,20 +86,47 @@ namespace Scriber.Engine.Tests
         }
 
         [Fact]
-        public void CreateDocumentVariables()
+        public void CreateDynamicObject()
         {
             var creator = Default;
             var nested = Default;
             creator.Fields.Add(new ObjectField(E, "nested", new Argument(E, nested)));
             nested.Fields.Add(new ObjectField(E, "key", new Argument(E, "value")));
 
-            var top = creator.Create(typeof(DocumentVariable), null) as DocumentVariable;
+            dynamic top = creator.Create(typeof(object), null);
             Assert.NotNull(top);
-            var nestedVariables = top["nested"];
+            var nestedVariables = top.nested;
             Assert.NotNull(nestedVariables);
-            var value = nestedVariables["key"];
-            Assert.Equal("value", value.GetValue<string>());
+            var value = nestedVariables.key;
+            Assert.IsType<string>(value);
+            Assert.Equal("value", value);
         }
+
+        [Fact]
+        public void CreateDynamicObjectArray()
+        {
+            var arrayObject = Default;
+            arrayObject.Fields.Add(new ObjectField(E, "key", new Argument(E, "value")));
+            var array = new ObjectArray(E, state, new Argument[] {
+                new Argument(E, "a"),
+                new Argument(E, arrayObject)
+            });
+            var creator = Default;
+            creator.Fields.Add(new ObjectField(E, "array", new Argument(E, array)));
+
+            dynamic top = creator.Create(typeof(object), null);
+            Assert.NotNull(top);
+            var arr = top.array;
+            Assert.NotNull(arr);
+            var value = arr[0];
+            Assert.IsType<string>(value);
+            Assert.Equal("a", value);
+            var arrayEntry = arr[1];
+            var entryValue = arrayEntry.key;
+            Assert.IsType<string>(entryValue);
+            Assert.Equal("value", entryValue);
+        }
+
 
         [Fact]
         public void CreateWithOverrideParameterInfo()

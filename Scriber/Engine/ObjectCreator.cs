@@ -2,6 +2,7 @@
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 
@@ -78,7 +79,7 @@ namespace Scriber.Engine
 
             var obj = CreateEmpty(defaultType, overrides);
 
-            if (obj is DocumentVariable vars)
+            if (obj is DynamicDictionary vars)
             {
                 foreach (var field in Fields)
                 {
@@ -131,6 +132,11 @@ namespace Scriber.Engine
             else
             {
                 objType = defaultType;
+            }
+
+            if (objType == typeof(object) || objType == typeof(DynamicObject))
+            {
+                objType = typeof(DynamicDictionary);
             }
 
             if (Argument.IsArgumentType(objType, out var genericType))
@@ -278,28 +284,22 @@ namespace Scriber.Engine
             info.SetValue(obj, value);
         }
 
-        private static void FillField(DocumentVariable vars, ObjectField field)
+        private static void FillField(DynamicDictionary vars, ObjectField field)
         {
             var value = field.Argument.Value;
-            DocumentVariable inner;
 
             if (value is ObjectCreator subCreator)
             {
                 // We can assume that the returned value is a document variable.
                 // In every other case the Create call throws an exception.
-                inner = (subCreator.Create(typeof(DocumentVariable), null) as DocumentVariable)!;
+                value = (subCreator.Create(typeof(DynamicDictionary), null) as DynamicObject)!;
             }
             else if (value is ObjectArray objectArray)
             {
-                var array = objectArray.Get(typeof(object));
-                inner = new DocumentVariable(array);
-            }
-            else
-            {
-                inner = new DocumentVariable(value);
+                value = objectArray.Get(typeof(object));
             }
 
-            vars[field.Key] = inner;
+            vars.SetMember(field.Key, value);
         }
     }
 }
