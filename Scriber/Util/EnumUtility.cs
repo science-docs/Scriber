@@ -42,8 +42,8 @@ namespace Scriber.Util
 
                 foreach (TTarget value in values.Cast<TTarget>())
                 {
-                    var stringValue = value.ToString()!.ToLowerInvariant();
-                    Dict[stringValue] = value;
+                    var stringValue = value.ToString()!;
+                    Dict[stringValue.ToLowerInvariant()] = value;
                     DictBack[value] = stringValue;
                 }
             }
@@ -62,7 +62,7 @@ namespace Scriber.Util
 
             public static TTarget? Convert(string value)
             {
-                if (Dict.TryGetValue(value, out var target))
+                if (Dict.TryGetValue(value.ToLowerInvariant(), out var target))
                 {
                     return target;
                 }

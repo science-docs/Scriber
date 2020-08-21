@@ -26,6 +26,7 @@ namespace Scriber.Engine.Tests
             Assert.NotNull(stack.Current);
             Assert.True(stack.IsRoot);
             Assert.Equal(1, stack.Count);
+            Assert.Equal(stack.Root, stack.Current);
         }
 
         [Fact]
@@ -36,6 +37,7 @@ namespace Scriber.Engine.Tests
             stack.Push();
             Assert.Equal(2, stack.Count);
             Assert.NotEqual(last, stack.Current);
+            Assert.NotEqual(stack.Root, stack.Current);
             Assert.False(stack.IsRoot);
         }
 

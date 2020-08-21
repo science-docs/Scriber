@@ -6,14 +6,15 @@ namespace Scriber.Engine
     public class BlockStack
     {
         public Block Current => stack.Peek();
+        public Block Root { get; }
         public int Count => stack.Count;
-        public bool IsRoot => Count == 1;
-
+        public bool IsRoot => Current == Root;
+        
         private readonly Stack<Block> stack = new Stack<Block>();
 
         public BlockStack()
         {
-            Push();
+            Root = Push();
         }
 
         public Block Push()
