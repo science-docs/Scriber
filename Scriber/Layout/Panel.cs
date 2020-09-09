@@ -8,7 +8,6 @@ namespace Scriber.Layout
     {
         public ElementCollection<DocumentElement> Elements { get; }
         public bool Flexible { get; set; }
-        public bool Glue { get; set; }
 
         protected Panel()
         {

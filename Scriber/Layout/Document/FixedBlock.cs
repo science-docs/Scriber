@@ -13,12 +13,12 @@ namespace Scriber.Layout.Document
         Center = 8,
         Right = 16,
 
-        TopLeft = 5,
-        BottomLeft = 6,
-        TopCenter = 9,
-        BottomCenter = 10,
-        TopRight = 17,
-        BottomRight = 18
+        TopLeft = Top | Left,
+        BottomLeft = Bottom | Left,
+        TopCenter = Top | Center,
+        BottomCenter = Bottom | Center,
+        TopRight = Top | Right,
+        BottomRight = Bottom | Right
     }
 
     public class FixedBlock : DocumentElement
@@ -34,7 +34,10 @@ namespace Scriber.Layout.Document
 
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
-            Child.Render(drawingContext, measurement);
+            foreach (var sub in measurement.Subs)
+            {
+                Child.Render(drawingContext, sub);
+            }
         }
 
         protected override AbstractElement CloneInternal()
@@ -52,14 +55,41 @@ namespace Scriber.Layout.Document
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            var measurement = Child.Measure(availableSize);
+            var measurement = new Measurement(this);
+            var childMeasurement = Child.Measure(availableSize);
+            measurement.Subs.Add(childMeasurement);
+            measurement.Position = CalculatePosition(childMeasurement.Size, availableSize);
+            return measurement;
+        }
 
-            foreach (var sub in measurement.Subs)
+        private Position CalculatePosition(Size childSize, Size availableSize)
+        {
+            double x = 0;
+            double y = 0;
+
+            if (Position.HasFlag(FixedPosition.Top))
             {
-                sub.Position = new Position(10, 10);
+                y = 0;
+            }
+            else if (Position.HasFlag(FixedPosition.Bottom))
+            {
+                y = availableSize.Height - childSize.Height;
             }
 
-            return measurement;
+            if (Position.HasFlag(FixedPosition.Left))
+            {
+                x = 0;
+            }
+            else if (Position.HasFlag(FixedPosition.Center))
+            {
+                x = (availableSize.Width - childSize.Width) / 2;
+            }
+            else if (Position.HasFlag(FixedPosition.Right))
+            {
+                x = availableSize.Width - childSize.Width;
+            }
+
+            return new Position(x, y);
         }
     }
 }

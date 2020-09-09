@@ -4,6 +4,16 @@ using System.Runtime.CompilerServices;
 
 namespace Scriber
 {
+    public static class DocumentLocal
+    {
+        public static int Increment(this DocumentLocal<int> local, Document document)
+        {
+            var value = local[document];
+            local[document] = ++value;
+            return value;
+        }
+    }
+
     public class DocumentLocal<T>
     {
         private readonly ConditionalWeakTable<Document, ObjectBox<T>> table = new ConditionalWeakTable<Document, ObjectBox<T>>();

@@ -10,13 +10,13 @@ using Scriber.Layout.Document;
 using Scriber.Logging;
 using Scriber.Bibliography;
 using Scriber.Localization;
+using System.Diagnostics.CodeAnalysis;
+using Scriber.Variables;
 
 namespace Scriber
 {
     public class Document : AbstractElement
     {
-        public DocumentVariable Variables { get; } = new DocumentVariable();
-
         public List<DocumentPage> Pages { get; } = new List<DocumentPage>();
 
         public PageNumberingModule PageNumbering { get; } = new PageNumberingModule();
@@ -52,8 +52,12 @@ namespace Scriber
             FontSize = 11;
 
             Hyphenator = new Text.Hyphenator("en-us");
+        }
 
-            DocumentVariables.Setup(Variables);
+        [return: MaybeNull]
+        public T Variable<T>(DocumentLocal<T> local)
+        {
+            return local[this];
         }
 
         public void Run()
@@ -89,8 +93,8 @@ namespace Scriber
 
         public void Measure()
         {
-            PageSize = Variables["page"]["size"].GetValue<Size>();
-            PageMargin = Variables["page"]["margin"].GetValue<Thickness>();
+            PageSize = Variable(PageVariables.Size);
+            PageMargin = Variable(PageVariables.Margin);
 
             PageBoxSize = new Size(PageSize.Width - PageMargin.Width, PageSize.Height - PageMargin.Height);
 
@@ -117,13 +121,19 @@ namespace Scriber
         public byte[] ToPdf()
         {
             var doc = new PdfDocument();
-            var renderContext = new PdfDrawingContext();
+            var renderContext = new PdfDrawingContext
+            {
+                Document = doc
+            };
 
             foreach (var page in Pages)
             {
-                var pdfPage = doc.AddPage();
-                var graphics = XGraphics.FromPdfPage(pdfPage);
-                renderContext.Graphics = graphics;
+                if (page is MeasuredDocumentPage)
+                {
+                    var pdfPage = doc.AddPage();
+                    var graphics = XGraphics.FromPdfPage(pdfPage);
+                    renderContext.Graphics = graphics;
+                }
                 page.OnRender(renderContext);
             }
 

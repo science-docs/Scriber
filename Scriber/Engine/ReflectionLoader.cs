@@ -8,7 +8,7 @@ namespace Scriber.Engine
 {
     public class ReflectionLoader
     {
-        private readonly List<Assembly> assemblies = new List<Assembly>();
+        private readonly HashSet<Assembly> assemblies = new HashSet<Assembly>();
 
         public ReflectionLoader()
         {
@@ -27,7 +27,10 @@ namespace Scriber.Engine
         {
             lock (assemblies)
             {
-                assemblies.AddRange(additionalAssemblies);
+                foreach (var asm in additionalAssemblies)
+                {
+                    assemblies.Add(asm);
+                }
 
                 foreach (var asm in assemblies)
                 {
@@ -45,6 +48,11 @@ namespace Scriber.Engine
 
             foreach (var package in packages)
             {
+                InitializePackage(context, package);
+            }
+
+            foreach (var package in packages)
+            {
                 FindCommands(context, package);
                 FindEnvironments(context, package);
             }
@@ -56,6 +64,17 @@ namespace Scriber.Engine
                 FindConverter(context, converter);
             }
             context.Converters.ResolvePaths();
+        }
+
+        private void InitializePackage(Context context, Type type)
+        {
+            if (type.IsSubclassOf(typeof(IPackage)))
+            {
+                if (Activator.CreateInstance(type) is IPackage package)
+                {
+                    package.Initialize(context, this);
+                }
+            }
         }
 
         private bool IsPackage(Type type)

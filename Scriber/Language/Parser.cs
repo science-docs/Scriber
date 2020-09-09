@@ -186,9 +186,9 @@ namespace Scriber.Language
         private static Element ParseBracketOpen(ParserContext context, Token token, Element previous)
         {
             var commandParent = context.PeekParent(1);
-            if (commandParent.Type == ElementType.Command && previous.Type == ElementType.Block && previous.Children.Count == 0 || previous.Type == ElementType.ObjectCreation || commandParent.Type == ElementType.ObjectCreation)
+            if (commandParent.Type == ElementType.Command && previous.Type == ElementType.Block && previous.Children.Count == 0 || previous.Type == ElementType.ObjectCreation || commandParent.Type == ElementType.ObjectCreation || commandParent.Type == ElementType.ObjectField)
             {
-                if (commandParent.Type == ElementType.ObjectCreation)
+                if (commandParent.Type == ElementType.ObjectCreation || commandParent.Type == ElementType.ObjectField)
                 {
                     previous = context.Parents.Peek();
                 }

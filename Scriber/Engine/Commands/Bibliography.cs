@@ -17,16 +17,17 @@ namespace Scriber.Engine.Commands
         [Command("BibliographyStyle")]
         public static void SetBibliographyStyle(CompilerState state, Argument<string> style)
         {
-            var fileInfo = state.FileSystem.TryFindFile(style.Value, "csl");
-            if (fileInfo != null)
+            var uri = state.FileSystem.Path.ConvertToUri(style.Value);
+            try
             {
-                using var sourceStream = fileInfo.OpenRead();
+                var bytes = state.FileSystem.File.ReadAllBytes(uri);
+                using var sourceStream = new System.IO.MemoryStream(bytes);
                 var styleFile = File.Load<StyleFile>(sourceStream);
                 state.Document.Citations = new Citations(new Processor(styleFile, LocaleFile.Defaults), state.Document.Locale.File);
             }
-            else
+            catch (Exception ex)
             {
-                throw new CompilerException(style.Source, $"Could not find resource '{style.Value}'");
+                throw new CompilerException(style.Source, $"Could not find resource '{style.Value}'", ex);
             }
         }
 
@@ -38,20 +39,16 @@ namespace Scriber.Engine.Commands
                 return;
             }
 
-            var sourceInfo = state.FileSystem.TryFindFile(bibliographyPath.Value, "bib");
-
-            if (sourceInfo != null)
+            var uri = state.FileSystem.Path.ConvertToUri(bibliographyPath.Value);
+            try
             {
-                if (sourceInfo.Extension == ".bib")
-                {
-                    var text = state.FileSystem.File.ReadAllText(sourceInfo.FullName);
-                    var bibEntries = BibParser.Parse(text, out var _);
-                    state.Document.Citations.AddRange(bibEntries.Select(e => e.ToCitation()));
-                }
+                var text = state.FileSystem.File.ReadAllText(uri);
+                var bibEntries = BibParser.Parse(text, out var _);
+                state.Document.Citations.AddRange(bibEntries.Select(e => e.ToCitation()));
             }
-            else
+            catch (Exception ex)
             {
-                throw new CompilerException(bibliographyPath.Source, $"Could not find resource '{bibliographyPath.Value}'");
+                throw new CompilerException(bibliographyPath.Source, $"Could not find resource '{bibliographyPath.Value}'", ex);
             }
         }
 

@@ -45,7 +45,8 @@ namespace Scriber.Layout
                 }
                 
             }
-            
+
+            measurement.Flexible = Flexible;
             return measurement;
         }
 
@@ -88,8 +89,7 @@ namespace Scriber.Layout
             var panel = new StackPanel
             {
                 Orientation = Orientation,
-                Flexible = Flexible,
-                Glue = Glue
+                Flexible = Flexible
             };
             foreach (var child in Elements)
             {

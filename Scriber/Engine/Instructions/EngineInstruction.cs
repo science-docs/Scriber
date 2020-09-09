@@ -45,6 +45,8 @@ namespace Scriber.Engine.Instructions
                     return new ObjectFieldInstruction(element);
                 case ElementType.Null:
                     return new NullInstruction(element);
+                case ElementType.Comment:
+                    return null;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(element), $"Unknown element type '{element.Type}'.");
             }

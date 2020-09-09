@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Variables;
 
 namespace Scriber.Engine.Environments
 {
@@ -14,7 +15,6 @@ namespace Scriber.Engine.Environments
             {
                 Orientation = Orientation.Vertical,
                 Flexible = true,
-                Glue = true,
                 Margin = new Thickness(12, 0)
             };
 
@@ -26,23 +26,12 @@ namespace Scriber.Engine.Environments
             {
                 var text = new TextLeaf
                 {
-                    Content = "Figure " + NextCaptionCount(state, "figure") + ": "
+                    Content = "Figure " + FigureVariables.FigureCaptionCounter.Increment(state.Document) + ": "
                 };
                 caption.Leaves.Insert(0, text);
             }
 
             return section;
-        }
-
-        private static int NextCaptionCount(CompilerState state, string type)
-        {
-            var vars = state.Document.Variables;
-            var v = vars["captions"][type];
-
-            int value = v.GetValue<int>() + 1;
-            v.SetValue(value);
-
-            return value;
         }
     }
 }

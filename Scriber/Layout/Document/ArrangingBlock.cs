@@ -18,15 +18,12 @@ namespace Scriber.Layout.Document
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            return new Measurement(this);
-        }
-
-        protected override void ArrangeOverride(Measurement finalMeasurement)
-        {
             if (Document != null)
             {
                 Manipulate(Document);
             }
+
+            return new Measurement(this);
         }
     }
 }

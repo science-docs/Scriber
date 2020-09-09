@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Scriber.Drawing;
+using Scriber.Variables;
 
 namespace Scriber.Layout.Document
 {
@@ -61,7 +62,7 @@ namespace Scriber.Layout.Document
                         height = Math.Max(lineNodes[item.Index].Element?.DesiredSize.Height ?? 0, height);
                     }
 
-                    var stretch = doc.Variables[DocumentVariables.Length, DocumentVariables.BaselineStretch].GetValue<double>();
+                    var stretch = ParagraphVariables.BaselineStretch[doc];
 
                     if (!last)
                     {
@@ -132,7 +133,9 @@ namespace Scriber.Layout.Document
 
             foreach (var sub in source.Subs)
             {
-                if (sub.Position.Y + sub.Size.Height >= height)
+                var pos = sub.Position;
+                var size = sub.TotalSize + sub.AccumulatedExtra.TotalSize;
+                if (pos.Y + size.Height >= height)
                 {
                     if (carryOver == -1)
                     {
@@ -144,7 +147,6 @@ namespace Scriber.Layout.Document
                         next.Extra.Subs.AddRange(GetFootnotes(items));
                     }
 
-                    var pos = sub.Position;
                     pos.Y -= height;
                     pos.Y += carryOver;
                     sub.Position = pos;

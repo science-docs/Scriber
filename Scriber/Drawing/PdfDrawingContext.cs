@@ -1,4 +1,5 @@
 ﻿using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
 using Scriber.Layout;
 using Scriber.Text;
 using System;
@@ -7,6 +8,8 @@ namespace Scriber.Drawing
 {
     public class PdfDrawingContext : DrawingContext
     {
+        public PdfDocument? Document { get; set; }
+
         public XGraphics? Graphics
         {
             get => graphics;
@@ -50,7 +53,7 @@ namespace Scriber.Drawing
 
         public override void AddLink(Rectangle rectangle, int targetPage)
         {
-            //Graphics.PdfPage.AddDocumentLink(new PdfSharpCore.Pdf.PdfRectangle())
+            G.PdfPage.AddDocumentLink(new PdfRectangle(new XRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height)), targetPage);
         }
     }
 }

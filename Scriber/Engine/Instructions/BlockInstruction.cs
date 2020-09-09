@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Scriber.Language;
 using Scriber.Layout.Document;
+using Scriber.Variables;
 
 namespace Scriber.Engine.Instructions
 {
@@ -49,7 +50,7 @@ namespace Scriber.Engine.Instructions
                     {
                         currentParagraph = new Paragraph();
                         var margin = currentParagraph.Margin;
-                        margin.Bottom = state.Document.Variables["length", "parskip"].GetValue<double>();
+                        margin.Bottom = state.Document.Variable(ParagraphVariables.Skip);
                         currentParagraph.Margin = margin;
                         results.Add(new Argument(item.Source, currentParagraph));
                     }

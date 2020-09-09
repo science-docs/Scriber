@@ -158,6 +158,7 @@ namespace Scriber.Engine
             else if (value is ObjectCreator creator)
             {
                 transformed = creator.Create(parameter);
+                isArgument = false;
             }
             else if (state.Converters.TryConvert(value, targetType, out var convertedValue))
             {
@@ -166,7 +167,7 @@ namespace Scriber.Engine
 
             if (isArgument && transformed != null)
             {
-                transformed = MakeArgument(argument, targetType, transformed);
+                transformed = argument.MakeGeneric(targetType, transformed);
             }
             
             return transformed != null;
@@ -175,14 +176,6 @@ namespace Scriber.Engine
         private static bool IsParams(ParameterInfo parameter)
         {
             return parameter.IsDefined(typeof(ParamArrayAttribute));
-        }
-
-        private static object MakeArgument(Argument argument, Type target, object value)
-        {
-            var targetArgType = typeof(Argument<>).MakeGenericType(target);
-            var genericArg = Activator.CreateInstance(targetArgType, argument.Source, value)
-                ?? throw new InvalidOperationException("A newly created argument cannot be null");
-            return genericArg;
         }
 
         private static void CountParameters(ParameterInfo[] parameters, out bool hasState, out int required, out int optional)

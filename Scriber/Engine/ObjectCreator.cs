@@ -134,7 +134,7 @@ namespace Scriber.Engine
                 objType = defaultType;
             }
 
-            if (objType == typeof(object) || objType == typeof(DynamicObject))
+            if (objType == typeof(object) || typeof(DynamicObject).IsAssignableFrom(objType))
             {
                 objType = typeof(DynamicDictionary);
             }

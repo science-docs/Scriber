@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,6 +30,28 @@ namespace Scriber.Engine
             return list.ToArray();
         }
 
+        public Argument MakeGeneric(Type type, object value)
+        {
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (value != null)
+            {
+                var valueType = value.GetType();
+                if (type.IsAssignableFrom(valueType))
+                {
+                    throw new InvalidCastException($"Cannot create generic argument of type {type.FormattedName()} with value of type {valueType.FormattedName()}.");
+                }
+            }
+
+            var targetArgType = typeof(Argument<>).MakeGenericType(type);
+            var genericArg = Activator.CreateInstance(targetArgType, Source, value) as Argument
+                ?? throw new InvalidOperationException("A newly created argument cannot be null");
+            return genericArg;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -44,6 +67,8 @@ namespace Scriber.Engine
 
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Argument<>);
         }
+
+        
 
         /// <summary>
         /// 

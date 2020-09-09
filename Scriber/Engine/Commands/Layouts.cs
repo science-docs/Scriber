@@ -7,10 +7,9 @@ namespace Scriber.Engine.Commands
     public static class Layouts
     {
         [Command("VerticalSpace")]
-        public static Box VSpace(string vertical)
+        public static Box VSpace(Unit vertical)
         {
-            double value = double.Parse(vertical);
-            return new Box(new Layout.Size(0, value));
+            return new Box(new Size(0, vertical.Point));
         }
 
         [Command("Centering")]
@@ -20,9 +19,12 @@ namespace Scriber.Engine.Commands
 
             static void Center(DocumentElement block)
             {
-                if (block.Parent != null)
+                if (block.Parent is Panel panel)
                 {
-                    block.Parent.HorizontalAlignment = HorizontalAlignment.Center;
+                    for (int i = 0; i < panel.Elements.Count; i++)
+                    {
+                        panel.Elements[i].HorizontalAlignment = HorizontalAlignment.Center;
+                    }
                 }
             }
         }
@@ -31,7 +33,9 @@ namespace Scriber.Engine.Commands
         public static void SetLength(CompilerState state, string lengthName, string length)
         {
             var l = double.Parse(length);
-            state.Document.Variables[DocumentVariables.Length][lengthName].SetValue(l);
+
+            // TODO:
+            //state.Document.Variables[DocumentVariables.Length][lengthName].SetValue(l);
         }
 
         [Command("SetCounter")]

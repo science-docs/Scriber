@@ -27,6 +27,19 @@ namespace Scriber.Layout
             this.measurements.AddRange(measurements);
         }
 
+        public bool Remove(Measurement item)
+        {
+            return measurements.Remove(item);
+        }
+
+        public void RemoveAll(IEnumerable<Measurement> items)
+        {
+            foreach (var item in items)
+            {
+                measurements.Remove(item);
+            }
+        }
+
         public void Clear()
         {
             measurements.Clear();

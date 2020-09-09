@@ -1,39 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Variables;
 
 namespace Scriber.Engine.Commands
 {
     [Package]
     public static class Sections
     {
-        private const int MaxLevel = 3;
-        private const string Level1 = "section";
-        private const string Level2 = "subsection";
-        private const string Level3 = "subsubsection";
+        public static DocumentLocal<int> Header1 = new DocumentLocal<int>(0);
+        public static DocumentLocal<int> Header2 = new DocumentLocal<int>(0);
+        public static DocumentLocal<int> Header3 = new DocumentLocal<int>(0);
+        public static DocumentLocal<int> Header4 = new DocumentLocal<int>(0);
+        public static DocumentLocal<int> Header5 = new DocumentLocal<int>(0);
 
-        private const string Number = "number";
-
-        private readonly static string[] Levels = new string[]
+        private static readonly DocumentLocal<int>[] Headers =
         {
-            Level1, Level2, Level3
+            Header1, Header2, Header3, Header4, Header5
         };
+
+        private const int MaxLevel = 5;
 
         [Command("TableOfContent")]
         public static CallbackBlock TableOfContent(CompilerState state)
         {
             return new CallbackBlock(() =>
             {
-                var vars = state.Document.Variables;
-                var entries = GetEntryTable(vars);
+                var entries = state.Document.Variable(TableVariables.TableOfContent)!;
 
                 var region = new StackPanel() { Orientation = Orientation.Vertical };
 
                 foreach (var entry in entries)
                 {
-                    region.Elements.Add(new TableElement(entry.Preamble, entry.Level, entry.Content, entry.Reference));
+                    region.Elements.Add(entry);
                 }
 
                 return region;
@@ -43,11 +42,10 @@ namespace Scriber.Engine.Commands
         [Command("Header")]
         public static Paragraph Header(CompilerState state, int level, Paragraph content)
         {
-            var vars = state.Document.Variables;
-            var pretext = CreatePretext(vars, level);
-            var entry = new TableEntry(pretext, level, content.Clone(), content);
-            GetEntryTable(vars).Add(entry);
-            ResetNumbering(vars, level);
+            ResetNumbering(state.Document, level);
+            var pretext = CreatePretext(state.Document, level);
+            var entry = new TableElement(pretext, level, content.Clone(), content);
+            state.Document.Variable(TableVariables.TableOfContent)!.Add(entry);
             var text = new TextLeaf
             {
                 Content = pretext + " "
@@ -60,6 +58,11 @@ namespace Scriber.Engine.Commands
         [Command("Header*")]
         public static Paragraph HeaderStar(int level, Paragraph content)
         {
+            if (level < 1 || level > MaxLevel)
+            {
+
+            }
+
             content.FontSize = level switch
             {
                 1 => 18,
@@ -95,19 +98,17 @@ namespace Scriber.Engine.Commands
             return HeaderStar(2, content);
         }
 
-        private static string CreatePretext(DocumentVariable variables, int level)
+        private static string CreatePretext(Document document, int level)
         {
             StringBuilder sb = new StringBuilder();
+            var header = Headers[level - 1];
 
-            string levelString = Levels[level - 1];
-
-            var current = variables[levelString][Number];
-            var value = current.GetValue<int>() + 1;
-            current.SetValue(value);
+            var levelLocal = document.Variable(header);
+            header.Set(document, levelLocal + 1);
 
             for (int i = 0; i < level; i++)
             {
-                sb.Append(variables[Levels[i]][Number].GetValue<int>());
+                sb.Append(document.Variable(Headers[i]));
                 if (i < level - 1)
                 {
                     sb.Append(".");
@@ -117,43 +118,12 @@ namespace Scriber.Engine.Commands
             return sb.ToString();
         }
 
-        private static void ResetNumbering(DocumentVariable variables, int startLevel)
+        private static void ResetNumbering(Document document, int startLevel)
         {
-            for (int i = startLevel; i < MaxLevel; i++)
+            for (int i = startLevel + 1; i < MaxLevel; i++)
             {
-                var levelString = Levels[startLevel];
-                variables[levelString][Number].SetValue(0);
+                Headers[i - 1].Set(document, 0);
             }
-        }
-
-        private static List<TableEntry> GetEntryTable(DocumentVariable variables)
-        {
-            var toc = variables[DocumentVariables.TableOfContent]["entries"];
-            var list = toc.GetValue<List<TableEntry>>();
-            if (list == null)
-            {
-                list = new List<TableEntry>();
-                toc.SetValue(list);
-            }
-            return list;
-        }
-    }
-
-    public class TableEntry
-    {
-        public string? Preamble { get; }
-        public int Level { get; }
-        public Paragraph Reference { get; }
-        public Paragraph Content { get; }
-        public PageReference Page { get; }
-
-        public TableEntry(string? preamble, int level, Paragraph content, Paragraph reference)
-        {
-            Content = content;
-            Level = level;
-            Preamble = preamble;
-            Reference = reference ?? throw new ArgumentNullException(nameof(reference));
-            Page = new PageReference(reference);
         }
     }
 }
