@@ -3,16 +3,17 @@
 namespace Scriber.Engine
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class PackageAttribute : Attribute
+    public sealed class ObjectTypeAttribute : Attribute
     {
         public string? Name { get; set; }
         public string? Description { get; set; }
 
-        public PackageAttribute()
+        public ObjectTypeAttribute()
         {
+
         }
 
-        public PackageAttribute(string name)
+        public ObjectTypeAttribute(string name)
         {
             Name = name;
         }

@@ -6,6 +6,7 @@ namespace Scriber.Engine
     public sealed class EnvironmentAttribute : Attribute
     {
         public string Name { get; set; }
+        public string? Description { get; set; }
 
         public EnvironmentAttribute(string name)
         {
