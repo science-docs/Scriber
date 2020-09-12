@@ -8,7 +8,7 @@ namespace Scriber.Layout
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            var measurement = new Measurement(this);
+            var measurement = new Measurement(this, null, Margin);
 
             if (Orientation == Orientation.Vertical)
             {
@@ -16,8 +16,10 @@ namespace Scriber.Layout
                 foreach (var child in Elements)
                 {
                     var childMeasurement = child.Measure(availableSize);
+                    y += childMeasurement.Margin.Top;
                     Align(childMeasurement, availableSize, y);
                     y += childMeasurement.TotalSize.Height;
+                    y -= childMeasurement.Margin.Top;
                     measurement.Subs.Add(childMeasurement);
                 }
             }

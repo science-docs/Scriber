@@ -6,6 +6,7 @@ namespace Scriber.Engine
     public class DynamicDictionary : DynamicObject
     {
         private readonly Dictionary<string, object?> dictionary = new Dictionary<string, object?>();
+        private readonly Dictionary<string, string> names = new Dictionary<string, string>();
 
         public override bool TryGetMember(GetMemberBinder binder, out object? result)
         {
@@ -21,7 +22,16 @@ namespace Scriber.Engine
 
         public void SetMember(string name, object? value)
         {
+            names[name.ToLowerInvariant()] = name;
             dictionary[name.ToLowerInvariant()] = value;
+        }
+
+        public IEnumerable<KeyValuePair<string, object?>> GetContents()
+        {
+            foreach (var entry in dictionary)
+            {
+                yield return new KeyValuePair<string, object?>(names[entry.Key], entry.Value);
+            }
         }
     }
 }

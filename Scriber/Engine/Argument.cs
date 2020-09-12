@@ -40,7 +40,7 @@ namespace Scriber.Engine
             if (value != null)
             {
                 var valueType = value.GetType();
-                if (type.IsAssignableFrom(valueType))
+                if (!type.IsAssignableFrom(valueType))
                 {
                     throw new InvalidCastException($"Cannot create generic argument of type {type.FormattedName()} with value of type {valueType.FormattedName()}.");
                 }

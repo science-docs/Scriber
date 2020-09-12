@@ -9,11 +9,11 @@ namespace Scriber.Layout.Document
         public Paragraph Content { get; }
         public PageReference Reference { get; }
 
-        private readonly Paragraph original;
+        private readonly AbstractElement original;
         private readonly Paragraph referenceParagraph;
         private readonly Paragraph? preambleParagraph;
 
-        public TableElement(string? preamble, int level, Paragraph content, Paragraph reference)
+        public TableElement(string? preamble, int level, Paragraph content, AbstractElement reference)
         {
             Preamble = preamble;
             Margin = new Thickness(3, 0);
