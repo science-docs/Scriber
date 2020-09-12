@@ -27,5 +27,10 @@ namespace Scriber.Engine
             commands.TryGetValue(name, out var command);
             return command;
         }
+
+        public bool Remove(string name)
+        {
+            return commands.Remove(name);
+        }
     }
 }

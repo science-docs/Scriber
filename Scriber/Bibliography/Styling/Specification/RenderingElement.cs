@@ -27,12 +27,12 @@ namespace Scriber.Bibliography.Styling.Specification
             set;
         }
 
-        public abstract bool HasVariableDefined(Interpreter interpreter, Citation citation);
+        public abstract bool HasVariableDefined(Interpreter interpreter);
 
-        public void Evaluate(Interpreter interpreter, Citation citation)
+        public void Evaluate(Interpreter interpreter)
         {
             int prefixCount = interpreter.Run.Children.Count;
-            EvaluateOverride(interpreter, citation);
+            EvaluateOverride(interpreter);
             if (interpreter.Run.Children.Count > prefixCount)
             {
                 interpreter.Insert(prefixCount, Prefix, this as IFormatting);
@@ -40,7 +40,7 @@ namespace Scriber.Bibliography.Styling.Specification
             }
         }
 
-        public abstract void EvaluateOverride(Interpreter interpreter, Citation citation);
+        public abstract void EvaluateOverride(Interpreter interpreter);
 
         /// <summary>
         /// Returns all child rendering elements.

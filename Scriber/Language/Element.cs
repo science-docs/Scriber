@@ -44,6 +44,7 @@ namespace Scriber.Language
         public int Line { get; set; }
         public string? Content { get; set; }
         public TextType ContentType { get; set; }
+        public Resource? Resource { get; set; }
         internal StringBuilder? StringBuilder { get; set; }
 
         public Element(Element? parent, ElementType type, int index, int line)

@@ -59,17 +59,17 @@ namespace Scriber.Bibliography.Styling.Specification
             set;
         } = new List<RenderingElement>();
 
-        public override void EvaluateOverride(Interpreter interpreter, Citation citation)
+        public override void EvaluateOverride(Interpreter interpreter)
         {
-            if (HasVariableDefined(interpreter, citation) && Children != null)
+            if (HasVariableDefined(interpreter) && Children != null)
             {
-                interpreter.Join(citation, this, Delimiter, Children.ToArray());
+                interpreter.Join(this, Delimiter, Children.ToArray());
             }
         }
 
-        public override bool HasVariableDefined(Interpreter interpreter, Citation citation)
+        public override bool HasVariableDefined(Interpreter interpreter)
         {
-            return Children != null && Children.Any(e => e.HasVariableDefined(interpreter, citation));
+            return Children != null && Children.Any(e => e.HasVariableDefined(interpreter));
         }
 
         /// <summary>

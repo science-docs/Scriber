@@ -1,17 +1,41 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Scriber.Language;
 using Scriber.Layout.Document;
+using Scriber.Variables;
 
 namespace Scriber.Engine.Instructions
 {
     public class BlockInstruction : EngineInstruction
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <exception cref="ArgumentNullException"/>
         public BlockInstruction(Element origin) : base(origin)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
         public override object Execute(CompilerState state, Argument[] arguments)
         {
+            if (state is null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
+            if (arguments is null)
+            {
+                throw new ArgumentNullException(nameof(arguments));
+            }
+
             var results = new List<Argument>();
 
             // Group continueous leafs into one paragraph
@@ -26,18 +50,18 @@ namespace Scriber.Engine.Instructions
                     {
                         currentParagraph = new Paragraph();
                         var margin = currentParagraph.Margin;
-                        margin.Bottom = state.Document.Variables["length", "parskip"].GetValue<double>();
+                        margin.Bottom = state.Document.Variable(ParagraphVariables.Skip);
                         currentParagraph.Margin = margin;
                         results.Add(new Argument(item.Source, currentParagraph));
                     }
 
                     currentParagraph.Leaves.Add(leaf);
                 }
-                else if (item == EmptyInstruction.Object)
+                else if (item.Value == EmptyInstruction.Object)
                 {
                     ResetParagraph(state, ref currentParagraph);
                 }
-                else if (item == NullInstruction.NullObject)
+                else if (item.Value == NullInstruction.NullObject)
                 {
                     ResetParagraph(state, ref currentParagraph);
                     results.Add(new Argument(item.Source, null));

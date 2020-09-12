@@ -6,14 +6,15 @@ namespace Scriber.Engine
     public class BlockStack
     {
         public Block Current => stack.Peek();
-
+        public Block Root { get; }
+        public int Count => stack.Count;
+        public bool IsRoot => Current == Root;
+        
         private readonly Stack<Block> stack = new Stack<Block>();
 
-        public bool IsRoot => stack.Count == 1;
-        
         public BlockStack()
         {
-            Push();
+            Root = Push();
         }
 
         public Block Push()
@@ -27,11 +28,27 @@ namespace Scriber.Engine
             return Current;
         }
 
-        public void Push(Block env)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="block"></param>
+        /// <exception cref="ArgumentNullException"/>
+        public void Push(Block block)
         {
-            stack.Push(env);
+            if (block is null)
+            {
+                throw new ArgumentNullException(nameof(block));
+            }
+
+            stack.Push(block);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        /// <exception cref="IndexOutOfRangeException"/>
         public Block Peek(int i)
         {
             int level = 0;

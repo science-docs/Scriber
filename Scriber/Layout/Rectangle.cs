@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Scriber.Layout
 {
@@ -40,6 +41,11 @@ namespace Scriber.Layout
             Y = y;
             Width = width;
             Height = height;
+        }
+
+        public Rectangle Transform(Matrix3x2 matrix)
+        {
+            return new Rectangle(Position.Transform(matrix), Size);
         }
 
         public override bool Equals(object? obj)

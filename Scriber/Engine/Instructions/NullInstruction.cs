@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using System;
 
 namespace Scriber.Engine.Instructions
 {
@@ -6,6 +7,11 @@ namespace Scriber.Engine.Instructions
     {
         public static object NullObject { get; } = new object();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <exception cref="ArgumentNullException"/>
         public NullInstruction(Element origin) : base(origin)
         {
         }

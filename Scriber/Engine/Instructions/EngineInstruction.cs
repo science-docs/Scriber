@@ -1,9 +1,15 @@
 ﻿using Scriber.Language;
+using System;
 
 namespace Scriber.Engine.Instructions
 {
     public abstract class EngineInstruction : Traceable
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <exception cref="ArgumentNullException"/>
         protected EngineInstruction(Element origin) : base(origin)
         {
         }
@@ -12,6 +18,11 @@ namespace Scriber.Engine.Instructions
 
         public static EngineInstruction? Create(Element element)
         {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             switch (element.Type)
             {
                 case ElementType.Text:
@@ -34,9 +45,11 @@ namespace Scriber.Engine.Instructions
                     return new ObjectFieldInstruction(element);
                 case ElementType.Null:
                     return new NullInstruction(element);
+                case ElementType.Comment:
+                    return null;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(element), $"Unknown element type '{element.Type}'.");
             }
-
-            return null;
         }
     }
 }

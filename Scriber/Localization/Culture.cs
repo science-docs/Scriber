@@ -8,7 +8,7 @@ namespace Scriber.Localization
         /// <summary>
         /// The invariant culture.
         /// </summary>
-        public static readonly Culture Invariant = new Culture(null);
+        public static readonly Culture Invariant = new Culture("en-US");
 
         /// <summary>
         /// Constructor.

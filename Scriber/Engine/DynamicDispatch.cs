@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Logging;
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
@@ -116,9 +117,9 @@ namespace Scriber.Engine
                     {
                         args[i] = transformed ?? throw new CompilerException(argument.Source, "Transformed element cannot be null.");
 
-                        if (arg.GetType() != transformed.GetType())
+                        if (!transformed.GetType().IsAssignableFrom(argument.Value.GetType()))
                         {
-                            state.Context.Logger.Debug($"Transformed element of type '{argument.Value.GetType().FormattedName()}' to '{transformed.GetType().FormattedName()}'.");
+                            state.Context.Logger.Debug(SR.Get(SRID.TransformSuccess, argument.Value.GetType().FormattedName(), transformed.GetType().FormattedName()));
                         }
                     }
                 }
@@ -157,6 +158,7 @@ namespace Scriber.Engine
             else if (value is ObjectCreator creator)
             {
                 transformed = creator.Create(parameter);
+                isArgument = false;
             }
             else if (state.Converters.TryConvert(value, targetType, out var convertedValue))
             {
@@ -165,7 +167,7 @@ namespace Scriber.Engine
 
             if (isArgument && transformed != null)
             {
-                transformed = MakeArgument(argument, targetType, transformed);
+                transformed = argument.MakeGeneric(targetType, transformed);
             }
             
             return transformed != null;
@@ -174,14 +176,6 @@ namespace Scriber.Engine
         private static bool IsParams(ParameterInfo parameter)
         {
             return parameter.IsDefined(typeof(ParamArrayAttribute));
-        }
-
-        private static object MakeArgument(Argument argument, Type target, object value)
-        {
-            var targetArgType = typeof(Argument<>).MakeGenericType(target);
-            var genericArg = Activator.CreateInstance(targetArgType, argument.Source, value)
-                ?? throw new InvalidOperationException("A newly created argument cannot be null");
-            return genericArg;
         }
 
         private static void CountParameters(ParameterInfo[] parameters, out bool hasState, out int required, out int optional)

@@ -11,7 +11,6 @@ namespace Scriber.Bibliography.Styling.Renderer
         public static void RenderNames(
             Interpreter interpreter,
             IFormatting? formatting,
-            Citation citation,
             string[] variables,
             TermName?[] terms,
             string? subsequentAuthorSubstitute,
@@ -21,7 +20,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             LabelElement? label,
             Func<NameElement?, EtAlElement?, LabelElement?, bool>[] substitutes)
         {
-            if (!RenderNameGroups(interpreter, formatting, citation, variables, terms, false, subsequentAuthorSubstitute, subsequentAuthorSubstituteRule, name, etAl, label))
+            if (!RenderNameGroups(interpreter, formatting, variables, terms, false, subsequentAuthorSubstitute, subsequentAuthorSubstituteRule, name, etAl, label))
             {
                 int i = 0;
                 while (i < substitutes.Length && !substitutes[i].Invoke(name, etAl, label))
@@ -34,7 +33,6 @@ namespace Scriber.Bibliography.Styling.Renderer
         private static bool RenderNameGroups(
             Interpreter interpreter,
             IFormatting? formatting,
-            Citation citation,
             string[] variables,
             TermName?[] terms,
             bool suppress,
@@ -49,7 +47,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             for (int i = 0; i < terms.Length; i++)
             {
                 var variable = variables[i];
-                var names = citation[variable];
+                var names = interpreter.Variable(variable);
                 if (names is INamesVariable namesVariable)
                 {
                     var group = new NameGroup(variable, terms[i], namesVariable);

@@ -8,8 +8,26 @@ namespace Scriber.Engine.Converter
     [CommandArgumentConverter(typeof(Paragraph), typeof(string), typeof(IEnumerable<Leaf>))]
     public class ParagraphConverter : IElementConverter
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="ConverterException"/>
         public object Convert(object source, Type targetType)
         {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (targetType is null)
+            {
+                throw new ArgumentNullException(nameof(targetType));
+            }
+
             if (source is Paragraph paragraph)
             {
                 if (targetType == typeof(IEnumerable<Leaf>))

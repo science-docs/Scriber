@@ -35,10 +35,10 @@ namespace Scriber.Layout.Document
             Origin = new Position(Width.Presentation / 2, Height.Presentation / 2);
         }
 
-        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             var image = new Image(imageData, Image);
-            drawingContext.DrawImage(image, new Rectangle(measurement.Position, measurement.Size));
+            drawingContext.DrawImage(image, new Rectangle(new Position(), measurement.Size));
         }
 
         protected override AbstractElement CloneInternal()
@@ -56,14 +56,15 @@ namespace Scriber.Layout.Document
             return image;
         }
 
-        protected override Measurements MeasureOverride(Size availableSize)
+        protected override Measurement MeasureOverride(Size availableSize)
         {
             var size = new Size(Width.Point * Scale, Height.Point * Scale);
+            return new Measurement(this, size, Margin);
+        }
 
-            var ms = new Measurements();
-            var m = new Measurement(this, size, Margin);
-            ms.Add(m);
-            return ms;
+        public override SplitResult Split(Measurement source, double height)
+        {
+            return new SplitResult(source, source, null);
         }
     }
 }

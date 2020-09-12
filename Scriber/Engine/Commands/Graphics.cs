@@ -1,6 +1,8 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Util;
+using System.IO;
+using System.Net.Http;
 
 namespace Scriber.Engine.Commands
 {
@@ -16,28 +18,40 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("IncludeGraphics")]
-        public static AbstractElement IncludeGraphics(CompilerState state, string imagePath, IncludeImageOptions? options = null)
+        public static AbstractElement IncludeGraphics(CompilerState state, Argument<string> imagePath, IncludeImageOptions? options = null)
         {
-            var imagePathInfo = state.FileSystem.TryFindFile(imagePath, "png", "jpg", "gif", "bmp");
-            
-            if (imagePathInfo != null && (options == null || !options.Draft))
+            if (options == null || !options.Draft)
             {
-                var bytes = state.FileSystem.File.ReadAllBytes(imagePathInfo.FullName);
-                var image = new ImageElement(bytes, imagePath);
-
-                if (options != null)
+                try
                 {
-                    image.Angle = options.Angle;
-                    image.Scale = options.Scale;
-                    image.Height = options.Height;
-                    image.Width = options.Width;
-                }
+                    var uri = state.FileSystem.Path.ConvertToUri(imagePath.Value);
+                    var bytes = state.FileSystem.File.ReadAllBytes(uri);
+                    var image = new ImageElement(bytes, imagePath.Value);
 
-                return image;
+                    if (options != null)
+                    {
+                        image.Angle = options.Angle;
+                        image.Scale = options.Scale;
+                        image.Height = options.Height;
+                        image.Width = options.Width;
+                    }
+
+                    return image;
+                }
+                catch (IOException io)
+                {
+                    state.Issues.Add(imagePath.Source, CompilerIssueType.Warning, $"Could not read file {imagePath.Value}. Make sure it does exist and is accessible.", io);
+                    return Paragraph.FromText(imagePath.Value);
+                }
+                catch (HttpRequestException http)
+                {
+                    state.Issues.Add(imagePath.Source, CompilerIssueType.Warning, $"Could not download resource from {imagePath.Value}.", http);
+                    return Paragraph.FromText(imagePath.Value);
+                }
             }
             else
             {
-                return Paragraph.FromText(imagePath);
+                return Paragraph.FromText(imagePath.Value);
             }
         }
 

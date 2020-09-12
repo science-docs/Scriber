@@ -46,7 +46,7 @@ namespace Scriber.Engine
                 {
                     arr.SetValue(value, i);
                 }
-                else if (CompilerState.Converters.TryConvert(value.GetType(), type, out var transformed))
+                else if (CompilerState.Converters.TryConvert(value, type, out var transformed))
                 {
                     arr.SetValue(transformed, i);
                 }

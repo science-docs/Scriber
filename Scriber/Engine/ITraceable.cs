@@ -14,6 +14,11 @@ namespace Scriber.Engine
     {
         public Element Origin { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <exception cref="ArgumentNullException"/>
         protected Traceable(Element origin)
         {
             Origin = origin ?? throw new ArgumentNullException(nameof(origin));

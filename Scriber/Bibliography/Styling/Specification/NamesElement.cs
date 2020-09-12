@@ -92,7 +92,7 @@ namespace Scriber.Bibliography.Styling.Specification
             set;
         }
 
-        public override void EvaluateOverride(Interpreter interpreter, Citation citation)
+        public override void EvaluateOverride(Interpreter interpreter)
         {
             if (Name == null)
             {
@@ -110,12 +110,12 @@ namespace Scriber.Bibliography.Styling.Specification
 
             var bibliography = interpreter.StyleFile.Bibliography;
 
-            NameRenderer.RenderNames(interpreter, this, citation, variables, terms, bibliography?.SubsequentAuthorSubstitute, bibliography?.SubsequentAuthorSubstituteRule, Name, EtAl, Label, Array.Empty<Func<NameElement?, EtAlElement?, LabelElement?, bool>>());
+            NameRenderer.RenderNames(interpreter, this, variables, terms, bibliography?.SubsequentAuthorSubstitute, bibliography?.SubsequentAuthorSubstituteRule, Name, EtAl, Label, Array.Empty<Func<NameElement?, EtAlElement?, LabelElement?, bool>>());
         }
 
-        public override bool HasVariableDefined(Interpreter interpreter, Citation citation)
+        public override bool HasVariableDefined(Interpreter interpreter)
         {
-            return Variable != null && citation[Variable] != null;
+            return Variable != null && interpreter.Variable(Variable) != null;
         }
 
         ///// <summary>

@@ -37,11 +37,11 @@ namespace Scriber.Bibliography.Styling.Specification
             set;
         }
 
-        public override void EvaluateOverride(Interpreter interpreter, Citation citation)
+        public override void EvaluateOverride(Interpreter interpreter)
         {
             ElseElement? renderingElement = null;
 
-            if (If != null && If.Matches(citation))
+            if (If != null && If.Matches(interpreter))
             {
                 renderingElement = If;
             }
@@ -49,7 +49,7 @@ namespace Scriber.Bibliography.Styling.Specification
             {
                 foreach (var elseIf in ElseIf)
                 {
-                    if (elseIf.Matches(citation))
+                    if (elseIf.Matches(interpreter))
                     {
                         renderingElement = elseIf;
                         break;
@@ -64,13 +64,13 @@ namespace Scriber.Bibliography.Styling.Specification
 
             if (renderingElement != null)
             {
-                renderingElement.Evaluate(interpreter, citation);
+                renderingElement.Evaluate(interpreter);
             }
         }
 
-        public override bool HasVariableDefined(Interpreter interpreter, Citation citation)
+        public override bool HasVariableDefined(Interpreter interpreter)
         {
-            return (If != null && If.HasVariableDefined(interpreter, citation)) || (ElseIf != null && ElseIf.Any(e => e.HasVariableDefined(interpreter, citation))) || (Else != null && Else.HasVariableDefined(interpreter, citation));
+            return (If != null && If.HasVariableDefined(interpreter)) || (ElseIf != null && ElseIf.Any(e => e.HasVariableDefined(interpreter))) || (Else != null && Else.HasVariableDefined(interpreter));
         }
     }
 }

@@ -67,7 +67,8 @@ namespace Scriber.Bibliography.Styling.Specification
             {
                 return citation =>
                 {
-                    return citation[key.Variable]?.ToString();
+                    interpreter.Citation = citation;
+                    return interpreter.Variable(key.Variable)?.ToString();
                 };
             }
             else if (key.Macro != null)
@@ -75,10 +76,11 @@ namespace Scriber.Bibliography.Styling.Specification
                 return citation =>
                 {
                     interpreter.Clear();
+                    interpreter.Citation = citation;
                     var macroElement = interpreter.StyleFile.FindMacro(key.Macro);
                     if (macroElement != null)
                     {
-                        macroElement.Evaluate(interpreter, citation);
+                        macroElement.Evaluate(interpreter);
                         var text = interpreter.Run.ToPlainText();
                         return text;
                     }

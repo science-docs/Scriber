@@ -15,6 +15,10 @@ namespace Scriber.Bibliography
             : this(from, to, false)
         {
         }
+        public DateVariable(IDateVariable from, IDateVariable to)
+            : this(from, to, false)
+        {
+        }
         public DateVariable(DateTime from, DateTime to, bool isCirca)
         {
             // done
@@ -27,6 +31,10 @@ namespace Scriber.Bibliography
             DayFrom = from.Day;
             DayTo = to.Day;
             IsApproximate = isCirca;
+        }
+        public DateVariable(IDateVariable from, IDateVariable to, bool isCirca)
+            : this(from.YearFrom, from.SeasonFrom, from.MonthFrom, from.DayFrom, to.YearTo, to.SeasonTo, to.MonthTo, to.DayTo, isCirca)
+        {
         }
         public DateVariable(int year, Season? season, int? month, int? day, bool isCirca)
             : this(year, season, month, day, year, season, month, day, isCirca)
@@ -86,9 +94,8 @@ namespace Scriber.Bibliography
         public static bool TryParse(string value, out DateVariable variable)
         {
             // number?
-            if (TryParseDate(value, out var single))
+            if (TryParseDate(value, out variable))
             {
-                variable = new DateVariable(single);
                 return true;
             }
 
@@ -116,10 +123,32 @@ namespace Scriber.Bibliography
             }
         }
 
-        private static bool TryParseDate(string text, out DateTime value)
+        private static bool TryParseDate(string text, out DateVariable value)
         {
-            return DateTime.TryParseExact(text, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out value);
+            if (TryParseDateExact(text, "yyyy-MM-dd", out var full))
+            {
+                value = new DateVariable(full);
+                return true;
+            }
+            else if (TryParseDateExact(text, "yyyy-MM", out var month))
+            {
+                value = new DateVariable(month.Year, null, month.Month, null, false);
+                return true;
+            }
+            else if (TryParseDateExact(text, "yyyy", out var year))
+            {
+                value = new DateVariable(year.Year, null, null, null, false);
+                return true;
+            }
+            value = new DateVariable();
+            return false;
         }
+
+        private static bool TryParseDateExact(string text, string format, out DateTime value)
+        {
+            return DateTime.TryParseExact(text, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out value);
+        }
+
         private static bool TrySplitDate(string text, string separators, out DateVariable variable)
         {
             // init

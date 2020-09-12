@@ -1,16 +1,16 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Variables;
 
 namespace Scriber.Engine.Commands
 {
-    [Package]
+    [Package("")]
     public static class Layouts
     {
         [Command("VerticalSpace")]
-        public static Box VSpace(string vertical)
+        public static Box VSpace(Unit vertical)
         {
-            double value = double.Parse(vertical);
-            return new Box(new Layout.Size(0, value));
+            return new Box(new Size(0, vertical.Point));
         }
 
         [Command("Centering")]
@@ -20,9 +20,12 @@ namespace Scriber.Engine.Commands
 
             static void Center(DocumentElement block)
             {
-                if (block.Parent != null)
+                if (block.Parent is Panel panel)
                 {
-                    block.Parent.HorizontalAlignment = HorizontalAlignment.Center;
+                    for (int i = 0; i < panel.Elements.Count; i++)
+                    {
+                        panel.Elements[i].HorizontalAlignment = HorizontalAlignment.Center;
+                    }
                 }
             }
         }
@@ -31,19 +34,38 @@ namespace Scriber.Engine.Commands
         public static void SetLength(CompilerState state, string lengthName, string length)
         {
             var l = double.Parse(length);
-            state.Document.Variables[DocumentVariables.Length][lengthName].SetValue(l);
+
+            // TODO:
+            //state.Document.Variables[DocumentVariables.Length][lengthName].SetValue(l);
         }
 
-        [Command("SetCounter")]
-        public static CallbackArrangingBlock SetCounter(CompilerState state, string counter, string count)
+        [Command("SetPageNumber")]
+        public static CallbackArrangingBlock SetPageNumber(int count)
         {
-            int intCount = int.Parse(count);
             return new CallbackArrangingBlock(Set);
 
             void Set(DocumentElement element)
             {
-                element.Document?.PageNumbering.Set(intCount);
+                element.Document?.PageNumbering.Set(count);
             }
         }
+
+        [Command("Geometry")]
+        public static void ChangeGeometry(CompilerState state, Geometry geometry)
+        {
+            var margin = new Thickness(geometry.Top.Point, geometry.Left.Point, geometry.Bottom.Point, geometry.Right.Point);
+            PageVariables.Margin.Set(state.Document, margin);
+        }
     }
+
+    public class Geometry
+    {
+        public Unit Left { get; set; }
+        public Unit Top { get; set; }
+
+        public Unit Right { get; set; }
+
+        public Unit Bottom { get; set; }
+    }
+
 }

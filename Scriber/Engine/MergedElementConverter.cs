@@ -10,16 +10,36 @@ namespace Scriber.Engine
 
         public MergedElementConverter(IElementConverter first)
         {
-            this.first = first;
+            this.first = first ?? throw new ArgumentNullException(nameof(first));
         }
 
         public void Add(Type converterSourceType, IElementConverter converter)
         {
+            if (converterSourceType is null)
+            {
+                throw new ArgumentNullException(nameof(converterSourceType));
+            }
+
+            if (converter is null)
+            {
+                throw new ArgumentNullException(nameof(converter));
+            }
+
             converters.Add((converterSourceType, converter));
         }
 
         public object Convert(object source, Type targetType)
         {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (targetType is null)
+            {
+                throw new ArgumentNullException(nameof(targetType));
+            }
+
             if (converters.Count == 0)
             {
                 return first.Convert(source, targetType);

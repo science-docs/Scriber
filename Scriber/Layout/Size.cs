@@ -43,5 +43,15 @@ namespace Scriber.Layout
         {
             return !(left == right);
         }
+
+        public static Size operator +(Size left, Size right)
+        {
+            return new Size(left.Width + right.Width, left.Height + right.Height);
+        }
+
+        public static Size operator -(Size left, Size right)
+        {
+            return new Size(left.Width - right.Width, left.Height - right.Height);
+        }
     }
 }

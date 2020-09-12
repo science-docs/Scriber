@@ -27,6 +27,19 @@ namespace Scriber.Engine
             return result;
         }
 
+        public static void Compile(CompilerState state, IEnumerable<Element> elements)
+        {
+            var block = state.Blocks.Push();
+            foreach (var element in elements)
+            {
+                Execute(state, element);
+            }
+            state.Blocks.Pop();
+            // As the @Include Command is nested 1 block deep,
+            // we need to add the elements to parent block
+            state.Blocks.Peek(1).Objects.AddRange(block.Objects);
+        }
+
         private static void IssuesChanged(Logger logger, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)

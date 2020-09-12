@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Scriber.Drawing;
+using Scriber.Variables;
 
 namespace Scriber.Layout.Document
 {
@@ -16,11 +18,11 @@ namespace Scriber.Layout.Document
             Leaves = new ElementCollection<Leaf>(this);
         }
 
-        protected override Measurements MeasureOverride(Size availableSize)
+        protected override Measurement MeasureOverride(Size availableSize)
         {
             var doc = Document ?? throw new LayoutException("Document was not set");
 
-            var ms = new Measurements();
+            var ms = new Measurement(this);
             lineNodes = new List<LineNode>();
             foreach (var leaf in Leaves)
             {
@@ -44,6 +46,7 @@ namespace Scriber.Layout.Document
                 var breaks = linebreak.BreakLines(lineNodes, new double[] { availableSize.Width }, new LinebreakOptions());
                 var positionedItems = linebreak.PositionItems(lineNodes, new double[] { availableSize.Width }, breaks, false);
                 lines = ProduceLines(positionedItems);
+                double totalHeight = 0;
 
                 for (int i = 0; i < lines.Length; i++)
                 {
@@ -59,15 +62,20 @@ namespace Scriber.Layout.Document
                         height = Math.Max(lineNodes[item.Index].Element?.DesiredSize.Height ?? 0, height);
                     }
 
-                    var stretch = doc.Variables[DocumentVariables.Length, DocumentVariables.BaselineStretch].GetValue<double>();
+                    var stretch = ParagraphVariables.BaselineStretch[doc];
 
                     if (!last)
                     {
                         height *= stretch;
                     }
                     var size = new Size(width, height);
-                    var measurement = new Measurement(this, size, Thickness.Zero);
-                    ms.Add(measurement);
+                    var measurement = new Measurement(this, size, Thickness.Zero)
+                    {
+                        Tag = line,
+                        Position = new Position(0, totalHeight)
+                    };
+                    totalHeight += height;
+                    ms.Subs.Add(measurement);
 
                     foreach (var node in line)
                     {
@@ -75,27 +83,16 @@ namespace Scriber.Layout.Document
                         if (item.Element is FootnoteLeaf footnote)
                         {
                             var footMS = footnote.Element.Measure(Document.PageBoxSize);
-                            ms[^1].PagebreakPenalty = double.PositiveInfinity;
-                            ms.AddInternal(footMS);
-                            foreach (var m in footMS)
-                            {
-                                m.PagebreakPenalty = double.PositiveInfinity;
-                            }
+                            measurement.Extra.Subs.Add(footMS);
                         }
                     }
                 }
             }
 
             
-            if (ms.Count > 0)
+            if (ms.Subs.Count > 0)
             {
-                ms[0].Margin = new Thickness(Margin.Top, 0, 0, 0);
-                ms[^1].Margin = new Thickness(0, 0, Margin.Bottom, 0);
-
-                if (ms.Count > 1)
-                {
-                    ms[^2].PagebreakPenalty = double.PositiveInfinity;
-                }
+                ms.Margin = new Thickness(Margin.Top, 0, Margin.Bottom, 0);
             }
 
             return ms;
@@ -128,31 +125,106 @@ namespace Scriber.Layout.Document
             return lines.ToArray();
         }
 
-        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        public override SplitResult Split(Measurement source, double height)
+        {
+            var measurement = new Measurement(this);
+            Measurement? next = new Measurement(this);
+            double carryOver = -1;
+
+            foreach (var sub in source.Subs)
+            {
+                var pos = sub.Position;
+                var size = sub.TotalSize + sub.AccumulatedExtra.TotalSize;
+                if (pos.Y + size.Height >= height)
+                {
+                    if (carryOver == -1)
+                    {
+                        carryOver = height - sub.Position.Y;
+                    }
+
+                    if (sub.Tag is PositionedItem[] items)
+                    {
+                        next.Extra.Subs.AddRange(GetFootnotes(items));
+                    }
+
+                    pos.Y -= height;
+                    pos.Y += carryOver;
+                    sub.Position = pos;
+                    next.Subs.Add(sub);
+                }
+                else
+                {
+                    if (sub.Tag is PositionedItem[] items)
+                    {
+                        var footnotes = GetFootnotes(items);
+                        foreach (var footMeasurement in footnotes)
+                        {
+                            height -= footMeasurement.TotalSize.Height;
+                        }
+                        measurement.Extra.Subs.AddRange(footnotes);
+                    }
+
+                    measurement.Subs.Add(sub);
+                }
+            }
+
+            if (next.Subs.Count == 0)
+            {
+                next = null;
+            }
+
+            return new SplitResult(source, measurement, next);
+        }
+
+        private IEnumerable<Measurement> GetFootnotes(PositionedItem[] items)
+        {
+            foreach (var item in items)
+            {
+                var node = lineNodes![item.Index];
+                if (node.Element is FootnoteLeaf footnote)
+                {
+                    yield return footnote.Element.Measurement;
+                }
+            }
+        }
+
+        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             if (lines == null || lineNodes == null)
             {
                 throw new InvalidOperationException("Rendering has been called before measuring");
             }
 
-            var items = lines[measurement.Index];
-            var position = measurement.Position;
-
-            foreach (var item in items)
+            foreach (var sub in measurement.Subs)
             {
-                var node = lineNodes[item.Index];
-
-                if (node.Element == null)
+                if (sub.Tag is PositionedItem[] items)
                 {
-                    throw new NullReferenceException("The Element property of a LineNode was null");
+                    foreach (var item in items)
+                    {
+                        var node = lineNodes[item.Index];
+
+                        if (node.Element == null)
+                        {
+                            throw new NullReferenceException("The Element property of a LineNode was null");
+                        }
+
+                        var offset = new Position(item.Offset, sub.Position.Y);
+
+                        var run = RunFromNode(node);
+
+                        if (lineNodes.Count > item.Index + 1)
+                        {
+                            var next = lineNodes[item.Index + 1];
+                            if (next.Type == LineNodeType.Glue)
+                            {
+                                run.Text += " ";
+                            }
+                        }
+
+                        drawingContext.Offset = offset;
+                        drawingContext.DrawText(run, node.Element.Foreground);
+                    }
                 }
-
-                var offset = new Position(position.X + item.Offset, position.Y);
-
-                var run = RunFromNode(node);
-
-                drawingContext.Offset = offset;
-                drawingContext.DrawText(run, node.Element.Foreground);
             }
         }
 
@@ -184,7 +256,7 @@ namespace Scriber.Layout.Document
         {
             var paragraph = new Paragraph();
 
-            foreach (var leaf in Leaves)
+            foreach (var leaf in Leaves.Where(e => !(e is FootnoteLeaf)))
             {
                 paragraph.Leaves.Add(leaf.Clone());
             }

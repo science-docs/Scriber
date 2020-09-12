@@ -11,11 +11,31 @@ namespace Scriber.Engine.Converter
         typeof(byte), typeof(sbyte),
         typeof(short), typeof(ushort),
         typeof(long), typeof(ulong),
-        typeof(decimal), typeof(bool))]
+        typeof(decimal), typeof(bool),
+        typeof(Index), typeof(Range))]
     public class StringConverter : IElementConverter
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="targetType"></param>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="ConverterException"/>
+        /// <exception cref="FormatException"/>
+        /// <exception cref="OverflowException"/>
         public object Convert(object source, Type targetType)
         {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (targetType is null)
+            {
+                throw new ArgumentNullException(nameof(targetType));
+            }
+
             if (source is string value)
             {
                 if (targetType.IsEnum)
@@ -77,9 +97,46 @@ namespace Scriber.Engine.Converter
                 {
                     return bool.Parse(value);
                 }
+                else if (targetType == typeof(Unit) && Unit.TryParse(value, out var unit))
+                {
+                    return unit;
+                }
+                else if (targetType == typeof(Index))
+                {
+                    return ParseIndex(value);
+                }
+                else if (targetType == typeof(Range))
+                {
+                    var split = value.Split('-', StringSplitOptions.RemoveEmptyEntries);
+                    if (split.Length == 1)
+                    {
+                        var index = ParseIndex(split[0]);
+                        return index..index;
+                    }
+                    else if (split.Length == 2)
+                    {
+                        return ParseIndex(split[0])..ParseIndex(split[1]);
+                    }
+                    else
+                    {
+                        throw new ConverterException($"Cannot convert '{value}' to range.");
+                    }
+                }
             }
             
             throw new ConverterException(source.GetType(), targetType);
+        }
+
+        private Index ParseIndex(string value)
+        {
+            if (value.StartsWith("^"))
+            {
+                return new Index(int.Parse(value.Substring(1)), true);
+            }
+            else
+            {
+                return new Index(int.Parse(value));
+            }
         }
     }
 }

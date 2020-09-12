@@ -6,6 +6,7 @@ namespace Scriber.Engine
     public sealed class CommandAttribute : Attribute
     {
         public string Name { get; set; }
+        public string? Description { get; set; }
         public string? RequiredEnvironment { get; set; }
 
         public CommandAttribute(string name)

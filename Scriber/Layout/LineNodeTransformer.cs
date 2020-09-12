@@ -10,7 +10,7 @@ namespace Scriber.Layout
     {
         public static LineNode GetDefaultGlue(AbstractElement element)
         {
-            var font = element.Font ?? throw new ArgumentException("Specified element missing font");
+            var font = element.Font ?? throw new ArgumentException("Specified element missing font", nameof(element));
             var size = element.FontSize;
             var spaceWidth = GetWidth(" ");
             var stretch = Math.Max(0, spaceWidth / 2);
@@ -34,7 +34,7 @@ namespace Scriber.Layout
             if (text == null)
                 return new List<LineNode>();
 
-            var font = leaf.Font ?? throw new ArgumentException("Specified element missing font");
+            var font = leaf.Font ?? throw new ArgumentException("Specified element missing font", nameof(leaf));
             var size = FontStyler.ScaleSize(leaf.FontStyle, leaf.FontSize);
             var spaceWidth = GetWidth(" ");
             var hyphenWidth = GetWidth("-");

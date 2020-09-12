@@ -4,6 +4,11 @@ namespace Scriber.Engine.Instructions
 {
     public class EmptyInstruction : EngineInstruction
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <exception cref="ArgumentNullException"/>
         public EmptyInstruction(Element origin) : base(origin)
         {
         }

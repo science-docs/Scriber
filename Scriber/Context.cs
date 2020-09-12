@@ -7,6 +7,7 @@ namespace Scriber
     public class Context
     {
         public IFileSystem FileSystem { get; }
+        public ResourceCache ResourceCache { get; }
         public Logger Logger { get; } = new Logger();
         public ConverterCollection Converters { get; } = new ConverterCollection();
         public CommandCollection Commands { get; } = new CommandCollection();
@@ -20,6 +21,7 @@ namespace Scriber
         public Context(IFileSystem? fileSystem)
         {
             FileSystem = fileSystem ?? new FileSystem();
+            ResourceCache = new ResourceCache(FileSystem);
         }
     }
 }

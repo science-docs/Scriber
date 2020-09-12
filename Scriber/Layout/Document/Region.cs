@@ -7,6 +7,7 @@ namespace Scriber.Layout.Document
     {
         public ElementCollection<DocumentElement> Elements { get; }
         public bool Flexible { get; set; }
+        public bool Glue { get; set; }
 
         private readonly Dictionary<Measurement, DocumentElement> elementMap = new Dictionary<Measurement, DocumentElement>();
 
@@ -15,9 +16,9 @@ namespace Scriber.Layout.Document
             Elements = new ElementCollection<DocumentElement>(this);
         }
 
-        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
-            elementMap[measurement].OnRender(drawingContext, measurement);
+            elementMap[measurement].Render(drawingContext, measurement);
         }
 
         protected override AbstractElement CloneInternal()
@@ -30,39 +31,41 @@ namespace Scriber.Layout.Document
             return section;
         }
 
-        protected override Measurements MeasureOverride(Size availableSize)
+        protected override Measurement MeasureOverride(Size availableSize)
         {
             elementMap.Clear();
-            var ms = new Measurements();
+            var ms = new Measurement(this);
 
             foreach (var element in Elements)
             {
-                var elementMs = element.Measure(availableSize);
+                ms.Subs.Add(element.Measure(availableSize));
 
-                foreach (var measurement in elementMs)
-                {
-                    measurement.Flexible = Flexible;
-                    elementMap[measurement] = element;
-                    ms.Add(measurement);
-                }
+                // TODO: this
+                //foreach (var measurement in elementMs)
+                //{
+                //    var m = measurement.Copy(this);
+                //    m.Flexible = Flexible;
+                //    elementMap[m] = element;
+                //    ms.Add(m);
+                //}
 
-                if (elementMs.Count > 0)
-                {
-                    elementMs[^1].PagebreakPenalty = double.PositiveInfinity;
-                }
+                //if (elementMs.Count > 0 && Glue)
+                //{
+                //    elementMs[^1].PagebreakPenalty = double.PositiveInfinity;
+                //}
             }
 
-            if (ms.Count > 0)
-            {
-                var fm = ms[0].Margin;
-                fm.Top += Margin.Top;
-                var lm = ms[^1].Margin;
-                lm.Bottom += Margin.Bottom;
-                ms[0].Margin = fm;
-                ms[^1].Margin = lm;
+            //if (ms.Count > 0)
+            //{
+            //    var fm = ms[0].Margin;
+            //    fm.Top += Margin.Top;
+            //    var lm = ms[^1].Margin;
+            //    lm.Bottom += Margin.Bottom;
+            //    ms[0].Margin = fm;
+            //    ms[^1].Margin = lm;
 
-                ms[^1].PagebreakPenalty = 0;
-            }
+            //    ms[^1].PagebreakPenalty = 0;
+            //}
 
             return ms;
         }

@@ -11,7 +11,7 @@ namespace Scriber.Layout.Document
             Size = size;
         }
 
-        public override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             // Is only spacing and does not render anything
         }
@@ -21,9 +21,9 @@ namespace Scriber.Layout.Document
             return new Box(Size);
         }
 
-        protected override Measurements MeasureOverride(Size availableSize)
+        protected override Measurement MeasureOverride(Size availableSize)
         {
-            return Measurements.Singleton(new Measurement(this, Size, Margin));
+            return new Measurement(this, Size, Margin);
         }
     }
 }

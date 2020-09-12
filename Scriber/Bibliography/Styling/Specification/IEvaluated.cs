@@ -2,6 +2,6 @@
 {
     public interface IEvaluated
     {
-        void Evaluate(Interpreter interpreter, Citation citation);
+        void Evaluate(Interpreter interpreter);
     }
 }

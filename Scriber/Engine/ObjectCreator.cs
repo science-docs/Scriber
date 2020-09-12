@@ -2,6 +2,7 @@
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 
@@ -14,11 +15,24 @@ namespace Scriber.Engine
         public CompilerState CompilerState { get; set; }
         public List<ObjectField> Fields { get; } = new List<ObjectField>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="compilerState"></param>
+        /// <exception cref="ArgumentNullException"/>
         public ObjectCreator(Element origin, CompilerState compilerState) : base(origin)
         {
             CompilerState = compilerState ?? throw new ArgumentNullException(nameof(compilerState));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="CompilerException"/>
         public object Create(ParameterInfo parameter)
         {
             if (parameter is null)
@@ -30,6 +44,13 @@ namespace Scriber.Engine
             return Create(parameter.ParameterType, attribute?.Overrides);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="CompilerException"/>
         public object Create(PropertyInfo property)
         {
             if (property is null)
@@ -41,11 +62,24 @@ namespace Scriber.Engine
             return Create(property.PropertyType, attribute?.Overrides);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="defaultType"></param>
+        /// <param name="overrides"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="CompilerException"/>
         public object Create(Type defaultType, Type[]? overrides)
         {
+            if (defaultType is null)
+            {
+                throw new ArgumentNullException(nameof(defaultType));
+            }
+
             var obj = CreateEmpty(defaultType, overrides);
 
-            if (obj is DocumentVariable vars)
+            if (obj is DynamicDictionary vars)
             {
                 foreach (var field in Fields)
                 {
@@ -100,6 +134,11 @@ namespace Scriber.Engine
                 objType = defaultType;
             }
 
+            if (objType == typeof(object) || typeof(DynamicObject).IsAssignableFrom(objType))
+            {
+                objType = typeof(DynamicDictionary);
+            }
+
             if (Argument.IsArgumentType(objType, out var genericType))
             {
                 ValidateType(genericType);
@@ -124,6 +163,7 @@ namespace Scriber.Engine
             object? emptyObj;
             if (Argument.IsArgumentType(type, out var genericType))
             {
+                ValidateType(genericType);
                 emptyObj = Activator.CreateInstance(type, Origin, CreateInstance(genericType));
             }
             else
@@ -145,13 +185,13 @@ namespace Scriber.Engine
         {
             string? issue = null;
 
-            if (type.IsAbstract)
-            {
-                issue = "is defined as abstract";
-            }
-            else if (type.IsInterface)
+            if (type.IsInterface)
             {
                 issue = "is an interface";
+            }
+            else if (type.IsAbstract)
+            {
+                issue = "is defined as abstract";
             }
             else if (type.IsPrimitive)
             {
@@ -165,9 +205,9 @@ namespace Scriber.Engine
             {
                 issue = "is an enum type";
             }
-            else if (!type.IsClass && !type.IsValueType)
+            else if (typeof(Delegate).IsAssignableFrom(type))
             {
-                issue = "is not a data type";
+                issue = "is a delegate type";
             }
             else if (type.GetConstructor(Type.EmptyTypes) == null)
             {
@@ -223,6 +263,19 @@ namespace Scriber.Engine
                 value = subCreator.Create(info);
             }
 
+            if (value is ObjectArray objectArray)
+            {
+                var elementType = type.GetElementType();
+                if (type.IsArray && elementType != null)
+                {
+                    value = objectArray.Get(elementType);
+                }
+                else
+                {
+                    throw new CompilerException();
+                }
+            }
+
             if (value != null && !type.IsAssignableFrom(value.GetType()))
             {
                 CompilerState.Converters.TryConvert(value, type, out value);
@@ -231,23 +284,22 @@ namespace Scriber.Engine
             info.SetValue(obj, value);
         }
 
-        private static void FillField(DocumentVariable vars, ObjectField field)
+        private static void FillField(DynamicDictionary vars, ObjectField field)
         {
             var value = field.Argument.Value;
-            DocumentVariable inner;
 
             if (value is ObjectCreator subCreator)
             {
                 // We can assume that the returned value is a document variable.
                 // In every other case the Create call throws an exception.
-                inner = (subCreator.Create(typeof(DocumentVariable), null) as DocumentVariable)!;
+                value = (subCreator.Create(typeof(DynamicDictionary), null) as DynamicObject)!;
             }
-            else
+            else if (value is ObjectArray objectArray)
             {
-                inner = new DocumentVariable(value);
+                value = objectArray.Get(typeof(object));
             }
 
-            vars[field.Key] = inner;
+            vars.SetMember(field.Key, value);
         }
     }
 }

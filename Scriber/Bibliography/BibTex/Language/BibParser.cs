@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Util;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -177,7 +178,7 @@ namespace Scriber.Bibliography.BibTex.Language
 
                     case BibBuilderState.SetTag:
                         Debug.Assert(bib != null, "bib != null");
-                        bib[tagName] = tagValueBuilder.ToString();
+                        bib[tagName] = CompositeTex(tagValueBuilder.ToString());
                         tagValueBuilder.Clear();
                         tagName = string.Empty;
                         AddItem(entryItems, lastTokenIndex, token.Index, EntryItemType.Value);
@@ -187,7 +188,7 @@ namespace Scriber.Bibliography.BibTex.Language
                         Debug.Assert(bib != null, "bib != null");
                         if (!string.IsNullOrEmpty(tagName))
                         {
-                            bib[tagName] = tagValueBuilder.ToString();
+                            bib[tagName] = CompositeTex(tagValueBuilder.ToString());
                             tagValueBuilder.Clear();
                             tagName = string.Empty;
                         }
@@ -215,6 +216,69 @@ namespace Scriber.Bibliography.BibTex.Language
         private void AddItem(List<BibEntryItem> items, int start, int end, EntryItemType type)
         {
             items.Add(new BibEntryItem(start, end - start, type));
+        }
+
+        private string CompositeTex(string value)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < value.Length; i++)
+            {
+                // {\'o} pattern
+                if (Matches(value, i, (0, '{'), (1, '\\'), (4, '}')))
+                {
+                    var diacritic = value[i + 2];
+                    var character = value[i + 3];
+                    i += 4;
+                    sb.Append(TexUtility.CompositeCharacter(character, diacritic));
+                }
+                // {\v{S}} pattern
+                else if (Matches(value, i, (0, '{'), (1, '\\'), (3, '{'), (5, '}'), (6, '}')))
+                {
+                    var diacritic = value[i + 2];
+                    var character = value[i + 4];
+                    i += 6;
+                    sb.Append(TexUtility.CompositeCharacter(character, diacritic));
+                }
+                else
+                {
+                    sb.Append(value[i]);
+                }
+            }
+
+            sb.Replace("\\&", "&");
+            sb.Replace("{", "");
+            sb.Replace("}", "");
+
+            // remove leftover tex commands
+            for (int i = 0; i < sb.Length; i++)
+            {
+                if (sb[i] == '\\')
+                {
+                    int cur = i;
+                    for (; i < sb.Length; i++)
+                    {
+                        if (char.IsWhiteSpace(sb[i]))
+                        {
+                            break;
+                        }
+                    }
+                    sb.Remove(cur, i - cur);
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private bool Matches(string value, int index, params (int add, char c)[] tuples)
+        {
+            foreach (var (add, c) in tuples)
+            {
+                if (index + add >= value.Length || value[index + add] != c)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>

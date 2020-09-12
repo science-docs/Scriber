@@ -11,8 +11,28 @@ namespace Scriber.Engine
 
         public void Add(IElementConverter converter, Type source, params Type[] targets)
         {
+            if (converter is null)
+            {
+                throw new ArgumentNullException(nameof(converter));
+            }
+
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (targets is null)
+            {
+                throw new ArgumentNullException(nameof(targets));
+            }
+
             foreach (var target in targets)
             {
+                if (target == null)
+                {
+                    throw new ArgumentException("A target type is null", nameof(targets));
+                }
+
                 if (!types.TryGetValue(source, out var targetTypes))
                 {
                     types[source] = new List<Type> { target };
@@ -93,17 +113,18 @@ namespace Scriber.Engine
             return converter;
         }
 
-        public object? Convert(object source, Type target)
-        {
-            if (TryConvert(source, target, out var value))
-            {
-                return value;
-            }
-            return null;
-        }
-
         public bool TryConvert(object source, Type target, out object value)
         {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (target is null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
             var type = source.GetType();
             var converter = Find(type, target);
 

@@ -40,7 +40,7 @@ namespace Scriber.Bibliography.Styling
             foreach (var citation in citations)
             {
                 interpreter.Citation = citation;
-                layout.Evaluate(interpreter, citation);
+                layout.Evaluate(interpreter);
                 runs.Add(interpreter.Run);
                 interpreter.Clear();
             }
@@ -77,7 +77,7 @@ namespace Scriber.Bibliography.Styling
             foreach (var citation in citations)
             {
                 interpreter.Citation = citation;
-                Style.Bibliography!.Layout!.Evaluate(interpreter, citation);
+                Style.Bibliography!.Layout!.Evaluate(interpreter);
                 runs.Add(interpreter.Run);
                 interpreter.Clear();
             }
