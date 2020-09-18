@@ -3,6 +3,7 @@ using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.AcroForms;
 using PdfSharpCore.Pdf.Advanced;
 using PdfSharpCore.Pdf.IO;
+using Scriber.Autocomplete;
 using Scriber.Language;
 using Scriber.Layout.Document;
 using Scriber.Util;
@@ -16,7 +17,7 @@ namespace Scriber.Engine.Commands
     public static class Includes
     {
         [Command("IncludePdf")]
-        public static PdfElement? IncludePdf(CompilerState state, Argument<string> path, Argument<PdfIncludeOptions>? options = null)
+        public static PdfElement? IncludePdf(CompilerState state, [Argument(ProposalProvider = typeof(IncludePdfFileProposalProvider))] Argument<string> path, Argument<PdfIncludeOptions>? options = null)
         {
             var uri = state.FileSystem.Path.ConvertToUri(path.Value);
             var bytes = state.FileSystem.File.ReadAllBytes(uri);
@@ -138,7 +139,7 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("Include")]
-        public static void Include(CompilerState state, Argument<string> path)
+        public static void Include(CompilerState state, [Argument(ProposalProvider = typeof(IncludeFileProposalProvider))] Argument<string> path)
         {
             var uri = state.FileSystem.Path.ConvertToUri(path.Value);
             var text = state.FileSystem.File.ReadAllText(uri);

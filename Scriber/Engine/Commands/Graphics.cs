@@ -1,4 +1,5 @@
-﻿using Scriber.Layout;
+﻿using Scriber.Autocomplete;
+using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Util;
 using System.IO;
@@ -18,7 +19,7 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("IncludeGraphics")]
-        public static AbstractElement IncludeGraphics(CompilerState state, Argument<string> imagePath, IncludeImageOptions? options = null)
+        public static AbstractElement IncludeGraphics(CompilerState state, [Argument(Name = "image", ProposalProvider = typeof(ImageFileProposalProvider))] Argument<string> imagePath, IncludeImageOptions? options = null)
         {
             if (options == null || !options.Draft)
             {

@@ -17,7 +17,7 @@ namespace Scriber.Engine.Commands
         {
             var acro = acronyms.GetContents();
             var stringConverter = new ParagraphConverter();
-            var list = AcronymVariables.Acronyms.Get(state.Document)!;
+            var list = AcronymVariables.Acronyms.Get(state.Document);
             var stackPanel = new StackPanel
             {
                 Orientation = Orientation.Vertical
@@ -51,8 +51,8 @@ namespace Scriber.Engine.Commands
         [Command("Acronym")]
         public static ITextLeaf SingleAcronym(CompilerState state, string name)
         {
-            var list = AcronymVariables.Acronyms.Get(state.Document)!;
-            var usedAcronyms = AcronymVariables.UsedAcronyms.Get(state.Document)!;
+            var list = AcronymVariables.Acronyms.Get(state.Document);
+            var usedAcronyms = AcronymVariables.UsedAcronyms.Get(state.Document);
             var pair = list.FirstOrDefault(e => e.name.ToLowerInvariant() == name.ToLowerInvariant());
 
             if (pair != default((string, string)))

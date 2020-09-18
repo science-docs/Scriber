@@ -40,11 +40,8 @@ namespace Scriber.Engine.Commands
                 caption.Leaves.Insert(0, text);
 
                 var figures = TableVariables.TableOfFigures.Get(state.Document);
-                if (figures != null)
-                {
-                    var tableElement = new TableElement(figureCount.ToString(), 1, copiedCaption, panel);
-                    figures.Add(tableElement);
-                }
+                var tableElement = new TableElement(figureCount.ToString(), 1, copiedCaption, panel);
+                figures.Add(tableElement);
             }
 
             return panel;
@@ -62,11 +59,7 @@ namespace Scriber.Engine.Commands
                 };
 
                 var figures = TableVariables.TableOfFigures.Get(state.Document);
-
-                if (figures != null)
-                {
-                    panel.Elements.AddRange(figures);
-                }
+                panel.Elements.AddRange(figures);
 
                 return panel;
             });
