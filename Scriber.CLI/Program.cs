@@ -1,12 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using Scriber.Bibliography;
-using Scriber.Bibliography.BibTex.Language;
-using Scriber.Bibliography.Styling;
-using Scriber.Bibliography.Styling.Specification;
 using Scriber.Engine;
 using Scriber.Language;
 using Scriber.Logging;
@@ -19,21 +14,6 @@ namespace Scriber.CLI
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
-
-            var style = File.Load<StyleFile>("ieee.csl");
-            var processor = new Processor(style, LocaleFile.Defaults);
-
-            var bibEntries = BibParser.Parse(System.IO.File.ReadAllText("lib.bib"), out var _);
-
-            var citations = bibEntries.Select(e => e.ToCitation()).ToArray();
-
-            for (int i = 0; i < citations.Length; i++)
-            {
-                citations[i]["citation-number"] = new TextVariable(i.ToString());
-            }
-
-            var runs = processor.Bibliography(new Localization.Culture("de-DE"), citations);
-
 
             Stopwatch watch = Stopwatch.StartNew();
 
@@ -141,17 +121,23 @@ namespace Scriber.CLI
             //////sb.AppendLine("\\includegraphics{test-image.png}");
             //////sb.AppendLine("\\caption{Second Test Image}");
             //////sb.AppendLine("\\end{figure}");
-            sb.AppendLine("@UseTemplate(nak.sc)");
-            sb.AppendLine("@TableOfFigures()");
-            sb.AppendLine("@Acronyms({ CPU: Computer Processing Unit, FP: Floating Point })").AppendLine();
-            sb.AppendLine("This is the full name '@Acronym(FP)' for acronym '@Acronym(FP)'.");
+            //sb.AppendLine("@UseTemplate(nak.sc)");
+            //sb.AppendLine("@TableOfFigures()");
+            //sb.AppendLine("@Acronyms({ CPU: Computer Processing Unit, FP: Floating Point })").AppendLine();
+            //sb.AppendLine("This is the full name '@Acronym(FP)' for acronym '@Acronym(FP)'.");
             //sb.AppendLine("@VerticalSpace(550pt)");
-            sb.AppendLine("@Figure() {");
-            sb.AppendLine("@Centering()");
-            sb.AppendLine("@IncludeGraphics(test-image.png)");
-            sb.AppendLine("@Caption(Second Test Image@Footnote(More Footnotes))");
-            sb.AppendLine("}");
-            sb.AppendLine().AppendLine("Some text");
+            //sb.AppendLine("@Figure() {");
+            //sb.AppendLine("@Centering()");
+            //sb.AppendLine("@IncludeGraphics(https://asia.olympus-imaging.com/content/000107506.jpg)");
+            //sb.AppendLine("@Caption(Second Test Image@Footnote(More Footnotes))");
+            //sb.AppendLine("}");
+
+            for (int i = 0; i < 100; i++)
+            {
+                sb.AppendLine().AppendLine("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+            }
+
+            
 
             //sb.AppendLine("@Section(More Sections)");
 
@@ -203,7 +189,7 @@ namespace Scriber.CLI
 
             var tokens = Lexer.Tokenize(sb.ToString());
             context.Logger.Logged += Logger_Logged;
-            var parserResult = Parser.Parse(tokens, context.Logger);
+            var parserResult = Parser.Parse(tokens, null, context.Logger);
             var result = Compiler.Compile(context, parserResult.Elements);
 
             var document = result.Document;

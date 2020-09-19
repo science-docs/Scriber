@@ -35,7 +35,7 @@ namespace Scriber.Engine
 
             CountParameters(parameters, out var hasState, out int required, out int optional);
 
-            if (args.Length < required || args.Length > required + optional && !IsParams(parameters[^1]))
+            if ((args.Length < required || args.Length > required + optional) && !IsParams(parameters[^1]))
             {
                 throw new CompilerException(element, $"Command {command} expects between {required} and {required + optional} arguments. {args.Length} arguments where supplied");
             }
@@ -86,7 +86,7 @@ namespace Scriber.Engine
 
         /// <summary>
         /// <para>Matches the given arguments to the parameters of the command. If an argument is not directly assignable to the parameter type a conversion is attempted.</para>
-        /// <para>A conversion requires an <see cref="IElementConverter"/> for the specified argument type to be present.</para>
+        /// <para>A conversion requires an <see cref="IConverter"/> for the specified argument type to be present.</para>
         /// </summary>
         /// <param name="args"></param>
         /// <param name="parameters"></param>
@@ -102,7 +102,7 @@ namespace Scriber.Engine
                     if (argument.Value == null)
                     {
                         var attribute = parm.GetCustomAttribute<ArgumentAttribute>();
-                        if (attribute?.NonNull ?? false || parm.ParameterType.IsValueType)
+                        if (attribute?.Nullable ?? true || parm.ParameterType.IsValueType)
                         {
                             throw new CompilerException(argument.Source, $"Argument 'null' was supplied for non nullable command parameter ({parm.ParameterType.FormattedName()} {attribute?.Name ?? parm.Name}).");
                         }

@@ -3,8 +3,8 @@ using Scriber.Layout.Document;
 
 namespace Scriber.Engine.Converter
 {
-    [CommandArgumentConverter(typeof(Leaf), typeof(Paragraph))]
-    public class LeafConverter : IElementConverter
+    [Converter(typeof(Leaf), typeof(Paragraph))]
+    public class LeafConverter : IConverter
     {
         /// <summary>
         /// 

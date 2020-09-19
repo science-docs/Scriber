@@ -38,6 +38,11 @@ namespace Scriber.Bibliography
             return citations.ContainsKey(key);
         }
 
+        public IEnumerable<Citation> GetCitations()
+        {
+            return citations.Values;
+        }
+
         public Run Cite(params string[] keys)
         {
             return Cite((IEnumerable<string>)keys);

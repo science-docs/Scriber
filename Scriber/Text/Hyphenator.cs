@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace Scriber.Text
 {
@@ -9,6 +10,8 @@ namespace Scriber.Text
         private readonly NHyphenator.Hyphenator hyphenator;
         private readonly AssemblyPatternsLoader loader;
 
+        private readonly Dictionary<string, string[]> cache = new Dictionary<string, string[]>();
+
         public Hyphenator(string langCode)
         {
             loader = new AssemblyPatternsLoader(langCode);
@@ -17,8 +20,17 @@ namespace Scriber.Text
 
         public string[] Hyphenate(string value)
         {
-            var hyphenated = hyphenator.HyphenateText(value);
-            return hyphenated.Split(Symbol);
+            if (cache.TryGetValue(value, out var hyphenated))
+            {
+                return hyphenated;
+            }
+            else
+            {
+                var hyphenatedText = hyphenator.HyphenateText(value);
+                hyphenated = hyphenatedText.Split(Symbol);
+                cache[value] = hyphenated;
+                return hyphenated;
+            }
         }
 
         private class AssemblyPatternsLoader : NHyphenator.Loaders.IHyphenatePatternsLoader

@@ -6,10 +6,10 @@ namespace Scriber.Engine
 {
     public class ConverterCollection
     {
-        private readonly Dictionary<(Type, Type), IElementConverter> converters = new Dictionary<(Type, Type), IElementConverter>();
+        private readonly Dictionary<(Type, Type), IConverter> converters = new Dictionary<(Type, Type), IConverter>();
         private readonly Dictionary<Type, List<Type>> types = new Dictionary<Type, List<Type>>();
 
-        public void Add(IElementConverter converter, Type source, params Type[] targets)
+        public void Add(IConverter converter, Type source, params Type[] targets)
         {
             if (converter is null)
             {
@@ -80,7 +80,7 @@ namespace Scriber.Engine
             }
         }
 
-        private MergedElementConverter ConvertBranchToConverter(List<(Type node, IElementConverter converter)> branch)
+        private MergedElementConverter ConvertBranchToConverter(List<(Type node, IConverter converter)> branch)
         {
             var converter = new MergedElementConverter(branch[0].converter);
 
@@ -92,7 +92,7 @@ namespace Scriber.Engine
             return converter;
         }
 
-        public IElementConverter? Find(Type source, Type target)
+        public IConverter? Find(Type source, Type target)
         {
             if (source is null)
             {
@@ -156,7 +156,7 @@ namespace Scriber.Engine
             public TypeTreeNode? Parent { get; }
             public Type From { get; }
 
-            private readonly List<(Type from, TypeTreeNode node, IElementConverter converter)> nodes = new List<(Type, TypeTreeNode, IElementConverter)>();
+            private readonly List<(Type from, TypeTreeNode node, IConverter converter)> nodes = new List<(Type, TypeTreeNode, IConverter)>();
 
             public TypeTreeNode(TypeTreeNode? parent, Type from)
             {
@@ -164,7 +164,7 @@ namespace Scriber.Engine
                 From = from;
             }
 
-            public void Add(TypeTreeNode node, IElementConverter converter)
+            public void Add(TypeTreeNode node, IConverter converter)
             {
                 nodes.Add((node.From, node, converter));
             }
@@ -187,9 +187,9 @@ namespace Scriber.Engine
                 return true;
             }
 
-            public List<List<(Type, IElementConverter)>> GetBranches()
+            public List<List<(Type, IConverter)>> GetBranches()
             {
-                var branches = new List<List<(Type, IElementConverter)>>();
+                var branches = new List<List<(Type, IConverter)>>();
                 
                 foreach (var child in nodes)
                 {
@@ -208,7 +208,7 @@ namespace Scriber.Engine
 
                     if (childBranches.Count == 0)
                     {
-                        branches.Add(new List<(Type, IElementConverter)>
+                        branches.Add(new List<(Type, IConverter)>
                         {
                             tuple
                         });

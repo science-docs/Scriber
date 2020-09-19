@@ -5,12 +5,12 @@ using System.Text;
 namespace Scriber.Engine
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class CommandArgumentConverterAttribute : Attribute
+    public sealed class ConverterAttribute : Attribute
     {
         public Type Source { get; }
         public Type[] Targets { get; }
 
-        public CommandArgumentConverterAttribute(Type source, params Type[] targets)
+        public ConverterAttribute(Type source, params Type[] targets)
         {
             Source = source;
             Targets = targets;

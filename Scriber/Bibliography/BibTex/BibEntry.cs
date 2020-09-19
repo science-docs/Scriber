@@ -622,12 +622,12 @@ namespace Scriber.Bibliography.BibTex
             }
 
             if (!string.IsNullOrWhiteSpace(Author))
-                cb.Author(NamesVariable.Parse(Author, "and", ","));
+                cb.Author(ParseName(Author));
             else if (!string.IsNullOrWhiteSpace(BookAuthor))
-                cb.Author(NamesVariable.Parse(BookAuthor, "and", ","));
+                cb.Author(ParseName(BookAuthor));
 
             if (!string.IsNullOrWhiteSpace(Editor))
-                cb.Editor(NamesVariable.Parse(Editor, "and", ","));
+                cb.Editor(ParseName(Editor));
 
             if (UrlDate != null && DateVariable.TryParse(UrlDate, out var urlDateVariable))
             {
@@ -645,29 +645,29 @@ namespace Scriber.Bibliography.BibTex
                 cb.EventDate(yearMonthVariable);
             }
 
+            ITextVariable? containerTitle = null;
             if (!string.IsNullOrWhiteSpace(Journal))
             {
-                var journalVariable = new TextVariable(Journal);
-                cb.ContainerTitle(journalVariable);
-                cb.CollectionTitle(journalVariable);
+                containerTitle = new TextVariable(Journal);
             }
             else if (!string.IsNullOrWhiteSpace(JournalTitle))
             {
-                var journalTitleVariable = new TextVariable(JournalTitle);
-                cb.ContainerTitle(journalTitleVariable);
-                cb.CollectionTitle(journalTitleVariable);
+                containerTitle = new TextVariable(JournalTitle);
             }
             else if (!string.IsNullOrWhiteSpace(BookTitle))
             {
-                var bookTitleVariable = new TextVariable(BookTitle);
-                cb.ContainerTitle(bookTitleVariable);
-                cb.CollectionTitle(bookTitleVariable);
+                containerTitle = new TextVariable(BookTitle);
             }
             else if (!string.IsNullOrWhiteSpace(Series))
             {
-                var seriesVariable = new TextVariable(Series);
-                cb.ContainerTitle(seriesVariable);
-                cb.CollectionTitle(seriesVariable);
+                containerTitle = new TextVariable(Series);
+                
+            }
+
+            if (containerTitle != null)
+            {
+                cb.ContainerTitle(containerTitle);
+                cb.CollectionTitle(containerTitle);
             }
 
 
@@ -720,7 +720,7 @@ namespace Scriber.Bibliography.BibTex
                 cb.Issn(new TextVariable(Issn));
 
             if (!string.IsNullOrWhiteSpace(Translator))
-                cb.Translator(NamesVariable.Parse(Translator, "and", ","));
+                cb.Translator(ParseName(Translator));
 
             if (Chapter != null && NumberVariable.TryParse(Chapter, out var chapterVariable))
                 cb.ChapterNumber(chapterVariable);
@@ -757,6 +757,11 @@ namespace Scriber.Bibliography.BibTex
                 
 
             return cb.Build();
+        }
+
+        private NamesVariable ParseName(string name)
+        {
+            return NamesVariable.Parse(name, "and", ",");
         }
 
         private string? Get([CallerMemberName] string? name = null)

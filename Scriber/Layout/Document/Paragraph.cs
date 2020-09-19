@@ -33,6 +33,10 @@ namespace Scriber.Layout.Document
                     lineNodes.AddRange(nodes);
                 }
             }
+            if (lineNodes.Count > 0)
+            {
+                lineNodes.Add(LineNode.Glue(0, 0, 0));
+            }
             for (int i = 0; i < lineNodes.Count - 1; i++)
             {
                 if (lineNodes[i].Type == LineNodeType.Glue && lineNodes[i + 1].Type == LineNodeType.Glue)

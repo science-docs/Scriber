@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Scriber.Engine.Converter
 {
-    [CommandArgumentConverter(typeof(string),
+    [Converter(typeof(string),
         typeof(Enum), typeof(Unit),
         typeof(int), typeof(uint),
         typeof(float), typeof(double),
@@ -13,7 +13,7 @@ namespace Scriber.Engine.Converter
         typeof(long), typeof(ulong),
         typeof(decimal), typeof(bool),
         typeof(Index), typeof(Range))]
-    public class StringConverter : IElementConverter
+    public class StringConverter : IConverter
     {
         /// <summary>
         /// 

@@ -142,10 +142,11 @@ namespace Scriber.Engine.Commands
         public static void Include(CompilerState state, [Argument(ProposalProvider = typeof(IncludeFileProposalProvider))] Argument<string> path)
         {
             var uri = state.FileSystem.Path.ConvertToUri(path.Value);
-            var text = state.FileSystem.File.ReadAllText(uri);
+            var resource = state.Context.ResourceSet.Get(uri);
+            var text = resource.GetContentAsString();
 
             var tokens = Language.Lexer.Tokenize(text);
-            var elements = Parser.Parse(tokens, state.Context.Logger);
+            var elements = Parser.Parse(tokens, resource, state.Context.Logger);
             Compiler.Compile(state, elements.Elements);
         }
 

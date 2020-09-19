@@ -8,7 +8,7 @@ namespace Scriber.Engine
         public static Command Create(CommandAttribute attribute, MethodInfo info)
         {
             var invoke = CreateDelegate(attribute.Name, info, out var parameters);
-            var commandItem = new Command(attribute.Name, attribute.RequiredEnvironment, invoke, parameters);
+            var commandItem = new Command(attribute.Name, invoke, parameters);
             return commandItem;
         }
 

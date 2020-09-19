@@ -2,6 +2,7 @@
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
@@ -169,6 +170,19 @@ namespace Scriber.Engine
             else
             {
                 emptyObj = Activator.CreateInstance(type);
+
+                if (emptyObj != null)
+                {
+                    foreach (var property in type.GetProperties().Where(e => e.CanWrite))
+                    {
+                        var defaultValueAttribute = property.GetCustomAttribute<DefaultValueAttribute>();
+
+                        if (defaultValueAttribute != null)
+                        {
+                            property.SetValue(emptyObj, defaultValueAttribute.Value);
+                        }
+                    }
+                }
             }
 
             // An object returned by Activator.CreateInstance(Type) can be null if the type is e.g. int?. 
