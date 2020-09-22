@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Variables;
@@ -26,7 +27,7 @@ namespace Scriber.Engine.Commands
         {
             return new CallbackBlock(() =>
             {
-                var entries = state.Document.Variable(TableVariables.TableOfContent)!;
+                var entries = state.Document.Variable(TableVariables.TableOfContent);
 
                 var region = new StackPanel() { Orientation = Orientation.Vertical };
 
@@ -39,63 +40,67 @@ namespace Scriber.Engine.Commands
             });
         }
 
-        [Command("Header")]
-        public static Paragraph Header(CompilerState state, int level, Paragraph content)
+        [Command("Heading")]
+        public static Paragraph Heading(CompilerState state, Argument<int> level, Argument<Paragraph> content)
         {
-            ResetNumbering(state.Document, level);
-            var pretext = CreatePretext(state.Document, level);
-            var entry = new TableElement(pretext, level, content.Clone(), content);
-            state.Document.Variable(TableVariables.TableOfContent)!.Add(entry);
+            var lvl = level.Value;
+            ResetNumbering(state.Document, lvl);
+            var pretext = CreatePretext(state.Document, lvl);
+            var paragraph = content.Value;
+            var entry = new TableElement(pretext, lvl, paragraph.Clone(), paragraph);
+            state.Document.Variable(TableVariables.TableOfContent).Add(entry);
             var text = new TextLeaf
             {
                 Content = pretext + " "
             };
-            content.Leaves.Insert(0, text);
+            paragraph.Leaves.Insert(0, text);
 
-            return HeaderStar(level, content);
+            return HeadingStar(state, level, content);
         }
 
-        [Command("Header*")]
-        public static Paragraph HeaderStar(int level, Paragraph content)
+        [Command("Heading*")]
+        public static Paragraph HeadingStar(CompilerState state, Argument<int> level, Argument<Paragraph> content)
         {
-            if (level < 1 || level > MaxLevel)
+            var lvl = level.Value;
+            if (lvl < 1 || lvl > MaxLevel)
             {
-
+                state.Issues.Add(level.Source, CompilerIssueType.Warning, "");
+                lvl = Math.Clamp(lvl, 1, MaxLevel);
             }
-
-            content.FontSize = level switch
+            var paragraph = content.Value;
+            paragraph.FontSize = lvl switch
             {
                 1 => 18,
                 2 => 16,
                 3 => 14,
                 _ => 12
             };
-            content.Margin = new Thickness(14 - level * 2, 0);
-            return content;
+            paragraph.Margin = new Thickness(14 - lvl * 2, 0);
+            return paragraph;
         }
 
         [Command("Section")]
-        public static Paragraph Section(CompilerState state, Paragraph content)
+        public static Paragraph Section(CompilerState state, Argument<Paragraph> content)
         {
-            return Header(state, 1, content);
+            return Heading(state, new Argument<int>(content.Source, 1), content);
         }
 
         [Command("Section*")]
-        public static Paragraph SectionStar(Paragraph content)
+        public static Paragraph SectionStar(CompilerState state, Argument<Paragraph> content)
         {
-            return HeaderStar(1, content);
+            return HeadingStar(state, new Argument<int>(content.Source, 1), content);
         }
 
         [Command("Subsection")]
-        public static Paragraph Subsection(CompilerState state, Paragraph content)
+        public static Paragraph Subsection(CompilerState state, Argument<Paragraph> content)
         {
-            return Header(state, 2, content);
+            return Heading(state, new Argument<int>(content.Source, 2), content);
         }
 
         [Command("Subsection*")]
-        public static Paragraph SubsectionStar(Paragraph content)
+        public static Paragraph SubsectionStar(CompilerState state, Argument<Paragraph> content)
         {
-            return HeaderStar(2, content);
+            return HeadingStar(state, new Argument<int>(content.Source, 2), content);
         }
 
         private static string CreatePretext(Document document, int level)

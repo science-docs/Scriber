@@ -32,7 +32,7 @@ namespace Scriber.Engine
         }
     }
 
-    public interface IElementConverter
+    public interface IConverter
     {
         object Convert(object source, Type targetType);
     }

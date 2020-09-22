@@ -1,4 +1,5 @@
-﻿using Scriber.Bibliography;
+﻿using Scriber.Autocomplete;
+using Scriber.Bibliography;
 using Scriber.Bibliography.BibTex.Language;
 using Scriber.Bibliography.Styling;
 using Scriber.Bibliography.Styling.Formatting;
@@ -15,7 +16,7 @@ namespace Scriber.Engine.Commands
     public static class Bibliography
     {
         [Command("BibliographyStyle")]
-        public static void SetBibliographyStyle(CompilerState state, Argument<string> style)
+        public static void SetBibliographyStyle(CompilerState state, [Argument(Name = "style", ProposalProvider = typeof(BibliographyStyleFileProposalProvider))] Argument<string> style)
         {
             var uri = state.FileSystem.Path.ConvertToUri(style.Value);
             try
@@ -32,7 +33,7 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("Bibliography")]
-        public static void AddBibliography(CompilerState state, Argument<string> bibliographyPath)
+        public static void AddBibliography(CompilerState state, [Argument(Name = "bibliography", ProposalProvider = typeof(BibliographyFileProposalProvider))] Argument<string> bibliographyPath)
         {
             if (state.Document.Citations == null)
             {
@@ -53,7 +54,7 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("Cite")]
-        public static IEnumerable<Leaf> Cite(CompilerState state, Argument<string> citationKey)
+        public static IEnumerable<Leaf> Cite(CompilerState state, [Argument(Name = "citation", ProposalProvider = typeof(CitationProposalProvider))] Argument<string> citationKey)
         {
             if (state.Document.Citations == null)
             {

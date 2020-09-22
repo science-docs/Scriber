@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 namespace Scriber.Engine
 {
-    public class MergedElementConverter : IElementConverter
+    public class MergedElementConverter : IConverter
     {
-        private readonly IElementConverter first;
-        private readonly List<(Type type, IElementConverter converter)> converters = new List<(Type, IElementConverter)>();
+        private readonly IConverter first;
+        private readonly List<(Type type, IConverter converter)> converters = new List<(Type, IConverter)>();
 
-        public MergedElementConverter(IElementConverter first)
+        public MergedElementConverter(IConverter first)
         {
             this.first = first ?? throw new ArgumentNullException(nameof(first));
         }
 
-        public void Add(Type converterSourceType, IElementConverter converter)
+        public void Add(Type converterSourceType, IConverter converter)
         {
             if (converterSourceType is null)
             {
@@ -45,7 +45,7 @@ namespace Scriber.Engine
                 return first.Convert(source, targetType);
             }
 
-            var converterList = new List<IElementConverter>(converters.Count);
+            var converterList = new List<IConverter>(converters.Count);
             var typeList = new List<Type>(converters.Count);
 
             converterList.Add(first);

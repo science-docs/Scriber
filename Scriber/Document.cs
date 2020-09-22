@@ -54,7 +54,6 @@ namespace Scriber
             Hyphenator = new Text.Hyphenator("en-us");
         }
 
-        [return: MaybeNull]
         public T Variable<T>(DocumentLocal<T> local)
         {
             return local[this];

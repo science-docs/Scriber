@@ -239,12 +239,12 @@ namespace Scriber.Language
 
         public static ParserResult Parse(IEnumerable<Token> tokens)
         {
-            return Parse(tokens, null);
+            return Parse(tokens, null, null);
         }
 
-        public static ParserResult Parse(IEnumerable<Token> tokens, Logger? logger)
+        public static ParserResult Parse(IEnumerable<Token> tokens, Resource? resource, Logger? logger)
         {
-            return ParseInternal(tokens, logger);
+            return ParseInternal(tokens, resource, logger);
         }
 
         public static ParserResult ParseFromString(string text)
@@ -254,10 +254,10 @@ namespace Scriber.Language
 
         public static ParserResult ParseFromString(string text, Logger? logger)
         {
-            return Parse(Lexer.Tokenize(text), logger);
+            return Parse(Lexer.Tokenize(text), null, logger);
         }
 
-        private static ParserResult ParseInternal(IEnumerable<Token> tokens, Logger? logger)
+        private static ParserResult ParseInternal(IEnumerable<Token> tokens, Resource? resource, Logger? logger)
         {
             if (tokens == null)
                 throw new ArgumentNullException(nameof(tokens));
@@ -267,7 +267,10 @@ namespace Scriber.Language
             if (items.Length == 0)
                 return ParserResult.Empty();
 
-            Element cur = new Element(null, ElementType.Block, 0, 0);
+            Element cur = new Element(null, ElementType.Block, 0, 0)
+            {
+                Resource = resource
+            };
             var context = new ParserContext();
             var elements = new List<Element>();
 
@@ -310,7 +313,10 @@ namespace Scriber.Language
                         cur = TopParent(cur);
                         BuildContent(cur);
                         elements.Add(cur);
-                        cur = new Element(null, ElementType.Block, token.Index, context.Line);
+                        cur = new Element(null, ElementType.Block, token.Index, context.Line)
+                        {
+                            Resource = resource
+                        };
                         context.Parents.Push(cur);
                     }
                     else

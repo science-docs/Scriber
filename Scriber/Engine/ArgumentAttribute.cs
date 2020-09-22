@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Autocomplete;
+using System;
 
 namespace Scriber.Engine
 {
@@ -8,6 +9,23 @@ namespace Scriber.Engine
         public string? Name { get; set; }
         public string? Description { get; set; }
         public Type[]? Overrides { get; set; }
-        public bool NonNull { get; set; } = false;
+        public Type? ProposalProvider { get; set; }
+        public bool Nullable { get; set; } = true;
+
+        public IProposalProvider? GetProposalProvider()
+        {
+            if (ProposalProvider == null)
+            {
+                return null;
+            }
+
+            if (!ProposalProvider.IsSubclassOf(typeof(IProposalProvider)))
+            {
+                return null;
+            }
+
+            var provider = Activator.CreateInstance(ProposalProvider) as IProposalProvider;
+            return provider;
+        }
     }
 }

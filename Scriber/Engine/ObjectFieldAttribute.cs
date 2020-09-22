@@ -7,6 +7,8 @@ namespace Scriber.Engine
     {
         public string? Name { get; }
         public string? Description { get; set; }
+        public string? Remarks { get; set; }
+        public string? Example { get; set; }
         public Type[]? Overrides { get; set; }
 
         public ObjectFieldAttribute()

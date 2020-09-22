@@ -1,34 +1,16 @@
 ﻿using Scriber.Util;
 using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
 
 namespace Scriber
 {
-    public class ResourceCache
+    public class ResourceSet
     {
-        private readonly Dictionary<string, Resource> cache = new Dictionary<string, Resource>();
-
         public IFileSystem FileSystem { get; }
 
-        public ResourceCache(IFileSystem fileSystem)
+        public ResourceSet(IFileSystem fileSystem)
         {
             FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-        }
-
-        public void Clear()
-        {
-            cache.Clear();
-        }
-
-        public void Clear(Uri uri)
-        {
-            if (uri is null)
-            {
-                throw new ArgumentNullException(nameof(uri));
-            }
-
-            cache.Remove(uri.ToString());
         }
 
         public Resource Get(Uri uri)
@@ -61,7 +43,7 @@ namespace Scriber
             return Get(uri).GetContentAsString();
         }
 
-        public Resource Get(Uri uri, Func<Uri, byte[]> resourceResolver)
+        private static Resource Get(Uri uri, Func<Uri, byte[]> resourceResolver)
         {
             if (uri is null)
             {
@@ -73,18 +55,9 @@ namespace Scriber
                 throw new ArgumentNullException(nameof(resourceResolver));
             }
 
-            var uriString = uri.ToString();
-            if (cache.TryGetValue(uriString, out var resource))
-            {
-                return resource;
-            }
-            else
-            {
-                var bytes = resourceResolver(uri);
-                resource = new Resource(uri, bytes);
-                cache[uriString] = resource;
-                return resource;
-            }
+            var bytes = resourceResolver(uri);
+            var resource = new Resource(uri, bytes);
+            return resource;
         }
 
         private byte[] DefaultResolver(Uri uri)

@@ -55,11 +55,46 @@ namespace Scriber.Util
             }
             else if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
             {
-                return WebUtility.DownloadBytes(uri);
+                return file.FromCache(uri, e => WebUtility.DownloadBytes(e));
             }
             else
             {
                 throw new ArgumentOutOfRangeException(nameof(uri), "Specified URI contains no valid scheme");
+            }
+        }
+
+        public static string Hash(Uri uri)
+        {
+            using System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
+            byte[] inputBytes = Encoding.UTF8.GetBytes(uri.ToString());
+            byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+            // Convert the byte array to hexadecimal string
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                sb.Append(hashBytes[i].ToString("x2"));
+            }
+            return sb.ToString();
+        }
+
+        public static byte[] FromCache(this IFile file, Uri uri, Func<Uri, byte[]> consumer)
+        {
+            var tempFolder = file.FileSystem.Path.GetTempPath();
+            const string folderName = ".scriber";
+            var scriberFolder = file.FileSystem.Path.Combine(tempFolder, folderName);
+            file.FileSystem.Directory.CreateDirectory(scriberFolder);
+            var hash = Hash(uri) + ".tmp";
+            var tempFile = file.FileSystem.Path.Combine(scriberFolder, hash);
+            if (file.Exists(tempFile))
+            {
+                return file.ReadAllBytes(tempFile);
+            }
+            else
+            {
+                var contents = consumer(uri);
+                file.WriteAllBytes(tempFile, contents);
+                return contents;
             }
         }
     }

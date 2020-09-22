@@ -1,14 +1,37 @@
 ﻿using System.Collections.Generic;
+using Scriber.Autocomplete;
 using Scriber.Layout.Document;
 using Scriber.Text;
+using Scriber.Variables;
 
 namespace Scriber.Engine.Commands
 {
-    [Package]
+    [Package("Colors")]
     public static class TextColors
     {
+        [Command("DefineColor")]
+        public static void DefineColor(CompilerState state, Argument<string> colorName, Argument<string> value)
+        {
+            if (string.IsNullOrWhiteSpace(colorName.Value))
+            {
+                state.Issues.Add(value.Source, CompilerIssueType.Warning, "Invalid name for color.");
+            }
+
+            var color = Color.FromCode(value.Value);
+
+            if (color != null)
+            {
+                var customColors = ColorVariables.CustomColors.Get(state.Document);
+                customColors[colorName.Value] = color.Value;
+            }
+            else
+            {
+                state.Issues.Add(value.Source, CompilerIssueType.Warning, $"Could not create color from '{value.Value}'.");
+            }
+        }
+
         [Command("Color")]
-        public static IEnumerable<Leaf> ColorText(CompilerState state, Argument<string> colorName, IEnumerable<Leaf> leaves)
+        public static IEnumerable<Leaf> ColorText(CompilerState state, [Argument(ProposalProvider = typeof(ColorProposalProvider))] Argument<string> colorName, IEnumerable<Leaf> leaves)
         {
             var color = Color.FromCode(colorName.Value);
 
@@ -22,12 +45,6 @@ namespace Scriber.Engine.Commands
                 }
             }
             return ApplyColor(color.Value, leaves);
-        }
-
-        [Command("Red")]
-        public static IEnumerable<Leaf> Red(IEnumerable<Leaf> leaves)
-        {
-            return ApplyColor(Colors.Red, leaves);
         }
 
         private static IEnumerable<Leaf> ApplyColor(Color color, IEnumerable<Leaf> leaves)

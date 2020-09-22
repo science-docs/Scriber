@@ -84,7 +84,7 @@ namespace Scriber.Engine
 
         private bool IsConverter(Type type)
         {
-            return type.GetCustomAttribute<CommandArgumentConverterAttribute>() != null;
+            return type.GetCustomAttribute<ConverterAttribute>() != null;
         }
 
         private void FindCommands(Context context, Type type)
@@ -132,12 +132,12 @@ namespace Scriber.Engine
 
         private void FindConverter(Context context, Type type)
         {
-            var attribute = type.GetCustomAttribute<CommandArgumentConverterAttribute>();
+            var attribute = type.GetCustomAttribute<ConverterAttribute>();
 
             if (attribute != null)
             {
-                if (typeof(IElementConverter).IsAssignableFrom(type) &&
-                    Activator.CreateInstance(type) is IElementConverter instance)
+                if (typeof(IConverter).IsAssignableFrom(type) &&
+                    Activator.CreateInstance(type) is IConverter instance)
                 {
                     context.Converters.Add(instance, attribute.Source, attribute.Targets);
                 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Scriber.Layout.Document;
 
 namespace Scriber.Engine.Converter
 {
-    [CommandArgumentConverter(typeof(Paragraph), typeof(string), typeof(IEnumerable<Leaf>))]
-    public class ParagraphConverter : IElementConverter
+    [Converter(typeof(Paragraph), typeof(string), typeof(IEnumerable<Leaf>))]
+    public class ParagraphConverter : IConverter
     {
         /// <summary>
         /// 
@@ -32,7 +33,7 @@ namespace Scriber.Engine.Converter
             {
                 if (targetType == typeof(IEnumerable<Leaf>))
                 {
-                    return paragraph.Leaves;
+                    return paragraph.Leaves.ToArray();
                 }
                 else if (targetType == typeof(string))
                 {

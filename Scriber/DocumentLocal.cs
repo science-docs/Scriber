@@ -50,14 +50,12 @@ namespace Scriber
             this.consumer = consumer;
         }
 
-        [MaybeNull]
         public T this[Document document]
         {
             get => Get(document);
             set => Set(document, value);
         }
 
-        [return: MaybeNull]
         public T Get(Document document)
         {
             if (table.TryGetValue(document, out var value))
