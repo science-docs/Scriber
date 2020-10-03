@@ -13,7 +13,6 @@ namespace Scriber.Engine.Instructions.Tests
         [InlineData(null, ElementType.ExplicitBlock, typeof(BlockInstruction))]
         [InlineData("paragraph", ElementType.Paragraph, typeof(EmptyInstruction))]
         [InlineData("command", ElementType.Command, typeof(CommandInstruction))]
-        [InlineData("environment", ElementType.Environment, typeof(EnvironmentInstruction))]
         [InlineData(null, ElementType.ObjectArray, typeof(ObjectArrayInstruction))]
         [InlineData("key", ElementType.ObjectField, typeof(ObjectFieldInstruction))]
         [InlineData(null, ElementType.Null, typeof(NullInstruction))]

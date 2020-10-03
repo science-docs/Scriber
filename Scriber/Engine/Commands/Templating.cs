@@ -23,7 +23,7 @@ namespace Scriber.Engine.Commands
 
                     if (existingCommand == null)
                     {
-                        var command = new Command(name, CreateTemplateCommand(defaultValue), Array.Empty<System.Reflection.ParameterInfo>());
+                        var command = new Command(name, CreateTemplateCommand(defaultValue), Array.Empty<Parameter>());
 
                         state.Commands.Add(command);
                     }
@@ -44,7 +44,7 @@ namespace Scriber.Engine.Commands
                     var name = obj.Key;
                     var value = obj.Value;
 
-                    var command = new Command(name, CreateTemplateCommand(value), Array.Empty<System.Reflection.ParameterInfo>());
+                    var command = new Command(name, CreateTemplateCommand(value), Array.Empty<Parameter>());
 
                     state.Commands.Add(command);
                 }

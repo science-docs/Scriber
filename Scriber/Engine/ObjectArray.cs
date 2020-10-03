@@ -1,6 +1,7 @@
 ﻿using Scriber.Language;
 using Scriber.Util;
 using System;
+using System.Collections.Generic;
 
 namespace Scriber.Engine
 {
@@ -17,6 +18,11 @@ namespace Scriber.Engine
         }
 
         public Array Get(Type type)
+        {
+            return Get(type, null);
+        }
+
+        public Array Get(Type type, IEnumerable<Type>? overrides)
         {
             if (type is null)
             {
@@ -35,24 +41,17 @@ namespace Scriber.Engine
             for (int i = 0; i < arr.Length; i++)
             {
                 var argument = array[i];
-                var value = argument.Value;
 
-                if (value is ObjectCreator creator)
+                if (argument.Value != null)
                 {
-                    value = creator.Create(type, null);
-                }
-
-                if (value == null || type.IsAssignableFrom(value.GetType()))
-                {
-                    arr.SetValue(value, i);
-                }
-                else if (CompilerState.Converters.TryConvert(value, type, out var transformed))
-                {
-                    arr.SetValue(transformed, i);
-                }
-                else
-                {
-                    throw new CompilerException(argument.Source, $"Cannot convert element of type '{value.GetType().FormattedName()}' to '{type.FormattedName()}' because no appropriate converter was found.");
+                    if (DynamicDispatch.IsAssignableFrom(CompilerState, type, overrides, argument, out var transformed))
+                    {
+                        arr.SetValue(transformed, i);
+                    }
+                    else
+                    {
+                        throw new CompilerException(argument.Source, $"Cannot convert element of type '{argument.Value.GetType().FormattedName()}' to '{type.FormattedName()}' because no appropriate converter was found.");
+                    }
                 }
             }
 

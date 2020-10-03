@@ -72,7 +72,7 @@ namespace Scriber.Engine
 
             if (obj != null)
             {
-                // basically pass the returned object to the previous environment
+                // basically pass the returned object to the previous block
                 var flattened = obj.Flatten();
                 if (IsEnvironmentArgument(element))
                 {

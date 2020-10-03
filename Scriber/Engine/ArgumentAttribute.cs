@@ -10,7 +10,6 @@ namespace Scriber.Engine
         public string? Description { get; set; }
         public Type[]? Overrides { get; set; }
         public Type? ProposalProvider { get; set; }
-        public bool Nullable { get; set; } = true;
 
         public IProposalProvider? GetProposalProvider()
         {

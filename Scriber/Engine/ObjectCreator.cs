@@ -71,7 +71,7 @@ namespace Scriber.Engine
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="CompilerException"/>
-        public object Create(Type defaultType, Type[]? overrides)
+        public object Create(Type defaultType, IEnumerable<Type>? overrides)
         {
             if (defaultType is null)
             {
@@ -111,18 +111,21 @@ namespace Scriber.Engine
             return value;
         }
 
-        private object CreateEmpty(Type defaultType, Type[]? overrides)
+        private object CreateEmpty(Type defaultType, IEnumerable<Type>? overrides)
         {
             Type? objType = null;
 
             if (TypeName != null && TypeName != defaultType.Name && TypeName != defaultType.FullName)
             {
-                foreach (var t in overrides ?? Array.Empty<Type>())
+                if (overrides != null)
                 {
-                    if (t.Name == TypeName || t.FullName == TypeName)
+                    foreach (var t in overrides)
                     {
-                        objType = t;
-                        break;
+                        if (t.Name == TypeName || t.FullName == TypeName)
+                        {
+                            objType = t;
+                            break;
+                        }
                     }
                 }
                 if (objType == null)
@@ -282,7 +285,7 @@ namespace Scriber.Engine
                 var elementType = type.GetElementType();
                 if (type.IsArray && elementType != null)
                 {
-                    value = objectArray.Get(elementType);
+                    value = objectArray.Get(elementType, null);
                 }
                 else
                 {
@@ -310,7 +313,7 @@ namespace Scriber.Engine
             }
             else if (value is ObjectArray objectArray)
             {
-                value = objectArray.Get(typeof(object));
+                value = objectArray.Get(typeof(object), null);
             }
 
             vars.SetMember(field.Key, value);

@@ -12,6 +12,11 @@ namespace Scriber
             local[document] = ++value;
             return value;
         }
+
+        public static DocumentLocal<T> Create<T>() where T : new()
+        {
+            return new DocumentLocal<T>(() => new T());
+        }
     }
 
     public class DocumentLocal<T>
@@ -19,20 +24,22 @@ namespace Scriber
         private readonly ConditionalWeakTable<Document, ObjectBox<T>> table = new ConditionalWeakTable<Document, ObjectBox<T>>();
         private readonly Func<T> consumer;
 
-        public DocumentLocal(T defaultValue)
+        public DocumentLocal([AllowNull] T defaultValue)
         {
-            if (defaultValue == null)
-            {
-                throw new ArgumentNullException(nameof(defaultValue));
-            }
-
             // As Strings cannot be manipulated, they are valid types for a document local value
-            if (!defaultValue.GetType().IsValueType && defaultValue.GetType() != typeof(string))
+            if (defaultValue != null && !defaultValue.GetType().IsValueType && defaultValue.GetType() != typeof(string))
             {
                 throw new ArgumentException("Default value of a document local has to be a value type", nameof(defaultValue));
             }
 
-            consumer = () => defaultValue;
+            if (defaultValue == null)
+            {
+                consumer = CreateDefault;
+            }
+            else
+            {
+                consumer = () => defaultValue;
+            }
         }
 
         public DocumentLocal(Func<T> consumer)
@@ -50,13 +57,18 @@ namespace Scriber
             this.consumer = consumer;
         }
 
+        protected DocumentLocal()
+        {
+            consumer = CreateDefault;
+        }
+
         public T this[Document document]
         {
             get => Get(document);
             set => Set(document, value);
         }
 
-        public T Get(Document document)
+        public virtual T Get(Document document)
         {
             if (table.TryGetValue(document, out var value))
             {
@@ -70,9 +82,15 @@ namespace Scriber
             }
         }
 
-        public void Set(Document document, [AllowNull] T value)
+        public virtual void Set(Document document, [AllowNull] T value)
         {
             table.AddOrUpdate(document, new ObjectBox<T>(value));
+        }
+
+        [return: MaybeNull]
+        private static T CreateDefault()
+        {
+            return default;
         }
 
         private class ObjectBox<TElement>

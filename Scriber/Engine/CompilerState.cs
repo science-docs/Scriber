@@ -10,18 +10,18 @@ namespace Scriber.Engine
         public Context Context { get; }
         public Document Document { get; }
         public BlockStack Blocks { get; }
-        public CompilerIssueCollection Issues { get; } = new CompilerIssueCollection();
+        public CompilerIssueCollection Issues { get; }
 
         public IFileSystem FileSystem => Context.FileSystem;
         public CommandCollection Commands => Context.Commands;
         public ConverterCollection Converters => Context.Converters;
-        public EnvironmentCollection Environments => Context.Environments;
 
         public CompilerState(Context context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
             Document = new Document();
             Blocks = new BlockStack();
+            Issues = new CompilerIssueCollection();
         }
 
         public Argument? Execute(Element element, Argument[] arguments)

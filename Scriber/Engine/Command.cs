@@ -10,9 +10,9 @@ namespace Scriber.Engine
     {
         public string Name { get; }
         public CommandExecution Execution { get; }
-        public IReadOnlyList<ParameterInfo> Parameters { get; }
+        public IReadOnlyList<Parameter> Parameters { get; }
 
-        public Command(string name, CommandExecution execution, ParameterInfo[] parameters)
+        public Command(string name, CommandExecution execution, Parameter[] parameters)
         {
             Name = name;
             Execution = execution;

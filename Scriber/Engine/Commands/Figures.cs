@@ -1,18 +1,15 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Variables;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Scriber.Engine.Commands
 {
     [Package]
     public static class Figures
     {
-        [Environment("Figure")]
-        public static StackPanel Figure(CompilerState state, Argument[] content)
+        [Command("Figure")]
+        public static StackPanel Figure(CompilerState state, Argument<DocumentElement>[] content)
         {
             var panel = new StackPanel
             {
@@ -55,7 +52,7 @@ namespace Scriber.Engine.Commands
                 var panel = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    //Margin = new Thickness(12, 0)
+                    Margin = new Thickness(12, 0)
                 };
 
                 var figures = TableVariables.TableOfFigures.Get(state.Document);

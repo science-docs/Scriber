@@ -3,7 +3,6 @@ using Scriber.Logging;
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Scriber.Engine
 {
@@ -19,23 +18,25 @@ namespace Scriber.Engine
         /// <param name="parameters"></param>
         /// <returns></returns>
         /// <exception cref="CompilerException"/>
-        public static object[] PadArguments(string command, Element element, CompilerState state, Argument[] args, ParameterInfo[] parameters)
+        public static object[] PadArguments(string command, Element element, CompilerState state, Argument[] args, Parameter[] parameters)
         {
-            // Guard for when the command does not require any arguments
-            if (parameters.Length == 0)
-            {
-                if (args.Length != 0)
-                {
-                    throw new CompilerException(element, $"Command {command} does not expect any arguments. Received: {args.Length}");
-                }
-                return Array.Empty<object>();
-            }
+            if (command is null)
+                throw new ArgumentNullException(nameof(command));
+            if (element is null)
+                throw new ArgumentNullException(nameof(element));
+            if (state is null)
+                throw new ArgumentNullException(nameof(state));
+            if (args is null)
+                throw new ArgumentNullException(nameof(args));
+            if (parameters is null)
+                throw new ArgumentNullException(nameof(parameters));
 
             var objects = new List<object>(parameters.Length);
 
             CountParameters(parameters, out var hasState, out int required, out int optional);
+            var full = required + optional;
 
-            if ((args.Length < required || args.Length > required + optional) && !IsParams(parameters[^1]))
+            if (args.Length < required || (args.Length > full && parameters.Length > 0 && !IsArrayParameter(parameters[^1], full, args)))
             {
                 throw new CompilerException(element, $"Command {command} expects between {required} and {required + optional} arguments. {args.Length} arguments where supplied");
             }
@@ -45,15 +46,15 @@ namespace Scriber.Engine
                 objects.Add(state);
             }
 
-            if (IsParams(parameters[^1]) && args.Length >= required + optional)
+            if (parameters.Length > 0 && IsArrayParameter(parameters[^1], full, args) && args.Length >= full)
             {
-                objects.AddRange(TransformParamsArray(state, required + optional, args));
+                objects.AddRange(TransformParamsArray(state, full, args));
             }
-            else
+            else if (full > 0)
             {
                 // add all given arguments
                 objects.AddRange(args);
-                // pad missing optional arguments
+                // pad missing optional arguments with null
                 var padArray = new object[required + optional - args.Length];
                 objects.AddRange(padArray);
             }
@@ -90,8 +91,16 @@ namespace Scriber.Engine
         /// </summary>
         /// <param name="args"></param>
         /// <param name="parameters"></param>
-        public static void MatchArguments(CompilerState state, object[] args, ParameterInfo[] parameters)
+        public static object[] MatchArguments(CompilerState state, object[] args, Parameter[] parameters)
         {
+            if (state is null)
+                throw new ArgumentNullException(nameof(state));
+            if (args is null)
+                throw new ArgumentNullException(nameof(args));
+            if (parameters is null)
+                throw new ArgumentNullException(nameof(parameters));
+
+            var result = new object[args.Length];
             for (int i = 0; i < args.Length; i++)
             {
                 var arg = args[i];
@@ -101,90 +110,213 @@ namespace Scriber.Engine
                 {
                     if (argument.Value == null)
                     {
-                        var attribute = parm.GetCustomAttribute<ArgumentAttribute>();
-                        if (attribute?.Nullable ?? true || parm.ParameterType.IsValueType)
+                        if (!parm.IsNullable || parm.Type.IsValueType)
                         {
-                            throw new CompilerException(argument.Source, $"Argument 'null' was supplied for non nullable command parameter ({parm.ParameterType.FormattedName()} {attribute?.Name ?? parm.Name}).");
+                            throw new CompilerException(argument.Source, $"Argument 'null' was supplied for non nullable command parameter '{parm.ToString(true)}'.");
                         }
+                        // result[i] is null by default, therefore continue
                         continue;
                     }
 
-                    if (!IsAssignableFrom(state, parm, argument, out var transformed))
+                    if (!IsAssignableFrom(state, parm.Type, parm.Overrides, argument, out var transformed))
                     {
-                        throw new CompilerException(argument.Source, $"Object of type '{argument.Value.GetType().FormattedName()}' cannot be assigned or transformed to parameter of type '{parm.ParameterType.FormattedName()}'.");
+                        throw new CompilerException(argument.Source, $"Object of type '{argument.Value.GetType().FormattedName()}' cannot be assigned or transformed to parameter of type '{parm.Type.FormattedName(parm.Info, true)}'.");
                     }
                     else
                     {
-                        args[i] = transformed ?? throw new CompilerException(argument.Source, "Transformed element cannot be null.");
+                        result[i] = transformed ?? throw new CompilerException(argument.Source, "Transformed element cannot be null.");
 
                         if (!transformed.GetType().IsAssignableFrom(argument.Value.GetType()))
                         {
-                            state.Context.Logger.Debug(SR.Get(SRID.TransformSuccess, argument.Value.GetType().FormattedName(), transformed.GetType().FormattedName()));
+                            state.Context.Logger.Debug(SR.Get(SRID.TransformSuccess, argument.Value.GetType().FormattedName(), transformed.GetType().FormattedName(parm.Info)));
                         }
                     }
                 }
+                else
+                {
+                    result[i] = arg;
+                }
             }
+            return result;
         }
 
-        public static bool IsAssignableFrom(CompilerState state, ParameterInfo parameter, Argument argument, out object? transformed)
+        public static bool IsAssignableFrom(CompilerState state, Type type, IEnumerable<Type>? overrides, Argument argument, out object? transformed)
         {
-            transformed = null;
-            var paramType = parameter.ParameterType;
-            var isArgument = Argument.IsArgumentType(paramType, out var targetType);
-            var value = argument.Value!;
-            if (paramType == typeof(Argument))
+            if (state is null)
+                throw new ArgumentNullException(nameof(state));
+            if (type is null)
+                throw new ArgumentNullException(nameof(type));
+            if (argument is null)
+                throw new ArgumentNullException(nameof(argument));
+
+            if (argument.Value == null)
             {
-                transformed = argument;
+                transformed = null;
+                return false;
             }
-            else if (paramType == typeof(object))
+
+            var isArgument = Argument.IsArgumentType(type, out var argType);
+            transformed = TryConvertSingle(state, type, overrides, argument);
+            
+            if (transformed == null)
             {
-                transformed = argument.Value;
-            }
-            else if (paramType == typeof(object[]) && argument.Value!.GetType().IsArray)
-            {
-                var array = (Array)argument.Value!;
-                var objArray = new object[array.Length];
-                Array.Copy(array, 0, objArray, 0, array.Length);
-                transformed = objArray;
-            }
-            else if (targetType.IsAssignableFrom(value.GetType()))
-            {
-                transformed = argument.Value;
-            }
-            else if (targetType.IsArray && value is ObjectArray list)
-            {
-                transformed = list.Get(targetType.GetElementType() ?? throw new Exception("Could not convert array type to simple type."));
-            }
-            else if (value is ObjectCreator creator)
-            {
-                transformed = creator.Create(parameter);
-                isArgument = false;
-            }
-            else if (state.Converters.TryConvert(value, targetType, out var convertedValue))
-            {
-                transformed = convertedValue;
+                transformed = TryConvertArray(state, type, overrides, argument);
             }
 
             if (isArgument && transformed != null)
             {
-                transformed = argument.MakeGeneric(targetType, transformed);
+                transformed = argument.MakeGeneric(argType, transformed);
             }
-            
+
             return transformed != null;
         }
 
-        private static bool IsParams(ParameterInfo parameter)
+        private static object? TryConvertSingle(CompilerState state, Type type, IEnumerable<Type>? overrides, Argument argument)
         {
-            return parameter.IsDefined(typeof(ParamArrayAttribute));
+            var value = argument.Value!;
+            Argument.IsArgumentType(type, out var argType);
+
+            if (type == typeof(Argument))
+            {
+                return argument;
+            }
+            else if (argType == typeof(object) || argType.IsAssignableFrom(value.GetType()))
+            {
+                return value;
+            }
+            else if (value is ObjectCreator creator)
+            {
+                return creator.Create(argType, overrides);
+            }
+            else if (state.Converters.TryConvert(value, argType, out var convertedValue))
+            {
+                return convertedValue;
+            }
+
+            return null;
         }
 
-        private static void CountParameters(ParameterInfo[] parameters, out bool hasState, out int required, out int optional)
+        private static object? TryConvertArray(CompilerState state, Type type, IEnumerable<Type>? overrides, Argument argument)
+        {
+            Array? array = null;
+            var value = argument.Value!;
+            Argument.IsArgumentType(type, out var argType);
+            var innerArgument = false;
+
+            if (type.IsArray)
+            {
+                var baseType = type.GetElementType()!;
+                innerArgument = Argument.IsArgumentType(baseType, out argType);
+            }
+
+            if (argType.IsArray)
+            {
+                argType = argType.GetElementType()!;
+            }
+
+            if (value is ObjectArray objectArray)
+            {
+                var arrayType = argType;
+                if (innerArgument)
+                {
+                    arrayType = Argument.MakeGeneric(arrayType);
+                }
+                array = objectArray.Get(arrayType, overrides);
+            }
+            else if (value.GetType().IsArray)
+            {
+                array = (Array)value;
+            }
+
+            if (array != null)
+            {
+                return DispatchArray(state, array, argType, innerArgument, argument);
+            }
+
+            return null;
+        }
+
+        private static Array DispatchArray(CompilerState state, Array array, Type argType, bool innerArgument, Argument argument)
+        {
+            var arrayType = argType;
+            if (innerArgument)
+            {
+                arrayType = Argument.MakeGeneric(argType);
+            }
+            var newArray = Array.CreateInstance(arrayType, array.Length);
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                var item = array.GetValue(i);
+                var itemValue = item;
+
+                if (itemValue is Argument argumentItem)
+                {
+                    itemValue = argumentItem.Value;
+                }
+
+                if (itemValue != null)
+                {
+                    if (argType.IsAssignableFrom(itemValue.GetType()))
+                    {
+                        // do nothing
+                    }
+                    else if (state.Converters.TryConvert(itemValue, argType, out var convertedValue))
+                    {
+                        itemValue = convertedValue;
+                    }
+
+                    if (innerArgument && item is Argument argItem)
+                    {
+                        itemValue = argItem.MakeGeneric(argType, itemValue);
+                    }
+                    else if (innerArgument)
+                    {
+                        itemValue = argument.MakeGeneric(argType, itemValue);
+                    }
+                    else if (arrayType == typeof(Argument))
+                    {
+                        itemValue = new Argument(argument.Source, itemValue);
+                    }
+                }
+
+                newArray.SetValue(itemValue, i);
+            }
+
+            return newArray;
+        }
+
+        private static bool IsArrayParameter(Parameter parameter, int size, Argument[] args)
+        {
+            if (parameter.Type.IsArray)
+            {
+                if (args.Length == size)
+                {
+                    var value = args[^1].Value;
+                    if (value != null)
+                    {
+                        return !value.GetType().IsArray;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static void CountParameters(Parameter[] parameters, out bool hasState, out int required, out int optional)
         {
             int start = 0;
             required = 0;
             optional = 0;
 
-            hasState = parameters[0].ParameterType == typeof(CompilerState);
+            hasState = parameters.Length > 0 && parameters[0].Type == typeof(CompilerState);
 
             if (hasState)
             {
