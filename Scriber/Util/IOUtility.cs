@@ -3,11 +3,15 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Text;
 using System.Net.Http;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Scriber.Util
 {
     public static class IOUtility
     {
+        private const string UriPackScheme = "pack";
+
         public static Uri ConvertToUri(this IPath path, string uriPath)
         {
             if (Uri.IsWellFormedUriString(uriPath, UriKind.Absolute))
@@ -57,9 +61,109 @@ namespace Scriber.Util
             {
                 return file.FromCache(uri, e => WebUtility.DownloadBytes(e));
             }
+            else if (uri.Scheme == UriPackScheme)
+            {
+                return file.FindPackResource(uri.AbsolutePath);
+            }
             else
             {
                 throw new ArgumentOutOfRangeException(nameof(uri), "Specified URI contains no valid scheme");
+            }
+        }
+
+        private static readonly Regex PackRegex = new Regex(@"^(?:(?<site>(?:application|sizeoforigin)):,,,)?(?:\/(?<asm>[a-zA-Z0-9]+)(;v(?<version>(?:\d\.)*\d))?;component)?(?<path>\/[a-zA-Z0-9_\/\.]*)$", RegexOptions.Compiled);
+
+        public static Assembly? FindPackAssembly(string assemblyName, string? assemblyVersion)
+        {
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            foreach (var asm in loadedAssemblies)
+            {
+                var name = asm.GetName().Name;
+                var version = asm.GetName().Version;
+
+                if (Version.TryParse(assemblyVersion, out var asmVersion))
+                {
+                    if (version != asmVersion)
+                    {
+                        continue;
+                    }
+                }
+
+                if (name == assemblyName)
+                {
+                    return asm;
+                }
+            }
+            return null;
+        }
+
+        public static byte[] FindPackResource(this IFile file, string uriPath)
+        {
+            if (file is null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            if (uriPath == null)
+            {
+                throw new ArgumentNullException(nameof(uriPath));
+            }
+
+            var match = PackRegex.Match(uriPath);
+            if (match.Success)
+            {
+                string? site = null;
+                if (match.Groups.TryGetValue("site", out var siteGroup))
+                    site = siteGroup.Value;
+                string? asm = null;
+                if (match.Groups.TryGetValue("asm", out var asmGroup))
+                    asm = asmGroup.Value;
+                string? version = null;
+                if (match.Groups.TryGetValue("version", out var versionGroup))
+                    version = versionGroup.Value;
+                string path = "/";
+                if (match.Groups.TryGetValue("path", out var pathGroup))
+                    path = pathGroup.Value;
+
+                Stream? stream;
+                if (site == "siteoforigin")
+                {
+                    var currentDir = file.FileSystem.Directory.GetCurrentDirectory();
+                    var fullPath = file.FileSystem.Path.Combine(currentDir, path);
+                    if (!file.Exists(fullPath))
+                    {
+                        throw new FileNotFoundException($"Specified file does not exist", path);
+                    }
+                    else
+                    {
+                        stream = file.OpenRead(fullPath);
+                    }
+                }
+                else if (site == null || site == "application")
+                {
+                    Assembly assembly = typeof(IOUtility).Assembly;
+                    if (asm != null)
+                    {
+                        assembly = FindPackAssembly(asm, version) ?? throw new IOException();
+                    }
+                    var asmPath = path.TrimStart('/').Replace('/', '.');
+                    stream = assembly.GetManifestResourceStream(asmPath) ?? throw new FileNotFoundException($"Specified file does not exist", path); ;
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid pack authority. Supported authorities are 'application' and 'siteoforigin'.", nameof(uriPath));
+                }
+                
+                
+                using var ms = new MemoryStream();
+                stream.CopyTo(ms);
+                stream.Dispose();
+                return ms.ToArray();
+            }
+            else
+            {
+                throw new ArgumentException("", nameof(uriPath));
             }
         }
 

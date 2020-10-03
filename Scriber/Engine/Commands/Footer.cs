@@ -1,4 +1,5 @@
 ﻿using Scriber.Layout.Document;
+using Scriber.Variables;
 
 namespace Scriber.Engine.Commands
 {
@@ -6,10 +7,16 @@ namespace Scriber.Engine.Commands
     public static class Footer
     {
         [Command("Footnote")]
-        public static FootnoteLeaf Footnote(Paragraph content, string? name = null)
+        public static FootnoteLeaf Footnote(CompilerState state, Paragraph content, string? name = null)
         {
             name ??= "0";
             var footnote = new FootnoteLeaf(name, content);
+            content.HorizontalAlignment = Layout.HorizontalAlignment.Justify;
+            var footnoteSize = state.Document.Variable(FontVariables.FootnoteSize);
+            if (footnoteSize != null)
+            {
+                content.FontSize = footnoteSize.Value;
+            }
             content.Parent = footnote;
             return footnote;
         }

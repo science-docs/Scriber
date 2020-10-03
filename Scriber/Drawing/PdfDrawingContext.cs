@@ -3,6 +3,7 @@ using PdfSharpCore.Pdf;
 using Scriber.Layout;
 using Scriber.Text;
 using System;
+using System.Numerics;
 
 namespace Scriber.Drawing
 {
@@ -53,7 +54,10 @@ namespace Scriber.Drawing
 
         public override void AddLink(Rectangle rectangle, int targetPage)
         {
-            G.PdfPage.AddDocumentLink(new PdfRectangle(new XRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height)), targetPage);
+            var transform = GetTransform();
+            rectangle.Position = rectangle.Position.Transform(transform);
+            var rect = G.Transformer.WorldToDefaultPage(new XRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height));
+            G.PdfPage.AddDocumentLink(new PdfRectangle(rect), targetPage + 1);
         }
     }
 }

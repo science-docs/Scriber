@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Threading;
@@ -26,7 +27,15 @@ namespace Scriber.CLI
             //sb.AppendLine("\\setlength[baselinestretch]{2}");
             //sb.AppendLine("@IncludePdf(tfl.pdf, { Fields: [ 4711, Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, A16a ] })");
             //sb.AppendLine("Some text");
-            ////sb.AppendLine("@CenterFooter(Page @ThePage)");
+            sb.AppendLine("@CenterFooter(@ThePage)");
+            sb.AppendLine("@Pagebreak()");
+            sb.AppendLine("@Pagebreak()");
+            sb.AppendLine("@Pagebreak()");
+            sb.AppendLine("@Pagebreak()");
+            sb.AppendLine("@SetPageNumbering(25, RomanUpper)");
+            sb.AppendLine("@Pagebreak()");
+            sb.AppendLine("@Pagebreak()");
+            sb.AppendLine("@Pagebreak()");
             ////sb.AppendLine("@Include(include.sc)");
             ////sb.AppendLine("\\section{This is a section}");
 
@@ -126,18 +135,27 @@ namespace Scriber.CLI
             //sb.AppendLine("@Acronyms({ CPU: Computer Processing Unit, FP: Floating Point })").AppendLine();
             //sb.AppendLine("This is the full name '@Acronym(FP)' for acronym '@Acronym(FP)'.");
             //sb.AppendLine("@VerticalSpace(550pt)");
-            //sb.AppendLine("@Figure() {");
-            //sb.AppendLine("@Centering()");
-            //sb.AppendLine("@IncludeGraphics(https://asia.olympus-imaging.com/content/000107506.jpg)");
-            //sb.AppendLine("@Caption(Second Test Image@Footnote(More Footnotes))");
+            //sb.AppendLine("@FootnoteSize(6)");
+            //sb.AppendLine("@FontSize(14)");
+            //sb.AppendLine("Some text");
+
+            //sb.AppendLine("@Section(First)");
+            //sb.AppendLine("@Subsection(Second)");
+            //sb.AppendLine("@Label(section, x)");
+            //sb.AppendLine("blabla @Reference(x)");
+            //sb.AppendLine("@Figure(@Centering(), @IncludeGraphics(https://asia.olympus-imaging.com/content/000107506.jpg), @Caption(Second Test Image@Footnote(More Footnotes)))");
+            //sb.AppendLine("@FontSize(20, Some Larger Text, Some more text)").AppendLine();
+            //sb.AppendLine("");
+            //sb.AppendLine("");
+            ////sb.AppendLine("@Caption(Second Test Image@Footnote(More Footnotes))");
             //sb.AppendLine("}");
 
-            for (int i = 0; i < 100; i++)
-            {
-                sb.AppendLine().AppendLine("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
-            }
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    sb.AppendLine().AppendLine("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+            //}
 
-            
+
 
             //sb.AppendLine("@Section(More Sections)");
 
@@ -206,7 +224,9 @@ namespace Scriber.CLI
 
         private static void Logger_Logged(Log log)
         {
-            Debug.WriteLine(string.Join("", log.GetFullMessageParts()));
+            var content = string.Join("", log.GetFullMessageParts());
+            Console.WriteLine(content);
+            Debug.WriteLine(content);
         }
     }
 }

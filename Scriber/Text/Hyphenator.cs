@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Scriber.Localization;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Scriber.Text
@@ -12,9 +13,9 @@ namespace Scriber.Text
 
         private readonly Dictionary<string, string[]> cache = new Dictionary<string, string[]>();
 
-        public Hyphenator(string langCode)
+        public Hyphenator(Culture culture)
         {
-            loader = new AssemblyPatternsLoader(langCode);
+            loader = new AssemblyPatternsLoader(culture.ToString());
             hyphenator = new NHyphenator.Hyphenator(loader, Symbol);
         }
 
@@ -39,7 +40,7 @@ namespace Scriber.Text
 
             public AssemblyPatternsLoader(string langCode)
             {
-                LangCode = langCode;
+                LangCode = langCode.ToLowerInvariant();
             }
 
             public string LoadExceptions()

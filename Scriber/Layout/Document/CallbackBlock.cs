@@ -21,12 +21,12 @@ namespace Scriber.Layout.Document
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }

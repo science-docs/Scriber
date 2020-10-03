@@ -27,6 +27,7 @@ namespace Scriber.Layout
         public double Shrink { get; set; }
         public double Cost { get; set; }
         public bool Flagged { get; set; }
+        public int? Link { get; set; }
 
         public static LineNode None(double width, double stretch, double shrink)
         {

@@ -10,7 +10,6 @@ using Scriber.Layout.Document;
 using Scriber.Logging;
 using Scriber.Bibliography;
 using Scriber.Localization;
-using System.Diagnostics.CodeAnalysis;
 using Scriber.Variables;
 
 namespace Scriber
@@ -25,21 +24,22 @@ namespace Scriber
 
         public ElementCollection<DocumentElement> PageItems { get; }
 
+        public List<Outline> Outlines { get; } = new List<Outline>();
+
         public Measurements Measurements { get; }
 
         public Text.Hyphenator Hyphenator { get; set; }
 
         public IArrangingStrategy ArrangingStrategy { get; set; } = new DefaultArrangingStrategy();
 
-        public Size PageSize { get; private set; }
-        public Size PageBoxSize { get; private set; }
-        public Thickness PageMargin { get; private set; }
-
         public Culture Culture { get; set; } = new Culture("en-US");
 
         public Locale Locale { get; set; }
 
         public Citations? Citations { get; set; }
+
+        public string? Title { get; set; }
+        public string? Author { get; set; }
 
         public Document()
         {
@@ -87,23 +87,17 @@ namespace Scriber
 
             Measurements.Clear();
             Pages.Clear();
-            PageNumbering.Set(1);
+            PageNumbering.Reset();
         }
 
         public void Measure()
         {
-            PageSize = Variable(PageVariables.Size);
-            PageMargin = Variable(PageVariables.Margin);
-
-            PageBoxSize = new Size(PageSize.Width - PageMargin.Width, PageSize.Height - PageMargin.Height);
+            var boxSize = Variable(PageVariables.BoxSize);
 
             foreach (var element in Elements.AsParallel())
             {
                 element.Document = this;
-                var elementSize = PageBoxSize;
-                elementSize.Height -= element.Margin.Height;
-                elementSize.Width -= element.Margin.Width;
-                Measurements.Add(element.Measure(elementSize));
+                Measurements.Add(element.Measure(boxSize));
             }
 
             foreach (var element in PageItems)
@@ -120,6 +114,10 @@ namespace Scriber
         public byte[] ToPdf()
         {
             var doc = new PdfDocument();
+            doc.Info.Author = Author ?? string.Empty;
+            doc.Info.Title = Title ?? string.Empty;
+            doc.Info.Creator = "Scriber " + typeof(Document).Assembly.GetName().Version?.ToString();
+
             var renderContext = new PdfDrawingContext
             {
                 Document = doc
@@ -136,6 +134,13 @@ namespace Scriber
                 page.OnRender(renderContext);
             }
 
+            if (doc.PageCount == 0)
+            {
+                doc.AddPage();
+            }
+
+            Outline.AddPdf(Outlines, doc);
+
             using var ms = new MemoryStream();
             doc.Save(ms);
             return ms.ToArray();
@@ -148,7 +153,7 @@ namespace Scriber
 
         protected override AbstractElement CloneInternal()
         {
-            return new Document();
+            throw new NotSupportedException();
         }
     }
 }

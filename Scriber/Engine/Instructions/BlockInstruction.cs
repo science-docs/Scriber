@@ -51,6 +51,7 @@ namespace Scriber.Engine.Instructions
                         currentParagraph = new Paragraph();
                         var margin = currentParagraph.Margin;
                         margin.Bottom = state.Document.Variable(ParagraphVariables.Skip);
+                        currentParagraph.FontSize = state.Document.Variable(FontVariables.FontSize);
                         currentParagraph.Margin = margin;
                         results.Add(new Argument(item.Source, currentParagraph));
                     }

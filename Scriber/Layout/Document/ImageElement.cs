@@ -59,6 +59,12 @@ namespace Scriber.Layout.Document
         protected override Measurement MeasureOverride(Size availableSize)
         {
             var size = new Size(Width.Point * Scale, Height.Point * Scale);
+            if (size.Width > availableSize.Width)
+            {
+                var ratio = size.Width / (availableSize.Width - Margin.Width - 2);
+                size.Width /= ratio;
+                size.Height /= ratio;
+            }
             return new Measurement(this, size, Margin);
         }
 

@@ -46,7 +46,39 @@ namespace Scriber.Engine.Commands
 
             void Set(DocumentElement element)
             {
-                element.Document?.PageNumbering.Set(count);
+                if (element.Document != null)
+                {
+                    element.Document.PageNumbering.Current = count;
+                }
+            }
+        }
+
+        [Command("SetPageNumbering")]
+        public static CallbackArrangingBlock SetPageNumbering(int count, PageNumberingStyle style)
+        {
+            return new CallbackArrangingBlock(Set);
+
+            void Set(DocumentElement element)
+            {
+                if (element.Document != null)
+                {
+                    element.Document.PageNumbering.Current = count;
+                    element.Document.PageNumbering.Style = style;
+                }
+            }
+        }
+
+        [Command("SetPageNumberingStyle")]
+        public static CallbackArrangingBlock SetPageNumberingStyle(PageNumberingStyle style)
+        {
+            return new CallbackArrangingBlock(Set);
+
+            void Set(DocumentElement element)
+            {
+                if (element.Document != null)
+                {
+                    element.Document.PageNumbering.Style = style;
+                }
             }
         }
 

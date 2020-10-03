@@ -51,7 +51,7 @@ namespace Scriber.Localization
                 new string[]{"", "m", "mm", "mmm"} // thousands
             };
 
-        private string FormatRomanNumber(int number)
+        public static string FormatRomanNumber(int number)
         {
             if (number == 0)
             {

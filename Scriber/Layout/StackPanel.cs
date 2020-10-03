@@ -16,10 +16,8 @@ namespace Scriber.Layout
                 foreach (var child in Elements)
                 {
                     var childMeasurement = child.Measure(availableSize);
-                    y += childMeasurement.Margin.Top;
                     Align(childMeasurement, availableSize, y);
                     y += childMeasurement.TotalSize.Height;
-                    y -= childMeasurement.Margin.Top;
                     measurement.Subs.Add(childMeasurement);
                 }
             }
