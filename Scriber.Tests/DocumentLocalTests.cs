@@ -60,11 +60,8 @@ namespace Scriber.Tests
         [Fact]
         public void NullDefaultValue()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() =>
-            {
-                new DocumentLocal<object>((object)null);
-            });
-            Assert.Equal("defaultValue", ex.ParamName);
+            var local = new DocumentLocal<object>((object)null);
+            Assert.Null(local.Get(new Document()));
         }
 
         [Fact]

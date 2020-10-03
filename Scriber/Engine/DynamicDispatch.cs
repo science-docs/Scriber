@@ -180,13 +180,13 @@ namespace Scriber.Engine
             {
                 return argument;
             }
-            else if (argType == typeof(object) || argType.IsAssignableFrom(value.GetType()))
-            {
-                return value;
-            }
             else if (value is ObjectCreator creator)
             {
                 return creator.Create(argType, overrides);
+            }
+            else if (argType == typeof(object) || argType.IsAssignableFrom(value.GetType()))
+            {
+                return value;
             }
             else if (state.Converters.TryConvert(value, argType, out var convertedValue))
             {
