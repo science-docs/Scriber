@@ -81,9 +81,25 @@ namespace Scriber.Language
             }
             else
             {
-                var node = Parent!.Children.Find(this)!;
+                var node = Parent.Children.Find(this)!;
                 previous = node.Previous?.Value;
                 next = node.Next?.Value;
+            }
+        }
+
+        public Element? ContainerOfType(ElementType type)
+        {
+            if (Parent == null)
+            {
+                return null;
+            }
+            else if (Parent.Type == type)
+            {
+                return Parent;
+            }
+            else
+            {
+                return Parent.ContainerOfType(type);
             }
         }
 

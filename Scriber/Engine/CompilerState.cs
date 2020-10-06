@@ -1,6 +1,7 @@
 ﻿using Scriber.Engine.Instructions;
 using Scriber.Language;
 using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 
 namespace Scriber.Engine
@@ -11,7 +12,6 @@ namespace Scriber.Engine
         public Document Document { get; }
         public BlockStack Blocks { get; }
         public CompilerIssueCollection Issues { get; }
-
         public IFileSystem FileSystem => Context.FileSystem;
         public CommandCollection Commands => Context.Commands;
         public ConverterCollection Converters => Context.Converters;

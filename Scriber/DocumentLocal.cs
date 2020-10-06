@@ -13,6 +13,13 @@ namespace Scriber
             return value;
         }
 
+        public static int Decrement(this DocumentLocal<int> local, Document document)
+        {
+            var value = local[document];
+            local[document] = --value;
+            return value;
+        }
+
         public static DocumentLocal<T> Create<T>() where T : new()
         {
             return new DocumentLocal<T>(() => new T());

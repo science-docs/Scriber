@@ -30,7 +30,14 @@ namespace Scriber.Engine.Converter
             {
                 if (targetType == typeof(Paragraph))
                 {
-                    return Paragraph.FromLeaves(leaf);
+                    if (leaf.Parent is Paragraph paragraph)
+                    {
+                        return paragraph;
+                    }
+                    else
+                    {
+                        return Paragraph.FromLeaves(leaf);
+                    }
                 }
             }
 

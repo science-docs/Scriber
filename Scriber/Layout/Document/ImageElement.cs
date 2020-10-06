@@ -38,7 +38,7 @@ namespace Scriber.Layout.Document
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             var image = new Image(imageData, Image);
-            drawingContext.DrawImage(image, new Rectangle(new Position(), measurement.Size));
+            drawingContext.DrawImage(image, new Rectangle(Position.Zero, measurement.Size));
         }
 
         protected override AbstractElement CloneInternal()
