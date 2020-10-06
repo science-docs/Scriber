@@ -12,23 +12,6 @@ namespace Scriber.Util
     {
         private const string UriPackScheme = "pack";
 
-        public static Uri ConvertToUri(this IPath path, string uriPath)
-        {
-            if (Uri.IsWellFormedUriString(uriPath, UriKind.Absolute))
-            {
-                return new Uri(uriPath, UriKind.Absolute);
-            }
-            else
-            {
-                var builder = new UriBuilder
-                {
-                    Path = path.GetFullPath(uriPath),
-                    Scheme = Uri.UriSchemeFile
-                };
-                return builder.Uri;
-            }
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -63,7 +46,7 @@ namespace Scriber.Util
             }
             else if (uri.Scheme == UriPackScheme)
             {
-                return file.FindPackResource(uri.AbsolutePath);
+                return file.FindPackResource(uri);
             }
             else
             {
@@ -71,7 +54,7 @@ namespace Scriber.Util
             }
         }
 
-        private static readonly Regex PackRegex = new Regex(@"^(?:(?<site>(?:application|sizeoforigin)):,,,)?(?:\/(?<asm>[a-zA-Z0-9]+)(;v(?<version>(?:\d\.)*\d))?;component)?(?<path>\/[a-zA-Z0-9_\/\.]*)$", RegexOptions.Compiled);
+        private static readonly Regex PackRegex = new Regex(@"^(?:(?<site>(?:application|siteoforigin)):,,,)?(?:\/(?<asm>[a-zA-Z0-9]+)(;v(?<version>(?:\d\.)*\d))?;component)?(?<path>\/[a-zA-Z0-9_\/\.]*)$", RegexOptions.Compiled);
 
         public static Assembly? FindPackAssembly(string assemblyName, string? assemblyVersion)
         {
@@ -98,34 +81,52 @@ namespace Scriber.Util
             return null;
         }
 
-        public static byte[] FindPackResource(this IFile file, string uriPath)
+        public static bool TrySplitPackUri(this Uri uri, out string? site, out string? assembly, out string? version, out string? path)
+        {
+            var uriPath = uri.AbsolutePath;
+            var match = PackRegex.Match(uriPath);
+            if (match.Success)
+            {
+                site = null;
+                if (match.Groups.TryGetValue("site", out var siteGroup))
+                    site = siteGroup.Value;
+                assembly = null;
+                if (match.Groups.TryGetValue("asm", out var asmGroup))
+                    assembly = asmGroup.Value;
+                version = null;
+                if (match.Groups.TryGetValue("version", out var versionGroup))
+                    version = versionGroup.Value;
+                path = "/";
+                if (match.Groups.TryGetValue("path", out var pathGroup))
+                    path = pathGroup.Value;
+
+                return true;
+            }
+            else
+            {
+                site = null;
+                assembly = null;
+                version = null;
+                path = null;
+                return false;
+            }
+        }
+
+        public static byte[] FindPackResource(this IFile file, Uri uri)
         {
             if (file is null)
             {
                 throw new ArgumentNullException(nameof(file));
             }
 
-            if (uriPath == null)
+            if (uri == null)
             {
-                throw new ArgumentNullException(nameof(uriPath));
+                throw new ArgumentNullException(nameof(uri));
             }
 
-            var match = PackRegex.Match(uriPath);
-            if (match.Success)
+            if (TrySplitPackUri(uri, out var site, out var asm, out var version, out var path))
             {
-                string? site = null;
-                if (match.Groups.TryGetValue("site", out var siteGroup))
-                    site = siteGroup.Value;
-                string? asm = null;
-                if (match.Groups.TryGetValue("asm", out var asmGroup))
-                    asm = asmGroup.Value;
-                string? version = null;
-                if (match.Groups.TryGetValue("version", out var versionGroup))
-                    version = versionGroup.Value;
-                string path = "/";
-                if (match.Groups.TryGetValue("path", out var pathGroup))
-                    path = pathGroup.Value;
-
+                path ??= "/";
                 Stream? stream;
                 if (site == "siteoforigin")
                 {
@@ -152,10 +153,9 @@ namespace Scriber.Util
                 }
                 else
                 {
-                    throw new ArgumentException("Invalid pack authority. Supported authorities are 'application' and 'siteoforigin'.", nameof(uriPath));
+                    throw new ArgumentException("Invalid pack authority. Supported authorities are 'application' and 'siteoforigin'.", nameof(uri));
                 }
-                
-                
+
                 using var ms = new MemoryStream();
                 stream.CopyTo(ms);
                 stream.Dispose();
@@ -163,7 +163,7 @@ namespace Scriber.Util
             }
             else
             {
-                throw new ArgumentException("", nameof(uriPath));
+                throw new ArgumentException("Not a valid pack uri.", nameof(uri));
             }
         }
 

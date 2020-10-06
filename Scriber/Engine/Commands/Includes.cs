@@ -19,7 +19,7 @@ namespace Scriber.Engine.Commands
         [Command("IncludePdf")]
         public static PdfElement? IncludePdf(CompilerState state, [Argument(ProposalProvider = typeof(IncludePdfFileProposalProvider))] Argument<string> path, Argument<PdfIncludeOptions>? options = null)
         {
-            var uri = state.FileSystem.Path.ConvertToUri(path.Value);
+            var uri = state.Context.ResourceSet.RelativeUri(path.Value);
             var bytes = state.FileSystem.File.ReadAllBytes(uri);
 
             var fields = options?.Value?.Fields;
@@ -141,13 +141,15 @@ namespace Scriber.Engine.Commands
         [Command("Include")]
         public static void Include(CompilerState state, [Argument(ProposalProvider = typeof(IncludeFileProposalProvider))] Argument<string> path)
         {
-            var uri = state.FileSystem.Path.ConvertToUri(path.Value);
+            var uri = state.Context.ResourceSet.RelativeUri(path.Value);
             var resource = state.Context.ResourceSet.Get(uri);
             var text = resource.GetContentAsString();
 
+            state.Context.ResourceSet.PushResource(resource);
             var tokens = Language.Lexer.Tokenize(text);
             var elements = Parser.Parse(tokens, resource, state.Context.Logger);
             Compiler.Compile(state, elements.Elements);
+            state.Context.ResourceSet.PopResource();
         }
 
         public class PdfIncludeOptions

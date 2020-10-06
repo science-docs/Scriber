@@ -25,7 +25,7 @@ namespace Scriber.Engine.Commands
             {
                 try
                 {
-                    var uri = state.FileSystem.Path.ConvertToUri(imagePath.Value);
+                    var uri = state.Context.ResourceSet.RelativeUri(imagePath.Value);
                     var bytes = state.FileSystem.File.ReadAllBytes(uri);
                     var image = new ImageElement(bytes, imagePath.Value);
 

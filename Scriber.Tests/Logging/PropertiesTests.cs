@@ -2,7 +2,7 @@
 using System.IO;
 using Xunit;
 
-namespace Scriber.Tests.Logging
+namespace Scriber.Logging.Tests
 {
     public class PropertiesTests
     {

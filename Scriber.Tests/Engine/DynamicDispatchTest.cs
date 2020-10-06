@@ -3,7 +3,7 @@ using Scriber.Tests.Fixture;
 using System;
 using Xunit;
 
-namespace Scriber.Tests.Engine
+namespace Scriber.Engine.Tests
 {
     public class DynamicDispatchTest
     {

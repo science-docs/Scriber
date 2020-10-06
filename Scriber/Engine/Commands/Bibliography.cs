@@ -18,7 +18,7 @@ namespace Scriber.Engine.Commands
         [Command("BibliographyStyle")]
         public static void SetBibliographyStyle(CompilerState state, [Argument(Name = "style", ProposalProvider = typeof(BibliographyStyleFileProposalProvider))] Argument<string> style)
         {
-            var uri = state.FileSystem.Path.ConvertToUri(style.Value);
+            var uri = state.Context.ResourceSet.RelativeUri(style.Value);
             try
             {
                 var bytes = state.FileSystem.File.ReadAllBytes(uri);
@@ -40,7 +40,7 @@ namespace Scriber.Engine.Commands
                 return;
             }
 
-            var uri = state.FileSystem.Path.ConvertToUri(bibliographyPath.Value);
+            var uri = state.Context.ResourceSet.RelativeUri(bibliographyPath.Value);
             try
             {
                 var text = state.FileSystem.File.ReadAllText(uri);
