@@ -5,7 +5,6 @@ using Scriber.Bibliography.Styling;
 using Scriber.Bibliography.Styling.Formatting;
 using Scriber.Bibliography.Styling.Specification;
 using Scriber.Layout.Document;
-using Scriber.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,10 +17,9 @@ namespace Scriber.Engine.Commands
         [Command("BibliographyStyle")]
         public static void SetBibliographyStyle(CompilerState state, [Argument(Name = "style", ProposalProvider = typeof(BibliographyStyleFileProposalProvider))] Argument<string> style)
         {
-            var uri = state.Context.ResourceSet.RelativeUri(style.Value);
             try
             {
-                var bytes = state.FileSystem.File.ReadAllBytes(uri);
+                var bytes = state.Context.ResourceSet.RelativeResource(style.Value).GetContent();
                 using var sourceStream = new System.IO.MemoryStream(bytes);
                 var styleFile = File.Load<StyleFile>(sourceStream);
                 state.Document.Citations = new Citations(new Processor(styleFile, LocaleFile.Defaults), state.Document.Locale.File);
@@ -40,10 +38,9 @@ namespace Scriber.Engine.Commands
                 return;
             }
 
-            var uri = state.Context.ResourceSet.RelativeUri(bibliographyPath.Value);
             try
             {
-                var text = state.FileSystem.File.ReadAllText(uri);
+                var text = state.Context.ResourceSet.RelativeResource(bibliographyPath.Value).GetContentAsString();
                 var bibEntries = BibParser.Parse(text, out var _);
                 state.Document.Citations.AddRange(bibEntries.Select(e => e.ToCitation()));
             }

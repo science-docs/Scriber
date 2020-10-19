@@ -1,12 +1,19 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Variables;
+using System.Globalization;
 
 namespace Scriber.Engine.Commands
 {
     [Package("")]
     public static class Layouts
     {
+        [Command("TextWidth")]
+        public static string TextWidth(CompilerState state)
+        {
+            return state.Document.Variable(PageVariables.BoxSize).Width.ToString(CultureInfo.InvariantCulture);
+        }
+
         [Command("VerticalSpace")]
         public static Box VSpace(Unit vertical)
         {

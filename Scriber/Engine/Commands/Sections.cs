@@ -49,21 +49,23 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("Reference")]
-        public static ITextLeaf Reference(CompilerState state, Argument<string> label)
+        public static ITextLeaf? Reference(CompilerState state, Argument<string> label)
         {
             var labels = LabelVariables.Labels.Get(state.Document);
             if (labels.TryGetValue(label.Value, out var tableElement))
             {
                 if (string.IsNullOrWhiteSpace(tableElement.Preamble))
                 {
-                    throw new CompilerException(label.Source, $"Element '{label.Value}' does not allow referencing");
+                    state.Issues.Add(label.Source, CompilerIssueType.Warning, $"Element '{label.Value}' does not allow referencing");
+                    return null;
                 }
 
                 return new ReferenceLeaf(tableElement.Reference.ReferencedElement, tableElement.Preamble);
             }
             else
             {
-                throw new Exception();
+                state.Issues.Add(label.Source, CompilerIssueType.Warning, $"No label '{label.Value}' exists.");
+                return null;
             }
         }
 

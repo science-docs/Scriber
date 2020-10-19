@@ -1,4 +1,5 @@
 ﻿using Scriber.Layout;
+using Scriber.Maths;
 using System;
 using System.Globalization;
 
@@ -51,55 +52,62 @@ namespace Scriber.Engine.Converter
                 }
                 else if (targetType == typeof(int))
                 {
-                    return int.Parse(value);
+                    return MathParser.Evaluate(value).AsInt();
                 }
                 else if (targetType == typeof(uint))
                 {
-                    return uint.Parse(value);
+                    return MathParser.Evaluate(value).AsUInt();
                 }
                 else if (targetType == typeof(float))
                 {
-                    return float.Parse(value, CultureInfo.InvariantCulture);
+                    return MathParser.Evaluate(value).AsSingle();
                 }
                 else if (targetType == typeof(double))
                 {
-                    return double.Parse(value, CultureInfo.InvariantCulture);
+                    return MathParser.Evaluate(value).AsDouble();
                 }
                 else if (targetType == typeof(byte))
                 {
-                    return byte.Parse(value);
+                    return MathParser.Evaluate(value).AsByte();
                 }
                 else if (targetType == typeof(sbyte))
                 {
-                    return sbyte.Parse(value);
+                    return MathParser.Evaluate(value).AsSByte();
                 }
                 else if (targetType == typeof(short))
                 {
-                    return short.Parse(value);
+                    return MathParser.Evaluate(value).AsShort();
                 }
                 else if (targetType == typeof(ushort))
                 {
-                    return ushort.Parse(value);
+                    return MathParser.Evaluate(value).AsUShort();
                 }
                 else if (targetType == typeof(long))
                 {
-                    return long.Parse(value);
+                    return MathParser.Evaluate(value).AsLong();
                 }
                 else if (targetType == typeof(ulong))
                 {
-                    return ulong.Parse(value);
+                    return MathParser.Evaluate(value).AsULong();
                 }
                 else if (targetType == typeof(decimal))
                 {
-                    return decimal.Parse(value, CultureInfo.InvariantCulture);
+                    return MathParser.Evaluate(value).AsDecimal();
                 }
                 else if (targetType == typeof(bool))
                 {
                     return bool.Parse(value);
                 }
-                else if (targetType == typeof(Unit) && Unit.TryParse(value, out var unit))
+                else if (targetType == typeof(Unit))
                 {
-                    return unit;
+                    if (Unit.TryParse(value, out var unit))
+                    {
+                        return unit;
+                    }
+                    else
+                    {
+                        return new Unit(MathParser.Evaluate(value).AsDouble(), UnitType.Point);
+                    }
                 }
                 else if (targetType == typeof(Index))
                 {

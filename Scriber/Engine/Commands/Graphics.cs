@@ -1,7 +1,6 @@
 ﻿using Scriber.Autocomplete;
 using Scriber.Layout;
 using Scriber.Layout.Document;
-using Scriber.Util;
 using System.IO;
 using System.Net.Http;
 
@@ -25,8 +24,7 @@ namespace Scriber.Engine.Commands
             {
                 try
                 {
-                    var uri = state.Context.ResourceSet.RelativeUri(imagePath.Value);
-                    var bytes = state.FileSystem.File.ReadAllBytes(uri);
+                    var bytes = state.Context.ResourceSet.RelativeResource(imagePath.Value).GetContent();
                     var image = new ImageElement(bytes, imagePath.Value);
 
                     if (options != null)

@@ -52,13 +52,7 @@ namespace Scriber.Engine.Commands
             
             var uri = state.Context.ResourceSet.RelativeUri(path);
             var resource = state.Context.ResourceSet.Get(uri);
-            state.Context.ResourceSet.PushResource(resource);
-            var text = resource.GetContentAsString();
-
-            var tokens = Lexer.Tokenize(text);
-            var elements = Parser.Parse(tokens, resource, state.Context.Logger);
-            Compiler.Compile(state, elements.Elements);
-            state.Context.ResourceSet.PopResource();
+            Compiler.Compile(state, resource);
 
             if (dynamicDictionary != null)
             {
