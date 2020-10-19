@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Util;
+using System;
 using System.Text;
 
 namespace Scriber
@@ -33,11 +34,7 @@ namespace Scriber
 
         public string GetContentAsString()
         {
-            if (content.Length > 3 && content[0] == 0xEF && content[1] == 0xBB && content[2] == 0xBF)
-            {
-                return Encoding.UTF8.GetString(content[3..]);
-            }
-            return Encoding.UTF8.GetString(content);
+            return Encoding.UTF8.GetString(new Span<byte>(content).OffsetByUtf8Preamble());
         }
 
         public void SetContent(byte[] content)

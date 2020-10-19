@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Scriber.Drawing.Shapes;
 using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Layout.Shapes;
+using Scriber.Text;
 using Scriber.Variables;
 
 namespace Scriber
@@ -65,6 +68,14 @@ namespace Scriber
                                 measurements.Insert(i + 1, split.Next);
                             }
                         }
+                        else if (curHeight == boxSize.Height)
+                        {
+                            curPage.Measurements.Add(split.Source);
+                            if (split.Source.Element.Page == null)
+                            {
+                                split.Source.Element.Page = curPage;
+                            }
+                        }
 
                         curHeight = boxSize.Height;
                         curPage = AddPage(document, pageSize, contentArea);
@@ -116,6 +127,23 @@ namespace Scriber
                 }
 
                 var extraOffset = new Position(extraStartOffset.X, extraStartOffset.Y - extraHeight);
+
+                // Add footnote bar
+                if (extras.Count > 0)
+                {
+                    var line = new Line(Position.Zero, new Position(boxSize.Width / 2.5, 0));
+                    var path = new PathElement(line)
+                    {
+                        Document = document,
+                        Page = page,
+                        Stroke = Colors.Black,
+                        Fill = Colors.Black
+                    };
+                    var pathMeasurement = path.Measure(boxSize);
+                    pathMeasurement.Position = extraOffset;
+                    path.Arrange(pathMeasurement);
+                    page.Measurements.Add(pathMeasurement);
+                }
 
                 foreach (var extra in extras)
                 {

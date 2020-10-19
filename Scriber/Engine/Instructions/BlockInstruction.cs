@@ -48,15 +48,21 @@ namespace Scriber.Engine.Instructions
                 {
                     if (currentParagraph == null)
                     {
-                        currentParagraph = new Paragraph();
-                        var margin = currentParagraph.Margin;
-                        margin.Bottom = state.Document.Variable(ParagraphVariables.Skip);
-                        currentParagraph.FontSize = state.Document.Variable(FontVariables.FontSize);
-                        currentParagraph.Margin = margin;
+                        currentParagraph = CreateNewParagraph(state);
                         results.Add(new Argument(item.Source, currentParagraph));
                     }
 
                     currentParagraph.Leaves.Add(leaf);
+                }
+                else if (item.Value is string str)
+                {
+                    if (currentParagraph == null)
+                    {
+                        currentParagraph = CreateNewParagraph(state);
+                        results.Add(new Argument(item.Source, currentParagraph));
+                    }
+
+                    currentParagraph.Leaves.Add(new TextLeaf(str));
                 }
                 else if (item.Value == EmptyInstruction.Object)
                 {
@@ -84,6 +90,16 @@ namespace Scriber.Engine.Instructions
             }
 
             return results.ToArray();
+        }
+
+        private Paragraph CreateNewParagraph(CompilerState state)
+        {
+            var currentParagraph = new Paragraph();
+            var margin = currentParagraph.Margin;
+            margin.Bottom = state.Document.Variable(ParagraphVariables.Skip);
+            currentParagraph.FontSize = state.Document.Variable(FontVariables.FontSize);
+            currentParagraph.Margin = margin;
+            return currentParagraph;
         }
 
         private void ResetParagraph(CompilerState state, ref Paragraph? paragraph)

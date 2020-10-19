@@ -127,6 +127,12 @@ namespace Scriber.Engine.Converter
             throw new ConverterException(source.GetType(), targetType);
         }
 
+        public static T Convert<T>(string input)
+        {
+            var converter = new StringConverter();
+            return (T)converter.Convert(input, typeof(T));
+        }
+
         private Index ParseIndex(string value)
         {
             if (value.StartsWith("^"))

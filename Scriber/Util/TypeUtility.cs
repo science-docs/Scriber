@@ -9,6 +9,11 @@ namespace Scriber.Util
     {
         public static bool IsNullable(this ContextualType type)
         {
+            if (type.Nullability != Nullability.NotNullable)
+            {
+                return true;
+            }
+
             var origType = type.OriginalType;
             if (Argument.IsArgumentType(origType))
             {

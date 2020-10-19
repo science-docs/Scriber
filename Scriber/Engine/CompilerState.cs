@@ -1,7 +1,6 @@
 ﻿using Scriber.Engine.Instructions;
 using Scriber.Language;
 using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
 
 namespace Scriber.Engine
@@ -15,6 +14,7 @@ namespace Scriber.Engine
         public IFileSystem FileSystem => Context.FileSystem;
         public CommandCollection Commands => Context.Commands;
         public ConverterCollection Converters => Context.Converters;
+        public bool Continue { get; private set; } = true;
 
         public CompilerState(Context context)
         {
@@ -22,6 +22,11 @@ namespace Scriber.Engine
             Document = new Document();
             Blocks = new BlockStack();
             Issues = new CompilerIssueCollection();
+        }
+
+        public void Stop()
+        {
+            Continue = false;
         }
 
         public Argument? Execute(Element element, Argument[] arguments)
@@ -40,6 +45,12 @@ namespace Scriber.Engine
             catch (CompilerException compilerException)
             {
                 Issues.Add(compilerException.Origin ?? element, CompilerIssueType.Error, compilerException.Message, compilerException.InnerException);
+            
+                if (Context.FailOnError)
+                {
+                    // Instead of propagating the exception, we just stop.
+                    Stop();
+                }
             }
 
 

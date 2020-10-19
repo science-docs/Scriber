@@ -113,5 +113,34 @@ namespace Scriber.Engine.Instructions.Tests
             Assert.Single(argResult);
             Assert.Null(argResult[0].Value);
         }
+
+        [Fact]
+        public void BlockWithStringElement()
+        {
+            var blockContent = Block.Execute(CS, new Argument[] {
+                new Argument(E, "some"),
+                new Argument(E, "text")
+            });
+            Assert.IsType<Argument[]>(blockContent);
+            var argResult = (Argument[])blockContent;
+            Assert.Single(argResult);
+            Assert.IsType<Paragraph>(argResult[0].Value);
+            var paragraph = (Paragraph)argResult[0].Value;
+            Assert.Equal("some", (paragraph.Leaves[0] as TextLeaf).Content);
+            Assert.Equal("text", (paragraph.Leaves[1] as TextLeaf).Content);
+        }
+
+        [Fact]
+        public void EmptyExplicitBlock()
+        {
+            var e = E;
+            e.Type = ElementType.ExplicitBlock;
+            var block = new BlockInstruction(e);
+            var blockContent = block.Execute(CS, Array.Empty<Argument>());
+            Assert.IsType<Argument[]>(blockContent);
+            var argResult = (Argument[])blockContent;
+            Assert.Single(argResult);
+            Assert.Null(argResult[0].Value);
+        }
     }
 }

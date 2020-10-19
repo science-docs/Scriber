@@ -37,14 +37,14 @@ namespace Scriber.Engine.Converter
                 }
                 else if (targetType == typeof(string))
                 {
-                    return ConvertToString(paragraph);
+                    return ToString(paragraph);
                 }
             }
 
             throw new ConverterException(source.GetType(), targetType);
         }
 
-        private static string ConvertToString(Paragraph paragraph)
+        public static string ToString(Paragraph paragraph)
         {
             StringBuilder sb = new StringBuilder();
 

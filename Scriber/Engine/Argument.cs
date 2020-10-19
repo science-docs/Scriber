@@ -110,6 +110,10 @@ namespace Scriber.Engine
                     Flatten(arg, list);
                 }
             }
+            else if (argument.Value is string)
+            {
+                list.Add(argument);
+            }
             else if (argument.Value is IEnumerable elements)
             {
                 foreach (var element in elements)

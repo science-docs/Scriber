@@ -70,11 +70,12 @@ namespace Scriber.Engine.Tests
         [Fact]
         public void FlattenSimple()
         {
-            var arg = new Argument(E, new int[] { 1, 2 });
+            var arg = new Argument(E, new object[] { 1, 2, "text" });
             var flattened = arg.Flatten();
-            Assert.Equal(2, flattened.Length);
+            Assert.Equal(3, flattened.Length);
             Assert.Equal(1, flattened[0].Value);
             Assert.Equal(2, flattened[1].Value);
+            Assert.Equal("text", flattened[2].Value);
         }
 
         [Fact]
@@ -97,6 +98,37 @@ namespace Scriber.Engine.Tests
             var arg = new Argument<string>(E, "value");
             Assert.IsType<string>(arg.Value);
             Assert.Equal("value", arg.Value);
+        }
+
+        [Fact]
+        public void MakeGeneric()
+        {
+            var arg = new Argument(E, "value");
+            var genArg = arg.MakeGeneric(typeof(string), "text");
+            Assert.IsType<Argument<string>>(genArg);
+            var actualGenericArg = genArg as Argument<string>;
+            Assert.Equal("text", actualGenericArg.Value);
+        }
+
+        [Fact]
+        public void MakeGenericNullType()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                var arg = new Argument(E, "value");
+                arg.MakeGeneric(null, "text");
+            });
+            Assert.Equal("type", ex.ParamName);
+        }
+
+        [Fact]
+        public void MakeGenericInvalidType()
+        {
+            Assert.Throws<InvalidCastException>(() =>
+            {
+                var arg = new Argument(E, 44);
+                arg.MakeGeneric(typeof(string), 123);
+            });
         }
     }
 }

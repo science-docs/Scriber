@@ -20,6 +20,8 @@ namespace Scriber
             }
         }
 
+        public int ResourceCount => resourceStack.Count;
+
         private readonly Stack<Resource> resourceStack = new Stack<Resource>();
 
         public ResourceSet(IFileSystem fileSystem)
@@ -35,6 +37,11 @@ namespace Scriber
         public void PopResource()
         {
             resourceStack.Pop();
+        }
+
+        public Resource RelativeResource(string uriPath)
+        {
+            return Get(RelativeUri(uriPath));
         }
 
         public Uri RelativeUri(string uriPath)

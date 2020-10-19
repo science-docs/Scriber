@@ -12,6 +12,15 @@ namespace Scriber.Util
     {
         private const string UriPackScheme = "pack";
 
+        public static Span<byte> OffsetByUtf8Preamble(this Span<byte> bytes)
+        {
+            if (bytes.Length > 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+            {
+                bytes = bytes.Slice(3);
+            }
+            return bytes;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -23,7 +32,7 @@ namespace Scriber.Util
         /// <exception cref="ArgumentOutOfRangeException"/>
         public static string ReadAllText(this IFile file, Uri uri)
         {
-            return Encoding.UTF8.GetString(file.ReadAllBytes(uri));
+            return Encoding.UTF8.GetString(OffsetByUtf8Preamble(file.ReadAllBytes(uri)));
         }
 
         /// <summary>
@@ -42,7 +51,7 @@ namespace Scriber.Util
             }
             else if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
             {
-                return file.FromCache(uri, e => WebUtility.DownloadBytes(e));
+                return file.FromTempCache(uri, e => WebUtility.DownloadBytes(e));
             }
             else if (uri.Scheme == UriPackScheme)
             {
@@ -182,7 +191,7 @@ namespace Scriber.Util
             return sb.ToString();
         }
 
-        public static byte[] FromCache(this IFile file, Uri uri, Func<Uri, byte[]> consumer)
+        public static byte[] FromTempCache(this IFile file, Uri uri, Func<Uri, byte[]> consumer)
         {
             var tempFolder = file.FileSystem.Path.GetTempPath();
             const string folderName = ".scriber";

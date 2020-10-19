@@ -28,6 +28,7 @@ namespace Scriber.Tests
         [InlineData("test.png", "file://localhost/C:/test.png")]
         [InlineData("/test.png", "file://localhost/C:/test.png")]
         [InlineData("./test.png", "file://localhost/C:/test.png")]
+        [InlineData("path/to/folder/../test.png", "file://localhost/C:/path/to/test.png")]
         [InlineData("https://www.dummy.com/item.pdf", "https://www.dummy.com/item.pdf")]
         public void RelativeUriWithoutResource(string srcPath, string targetUri)
         {
