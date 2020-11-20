@@ -47,7 +47,7 @@ namespace Scriber.Util
         {
             if (uri.IsFile)
             {
-                return file.ReadAllBytes(uri.AbsolutePath.Substring(1));
+                return file.ReadAllBytes(uri.AbsolutePath);
             }
             else if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
             {

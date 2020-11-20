@@ -104,10 +104,6 @@ namespace Scriber.Engine.Converter
                     {
                         return unit;
                     }
-                    else
-                    {
-                        return new Unit(MathParser.Evaluate(value).AsDouble(), UnitType.Point);
-                    }
                 }
                 else if (targetType == typeof(Index))
                 {

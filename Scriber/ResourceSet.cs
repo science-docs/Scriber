@@ -73,6 +73,7 @@ namespace Scriber
                 var uriBuilder = new UriBuilder
                 {
                     Path = FileSystem.Path.GetFullPath(uriPath),
+                    Host = "",
                     Scheme = Uri.UriSchemeFile
                 };
                 return uriBuilder.Uri;

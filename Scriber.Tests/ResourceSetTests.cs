@@ -1,6 +1,5 @@
 ﻿using Scriber.Tests.Fixture;
 using System;
-using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -14,6 +13,8 @@ namespace Scriber.Tests
         [Theory]
         [InlineData("https://www.dummy.com/folder/sample.pdf", "test.png", "https://www.dummy.com/folder/test.png")]
         [InlineData("https://www.dummy.com/folder/sample.pdf", "https://www.dummy.com/item.pdf", "https://www.dummy.com/item.pdf")]
+        [InlineData("C:/Test/image.png", "C:/item.pdf", "file:///C:/item.pdf")]
+        [InlineData("C:/Test/image.png", "item.pdf", "file:///C:/Test/item.pdf")]
         public void RelativeUriWithResource(string current, string srcPath, string targetUri)
         {
             var uri = new Uri(current);
@@ -25,10 +26,10 @@ namespace Scriber.Tests
         }
 
         [Theory]
-        [InlineData("test.png", "file://localhost/C:/test.png")]
-        [InlineData("/test.png", "file://localhost/C:/test.png")]
-        [InlineData("./test.png", "file://localhost/C:/test.png")]
-        [InlineData("path/to/folder/../test.png", "file://localhost/C:/path/to/test.png")]
+        [InlineData("test.png", "file:///C:/test.png")]
+        [InlineData("/test.png", "file:///C:/test.png")]
+        [InlineData("./test.png", "file:///C:/test.png")]
+        [InlineData("path/to/folder/../test.png", "file:///C:/path/to/test.png")]
         [InlineData("https://www.dummy.com/item.pdf", "https://www.dummy.com/item.pdf")]
         public void RelativeUriWithoutResource(string srcPath, string targetUri)
         {
