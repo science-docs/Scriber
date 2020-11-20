@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Scriber.Engine
 {
-    public class CommandCollection
+    public class CommandCollection : IEnumerable<Command>
     {
         private readonly Dictionary<string, List<Command>> commands = new Dictionary<string, List<Command>>();
 
@@ -77,6 +78,16 @@ namespace Scriber.Engine
         public bool Remove(string name)
         {
             return commands.Remove(name);
+        }
+
+        public IEnumerator<Command> GetEnumerator()
+        {
+            return commands.Values.SelectMany(e => e).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
