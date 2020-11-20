@@ -113,7 +113,8 @@ namespace Scriber.Language
         {
             var command = new Element(context.Parents.Peek(), ElementType.Command, token.Index, context.Line)
             {
-                Content = token.Content.Substring(1)
+                Content = token.Content.Substring(1),
+                Length = token.Content.Length
             };
             return command;
         }
@@ -447,6 +448,11 @@ namespace Scriber.Language
                 element.Content = text;
                 element.StringBuilder = null;
                 element.Length = element.Content.Length;
+
+                if (element.Type == ElementType.Quotation)
+                {
+                    element.Length += 2;
+                }
             }
         }
 
