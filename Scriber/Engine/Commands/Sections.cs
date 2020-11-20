@@ -86,8 +86,7 @@ namespace Scriber.Engine.Commands
         [Command("Heading")]
         public static Paragraph Heading(CompilerState state, Argument<int> level, Argument<Paragraph> content)
         {
-            var pretext = CreatePretext(state.Document, level.Value);
-            AddTableOfContent(state, level, content);
+            var pretext = AddTableOfContentInternal(state, level, content);
             return CreateHeading(state, level, content, pretext);
         }
 
@@ -100,12 +99,18 @@ namespace Scriber.Engine.Commands
         [Command("AddTableOfContent")]
         public static void AddTableOfContent(CompilerState state, Argument<int> level, Argument<Paragraph> content)
         {
+            AddTableOfContentInternal(state, level, content);
+        }
+
+        public static string AddTableOfContentInternal(CompilerState state, Argument<int> level, Argument<Paragraph> content)
+        {
             var lvl = level.Value;
             ResetNumbering(state.Document, lvl);
             var pretext = CreatePretext(state.Document, lvl);
             var paragraph = content.Value;
             var entry = new TableElement(pretext, lvl, paragraph.Clone(), paragraph);
             state.Document.Variable(TableVariables.TableOfContent).Add(entry);
+            return pretext;
         }
 
         private static Paragraph CreateHeading(CompilerState state, Argument<int> level, Argument<Paragraph> content, string? preamble = null)
