@@ -5,6 +5,8 @@ namespace Scriber.Layout
 {
     public struct Position
     {
+        public static readonly Position Zero = new Position(0, 0);
+
         public double X;
         public double Y;
 

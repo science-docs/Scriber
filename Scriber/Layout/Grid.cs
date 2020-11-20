@@ -286,8 +286,8 @@ namespace Scriber.Layout
                         x = availableSize.Width;
                     }
 
-                    x = Math.Max(0, x - element.Margin.Width);
-                    y = Math.Max(0, y - element.Margin.Height);
+                    x = Math.Max(0, x);
+                    y = Math.Max(0, y);
 
                     Measurement = element.Measure(new Size(x, y));
                     Measurement.Margin = element.Margin;

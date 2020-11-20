@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Scriber.Layout;
 using Scriber.Layout.Document;
@@ -6,6 +7,13 @@ using Scriber.Variables;
 
 namespace Scriber.Engine.Commands
 {
+    public enum LabelType
+    {
+        Section,
+        Figure,
+        Table
+    }
+
     [Package]
     public static class Sections
     {
@@ -22,6 +30,45 @@ namespace Scriber.Engine.Commands
 
         private const int MaxLevel = 5;
 
+        [Command("Label")]
+        public static void Label(CompilerState state, string name)
+        {
+            Label(state, LabelType.Section, name);
+        }
+
+        [Command("Label")]
+        public static void Label(CompilerState state, LabelType type, string name)
+        {
+            TableElement element = type switch
+            {
+                LabelType.Figure => state.Document.Variable(TableVariables.TableOfFigures)[^1],
+                LabelType.Table => state.Document.Variable(TableVariables.TableOfTables)[^1],
+                _ => state.Document.Variable(TableVariables.TableOfContent)[^1]
+            };
+            LabelVariables.Labels.Get(state.Document)[name] = element;
+        }
+
+        [Command("Reference")]
+        public static ITextLeaf? Reference(CompilerState state, Argument<string> label)
+        {
+            var labels = LabelVariables.Labels.Get(state.Document);
+            if (labels.TryGetValue(label.Value, out var tableElement))
+            {
+                if (string.IsNullOrWhiteSpace(tableElement.Preamble))
+                {
+                    state.Issues.Add(label.Source, CompilerIssueType.Warning, $"Element '{label.Value}' does not allow referencing");
+                    return null;
+                }
+
+                return new ReferenceLeaf(tableElement.Reference.ReferencedElement, tableElement.Preamble);
+            }
+            else
+            {
+                state.Issues.Add(label.Source, CompilerIssueType.Warning, $"No label '{label.Value}' exists.");
+                return null;
+            }
+        }
+
         [Command("TableOfContent")]
         public static CallbackBlock TableOfContent(CompilerState state)
         {
@@ -29,19 +76,33 @@ namespace Scriber.Engine.Commands
             {
                 var entries = state.Document.Variable(TableVariables.TableOfContent);
 
-                var region = new StackPanel() { Orientation = Orientation.Vertical };
+                var tableOfContent = new StackPanel { Orientation = Orientation.Vertical };
+                tableOfContent.Elements.AddRange(entries);
 
-                foreach (var entry in entries)
-                {
-                    region.Elements.Add(entry);
-                }
-
-                return region;
+                return tableOfContent;
             });
         }
 
         [Command("Heading")]
         public static Paragraph Heading(CompilerState state, Argument<int> level, Argument<Paragraph> content)
+        {
+            var pretext = AddTableOfContentInternal(state, level, content);
+            return CreateHeading(state, level, content, pretext);
+        }
+
+        [Command("Heading*")]
+        public static Paragraph HeadingStar(CompilerState state, Argument<int> level, Argument<Paragraph> content)
+        {
+            return CreateHeading(state, level, content);
+        }
+
+        [Command("AddTableOfContent")]
+        public static void AddTableOfContent(CompilerState state, Argument<int> level, Argument<Paragraph> content)
+        {
+            AddTableOfContentInternal(state, level, content);
+        }
+
+        public static string AddTableOfContentInternal(CompilerState state, Argument<int> level, Argument<Paragraph> content)
         {
             var lvl = level.Value;
             ResetNumbering(state.Document, lvl);
@@ -49,17 +110,10 @@ namespace Scriber.Engine.Commands
             var paragraph = content.Value;
             var entry = new TableElement(pretext, lvl, paragraph.Clone(), paragraph);
             state.Document.Variable(TableVariables.TableOfContent).Add(entry);
-            var text = new TextLeaf
-            {
-                Content = pretext + " "
-            };
-            paragraph.Leaves.Insert(0, text);
-
-            return HeadingStar(state, level, content);
+            return pretext;
         }
 
-        [Command("Heading*")]
-        public static Paragraph HeadingStar(CompilerState state, Argument<int> level, Argument<Paragraph> content)
+        private static Paragraph CreateHeading(CompilerState state, Argument<int> level, Argument<Paragraph> content, string? preamble = null)
         {
             var lvl = level.Value;
             if (lvl < 1 || lvl > MaxLevel)
@@ -76,6 +130,17 @@ namespace Scriber.Engine.Commands
                 _ => 12
             };
             paragraph.Margin = new Thickness(14 - lvl * 2, 0);
+            AddOutline(state, lvl, paragraph);
+
+            if (preamble != null)
+            {
+                var text = new TextLeaf
+                {
+                    Content = preamble + " "
+                };
+                paragraph.Leaves.Insert(0, text);
+            }
+
             return paragraph;
         }
 
@@ -129,6 +194,28 @@ namespace Scriber.Engine.Commands
             {
                 Headers[i - 1].Set(document, 0);
             }
+        }
+
+        private static void AddOutline(CompilerState state, int level, Paragraph content)
+        {
+            if (state.Converters.TryConvert(content, out string stringContent))
+            {
+                var doc = state.Document;
+                var outlineChildren = GetParentOutline(doc.Outlines, 1, level)?.Children ?? doc.Outlines;
+                outlineChildren.Add(new Outline(stringContent, content));
+            }
+        }
+
+        private static Outline? GetParentOutline(List<Outline> outlines, int outlineLevel, int level)
+        {
+            if (outlineLevel >= level)
+            {
+                return null;
+            }
+
+            var last = outlines[^1];
+            var child = GetParentOutline(last.Children, outlineLevel + 1, level);
+            return child ?? last;
         }
     }
 }

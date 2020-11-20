@@ -1,4 +1,5 @@
-﻿using Scriber.Layout;
+﻿using Scriber.Drawing.Shapes;
+using Scriber.Layout;
 using Scriber.Text;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace Scriber.Drawing
         public abstract void AddLink(Rectangle rectangle, int targetPage);
         public abstract void DrawImage(Image image, Rectangle rectangle);
         public abstract void DrawText(TextRun run, Color color);
+        public abstract void DrawPath(Path path, Color fill, Color stroke, double strokeWidth);
 
         protected void ClearTransform()
         {

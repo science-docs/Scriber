@@ -1,4 +1,5 @@
 ﻿using Scriber.Engine;
+using Scriber.Engine.Converter;
 using Scriber.Variables;
 using System.Collections.Generic;
 
@@ -12,7 +13,7 @@ namespace Scriber.Autocomplete
 
             foreach (var (name, full) in acronyms)
             {
-                yield return new Proposal(name) { Info = full };
+                yield return new Proposal(name) { Info = ParagraphConverter.ToString(full) };
             }
         }
     }

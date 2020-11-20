@@ -1,11 +1,8 @@
-﻿using Scriber.Engine.Converter;
-using Scriber.Layout;
+﻿using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Variables;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Scriber.Engine.Commands
 {
@@ -16,7 +13,6 @@ namespace Scriber.Engine.Commands
         public static StackPanel ListOfAcronyms(CompilerState state, DynamicDictionary acronyms)
         {
             var acro = acronyms.GetContents();
-            var stringConverter = new ParagraphConverter();
             var list = AcronymVariables.Acronyms.Get(state.Document);
             var stackPanel = new StackPanel
             {
@@ -30,8 +26,7 @@ namespace Scriber.Engine.Commands
 
                 if (value is Paragraph paragraph)
                 {
-                    var stringValue = (stringConverter.Convert(paragraph, typeof(string)) as string)!;
-                    list.Add((key, stringValue));
+                    list.Add((key, paragraph));
 
                     var grid = new Grid();
                     grid.Rows.Add(new GridLength(GridUnit.Auto, 0));
@@ -39,7 +34,7 @@ namespace Scriber.Engine.Commands
                     grid.Columns.Add(new GridLength(GridUnit.Auto, 0));
 
                     grid.Set(Paragraph.FromText(key), 0, 0);
-                    grid.Set(Paragraph.FromText(stringValue), 0, 1);
+                    grid.Set(paragraph, 0, 1);
 
                     stackPanel.Elements.Add(grid);
                 }
@@ -49,26 +44,26 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("Acronym")]
-        public static ITextLeaf SingleAcronym(CompilerState state, string name)
+        public static IEnumerable<Leaf> SingleAcronym(CompilerState state, string name)
         {
             var list = AcronymVariables.Acronyms.Get(state.Document);
             var usedAcronyms = AcronymVariables.UsedAcronyms.Get(state.Document);
             var pair = list.FirstOrDefault(e => e.name.ToLowerInvariant() == name.ToLowerInvariant());
 
-            if (pair != default((string, string)))
+            if (pair != default((string, Paragraph)))
             {
-                string text = pair.name;
+                var paragraph = Paragraph.FromLeaves(new ReferenceLeaf(pair.full, pair.name));
 
                 if (usedAcronyms.Add(pair.name))
                 {
-                    text = pair.full;
+                    paragraph = pair.full;
                 }
 
-                return new TextLeaf(text);
+                return paragraph.Leaves;
             }
             else
             {
-                return new TextLeaf("???");
+                return new Leaf[] { new TextLeaf("???") };
             }
         }
     }

@@ -86,7 +86,7 @@ namespace Scriber.Layout.Document
                         var item = lineNodes[node.Index];
                         if (item.Element is FootnoteLeaf footnote)
                         {
-                            var footMS = footnote.Element.Measure(Document.PageBoxSize);
+                            var footMS = footnote.Element.Measure(Document.Variable(PageVariables.BoxSize));
                             measurement.Extra.Subs.Add(footMS);
                         }
                     }
@@ -227,6 +227,12 @@ namespace Scriber.Layout.Document
 
                         drawingContext.Offset = offset;
                         drawingContext.DrawText(run, node.Element.Foreground);
+
+                        if (node.Link != null)
+                        {
+                            var rect = new Rectangle(offset, new Size(node.Width, node.Element.FontSize));
+                            drawingContext.AddLink(rect, node.Link.Value);
+                        }
                     }
                 }
             }

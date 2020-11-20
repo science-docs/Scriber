@@ -16,7 +16,10 @@ namespace Scriber.Engine
 
             foreach (var element in elements)
             {
-                Execute(state, element);
+                if (state.Continue)
+                {
+                    Execute(state, element);
+                }
             }
 
             state.Document.Elements.AddRange(state.Blocks.Current.Objects.Select(e => e.Value).OfType<DocumentElement>());
@@ -40,6 +43,25 @@ namespace Scriber.Engine
             state.Blocks.Peek(1).Objects.AddRange(block.Objects);
         }
 
+        public static CompilerResult Compile(Context context, Resource resource)
+        {
+            context.ResourceSet.PushResource(resource);
+            var tokens = Lexer.Tokenize(resource.GetContentAsString());
+            var parserResult = Parser.Parse(tokens, resource, context.Logger);
+            var result = Compile(context, parserResult.Elements);
+            context.ResourceSet.PopResource();
+            return result;
+        }
+
+        public static void Compile(CompilerState state, Resource resource)
+        {
+            state.Context.ResourceSet.PushResource(resource);
+            var tokens = Lexer.Tokenize(resource.GetContentAsString());
+            var parserResult = Parser.Parse(tokens, resource, state.Context.Logger);
+            Compile(state, parserResult.Elements);
+            state.Context.ResourceSet.PopResource();
+        }
+
         private static void IssuesChanged(Logger logger, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
@@ -60,7 +82,10 @@ namespace Scriber.Engine
 
             foreach (var inline in element.Children)
             {
-                Execute(state, inline);
+                if (state.Continue)
+                {
+                    Execute(state, inline);
+                }
             }
 
             var obj = state.Execute(element, state.Blocks.Current.Objects.ToArray());
@@ -72,7 +97,7 @@ namespace Scriber.Engine
 
             if (obj != null)
             {
-                // basically pass the returned object to the previous environment
+                // basically pass the returned object to the previous block
                 var flattened = obj.Flatten();
                 if (IsEnvironmentArgument(element))
                 {

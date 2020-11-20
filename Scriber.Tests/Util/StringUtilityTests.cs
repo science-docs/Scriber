@@ -26,6 +26,8 @@ namespace Scriber.Util.Tests
 
         [Theory]
         [InlineData(" d ", "d", 1)]
+        [InlineData(" d", "d", 1)]
+        [InlineData("d", "d", 0)]
         public void AdvanceTrim(string value, string target, int advance)
         {
             var result = value.Trim(out var ad);

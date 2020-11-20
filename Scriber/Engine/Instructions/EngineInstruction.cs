@@ -33,10 +33,9 @@ namespace Scriber.Engine.Instructions
                     return new BlockInstruction(element);
                 case ElementType.Paragraph:
                     return new EmptyInstruction(element);
+                case ElementType.Environment:
                 case ElementType.Command:
                     return new CommandInstruction(element);
-                case ElementType.Environment:
-                    return new EnvironmentInstruction(element);
                 case ElementType.ObjectArray:
                     return new ObjectArrayInstruction(element);
                 case ElementType.ObjectCreation:

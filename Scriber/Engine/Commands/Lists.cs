@@ -12,8 +12,8 @@ namespace Scriber.Engine.Commands
             return new ListItem(content);
         }
 
-        [Environment("List")]
-        public static StackPanel List(CompilerState state, Argument[] contents, ListStyle style)
+        [Command("List")]
+        public static StackPanel List(CompilerState state, ListStyle style, Argument[] contents)
         {
             var panel = new StackPanel
             {

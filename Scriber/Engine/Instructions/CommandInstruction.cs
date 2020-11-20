@@ -37,7 +37,7 @@ namespace Scriber.Engine.Instructions
                 throw new ArgumentNullException(nameof(arguments));
             }
 
-            var command = state.Commands.Find(Name);
+            var command = state.Commands.Find(Name, arguments.Length);
 
             if (command == null)
             {

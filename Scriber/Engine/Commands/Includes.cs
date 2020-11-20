@@ -6,7 +6,6 @@ using PdfSharpCore.Pdf.IO;
 using Scriber.Autocomplete;
 using Scriber.Language;
 using Scriber.Layout.Document;
-using Scriber.Util;
 using System;
 using System.IO;
 using System.Linq;
@@ -19,8 +18,8 @@ namespace Scriber.Engine.Commands
         [Command("IncludePdf")]
         public static PdfElement? IncludePdf(CompilerState state, [Argument(ProposalProvider = typeof(IncludePdfFileProposalProvider))] Argument<string> path, Argument<PdfIncludeOptions>? options = null)
         {
-            var uri = state.FileSystem.Path.ConvertToUri(path.Value);
-            var bytes = state.FileSystem.File.ReadAllBytes(uri);
+            var uri = state.Context.ResourceSet.RelativeUri(path.Value);
+            var bytes = state.Context.ResourceSet.GetBytes(uri);
 
             var fields = options?.Value?.Fields;
 
@@ -121,7 +120,7 @@ namespace Scriber.Engine.Commands
 
         private static void Render(XGraphics graphics, XFont font, XBrush brush, XRect rectangle, string text)
         {
-            var options = new XStringFormat()
+            var options = new XStringFormat
             {
                 Alignment = XStringAlignment.Near,
                 LineAlignment = XLineAlignment.Near
@@ -141,13 +140,31 @@ namespace Scriber.Engine.Commands
         [Command("Include")]
         public static void Include(CompilerState state, [Argument(ProposalProvider = typeof(IncludeFileProposalProvider))] Argument<string> path)
         {
-            var uri = state.FileSystem.Path.ConvertToUri(path.Value);
+            var uri = state.Context.ResourceSet.RelativeUri(path.Value);
             var resource = state.Context.ResourceSet.Get(uri);
-            var text = resource.GetContentAsString();
+            Compiler.Compile(state, resource);
+        }
 
-            var tokens = Language.Lexer.Tokenize(text);
-            var elements = Parser.Parse(tokens, resource, state.Context.Logger);
-            Compiler.Compile(state, elements.Elements);
+        [Command("Root")]
+        public static void Root(CompilerState state, Argument<string> rootFile)
+        {
+            // Root command only executes if the current document is the first in the compile order
+            if (state.Context.ResourceSet.ResourceCount > 1)
+            {
+                state.Context.Logger.Debug("Root command skipped.");
+                return;
+            }
+
+            // Reset the current state
+            while (!state.Blocks.IsRoot)
+            {
+                state.Blocks.Pop();
+            }
+            state.Blocks.Current.Objects.Clear();
+            // Compile the root file
+            Include(state, rootFile);
+            // Afterwards stop the compilation of the current file
+            state.Stop();
         }
 
         public class PdfIncludeOptions

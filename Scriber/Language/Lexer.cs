@@ -1,35 +1,26 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Scriber.Language
 {
     public static class Lexer
     {
-        public static IEnumerable<Token> Tokenize(string text)
+        public static IEnumerable<Token> Tokenize(ReadOnlySpan<char> span)
         {
-            using var sr = new StringReader(text);
-            return Tokenize(sr).ToArray();
-        }
-
-        public static IEnumerable<Token> Tokenize(TextReader reader)
-        {
-            int code;
-            int index = 0;
             int line = 0;
             bool ignore = false;
             char c;
             Token? cur = null;
             StringBuilder sb = new StringBuilder();
+            var tokens = new List<Token>(span.Length / 50);
 
-            while ((code = reader.Read()) != -1)
+            for (int i = 0; i < span.Length; i++)
             {
-                c = (char)code;
+                c = span[i];
 
                 if (c == '\r')
                 {
-                    index++;
                     continue;
                 }
 
@@ -47,14 +38,12 @@ namespace Scriber.Language
                         }
 
                         sb.Append(c);
-                        index++;
                         ignore = false;
                         continue;
                     }
                     else if (c == '\\')
                     {
                         ignore = true;
-                        index++;
                         continue;
                     }
                 }
@@ -68,7 +57,7 @@ namespace Scriber.Language
                         cur.Content = sb.ToString();
                         sb.Clear();
                         // do not return empty text passages
-                        yield return cur;
+                        tokens.Add(cur);
                         cur = null;
                     }
                     else
@@ -84,30 +73,30 @@ namespace Scriber.Language
                         var type = GetTokenType(c);
                         if (IsSingleToken(type))
                         {
-                            yield return new Token(type, index, line, c.ToString());
+                            tokens.Add(new Token(type, i, line, c.ToString()));
                         }
                         else
                         {
-                            cur = new Token(GetTokenType(c), index, line);
+                            cur = new Token(GetTokenType(c), i, line);
                             sb.Append(c);
                         }
                     }
                     else
                     {
-                        cur = new Token(TokenType.Text, index, line);
+                        cur = new Token(TokenType.Text, i, line);
                         sb.Append(c);
                     }
 
                 }
-
-                index++;
             }
             
             if (cur != null)
             {
                 cur.Content = sb.ToString();
-                yield return cur;
+                tokens.Add(cur);
             }
+
+            return tokens;
         }
 
         private static bool IsSpecialCharacter(char c)

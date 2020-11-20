@@ -103,8 +103,16 @@ namespace Scriber.Layout
 
         private static void Glue(string fullText, out bool start, out bool end)
         {
-            start = char.IsWhiteSpace(fullText[0]);
-            end = char.IsWhiteSpace(fullText[^1]);
+            if (!string.IsNullOrEmpty(fullText))
+            {
+                start = char.IsWhiteSpace(fullText[0]);
+                end = char.IsWhiteSpace(fullText[^1]);
+            }
+            else
+            {
+                start = false;
+                end = false;
+            }
         }
 
         private static IEnumerable<string> Chunkenize(string fullText)

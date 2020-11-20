@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Scriber.Engine
@@ -147,6 +148,22 @@ namespace Scriber.Engine
             else
             {
                 value = source;
+                return false;
+            }
+        }
+
+        public bool TryConvert<T>(object source, out T value)
+        {
+            if (TryConvert(source, typeof(T), out var x))
+            {
+                value = (T)x;
+                return true;
+            }
+            else
+            {
+                #pragma warning disable CS8601 // Possible null reference assignment.
+                value = default;
+                #pragma warning restore CS8601 // Possible null reference assignment.
                 return false;
             }
         }

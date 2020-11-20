@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Scriber.Layout.Document
 {
@@ -91,6 +90,10 @@ namespace Scriber.Layout.Document
             {
                 throw new ArgumentNullException(nameof(item));
             }
+            if (index > Count)
+            {
+                throw new IndexOutOfRangeException();
+            }
 
             item.Parent = Parent;
             list.Insert(index, item);
@@ -108,6 +111,11 @@ namespace Scriber.Layout.Document
 
         public void RemoveAt(int index)
         {
+            if (index >= Count)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
             list[index].Parent = null;
             list.RemoveAt(index);
         }

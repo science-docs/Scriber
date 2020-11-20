@@ -54,7 +54,6 @@ namespace Scriber.Engine
             foreach (var package in packages)
             {
                 FindCommands(context, package);
-                FindEnvironments(context, package);
             }
 
             var converters = asm.GetTypes().Where(e => IsConverter(e));
@@ -106,30 +105,6 @@ namespace Scriber.Engine
             return command != null && method.IsStatic;
         }
 
-        private void FindEnvironments(Context context, Type type)
-        {
-            var methods = type.GetMethods();
-
-            foreach (var method in methods)
-            {
-                if (IsEnvironment(method, out var environment) && environment != null)
-                {
-                    context.Environments.Add(EnvironmentFactory.Create(environment, method));
-                }
-            }
-        }
-
-        private bool IsEnvironment(MethodInfo method, out EnvironmentAttribute? environment)
-        {
-            var argumentArray = new Type[] { typeof(Argument[]) };
-            var objArray = new Type[] { typeof(object[]) };
-            var stateObjArray = new Type[] { typeof(CompilerState), typeof(object[]) };
-            var stateArgumentArray = new Type[] { typeof(CompilerState), typeof(Argument[]) };
-
-            environment = method.GetCustomAttribute<EnvironmentAttribute>();
-            return environment != null && method.IsStatic && MatchesArgs(method, argumentArray, objArray, stateObjArray, stateArgumentArray);
-        }
-
         private void FindConverter(Context context, Type type)
         {
             var attribute = type.GetCustomAttribute<ConverterAttribute>();
@@ -146,33 +121,6 @@ namespace Scriber.Engine
                     context.Logger.Warning($"Could not create converter instance from type '{type.FormattedName()}'.");
                 }
             }
-        }
-
-        private bool MatchesArgs(MethodInfo method, params Type[][] types)
-        {
-            var args = method.GetParameters();
-
-            foreach (var typeList in types)
-            {
-                bool matches = true;
-                if (args.Length >= typeList.Length)
-                {
-                    for (int i = 0; i < typeList.Length; i++)
-                    {
-                        if (args[i].ParameterType != typeList[i])
-                        {
-                            matches = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (matches)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

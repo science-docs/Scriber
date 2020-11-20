@@ -1,12 +1,19 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Variables;
+using System.Globalization;
 
 namespace Scriber.Engine.Commands
 {
     [Package("")]
     public static class Layouts
     {
+        [Command("TextWidth")]
+        public static string TextWidth(CompilerState state)
+        {
+            return state.Document.Variable(PageVariables.BoxSize).Width.ToString(CultureInfo.InvariantCulture);
+        }
+
         [Command("VerticalSpace")]
         public static Box VSpace(Unit vertical)
         {
@@ -46,7 +53,39 @@ namespace Scriber.Engine.Commands
 
             void Set(DocumentElement element)
             {
-                element.Document?.PageNumbering.Set(count);
+                if (element.Document != null)
+                {
+                    element.Document.PageNumbering.Current = count;
+                }
+            }
+        }
+
+        [Command("SetPageNumbering")]
+        public static CallbackArrangingBlock SetPageNumbering(int count, PageNumberingStyle style)
+        {
+            return new CallbackArrangingBlock(Set);
+
+            void Set(DocumentElement element)
+            {
+                if (element.Document != null)
+                {
+                    element.Document.PageNumbering.Current = count;
+                    element.Document.PageNumbering.Style = style;
+                }
+            }
+        }
+
+        [Command("SetPageNumberingStyle")]
+        public static CallbackArrangingBlock SetPageNumberingStyle(PageNumberingStyle style)
+        {
+            return new CallbackArrangingBlock(Set);
+
+            void Set(DocumentElement element)
+            {
+                if (element.Document != null)
+                {
+                    element.Document.PageNumbering.Style = style;
+                }
             }
         }
 

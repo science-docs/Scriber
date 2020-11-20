@@ -27,6 +27,7 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
+using Scriber.Maths;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -401,16 +402,16 @@ namespace Scriber.Layout
             // set default type as point
             UnitType type;
             unit = Zero;
-            string units = string.Empty;
             string unitType = string.Empty;
-            int index = 0;
+            int index = value.Length - 1;
 
-            for (; index < value.Length; index++)
+            // start parsing from the back to identify the unit type
+            for (; index > 0; index--)
             {
                 var c = value[index];
-                if (c == '.' || char.IsDigit(c))
+                if (char.IsLetter(c))
                 {
-                    units += c;
+                    unitType = c + unitType;
                 }
                 else
                 {
@@ -418,29 +419,11 @@ namespace Scriber.Layout
                 }
             }
 
-            if (!double.TryParse(units, NumberStyles.Number, CultureInfo.InvariantCulture, out var unitValue))
+            // Evaluate the rest of the input as a math expression
+            var mathPart = value.Substring(0, index + 1);
+            if (!MathParser.TryEvaluate(mathPart, out var unitValue))
             {
                 return false;
-            }
-
-            for (; index < value.Length; index++)
-            {
-                if (!char.IsWhiteSpace(value[index]))
-                {
-                    break;
-                }
-            }
-
-            for (; index < value.Length; index++)
-            {
-                if (char.IsLetter(value[index]))
-                {
-                    unitType += value[index];
-                }
-                else
-                {
-                    return false;
-                }
             }
 
             if (string.IsNullOrEmpty(unitType) || unitType == GetSuffix(UnitType.Point))
@@ -468,7 +451,7 @@ namespace Scriber.Layout
                 return false;
             }
 
-            unit = new Unit(unitValue, type);
+            unit = new Unit(unitValue.AsDouble(), type);
             return true;
         }
 

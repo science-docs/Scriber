@@ -14,13 +14,17 @@ namespace Scriber
 
         public void AddPageItems()
         {
+            var pageItemSize = new Size(ContentArea.Width, Size.Height);
             foreach (var pageItem in Document.PageItems)
             {
                 var clone = pageItem.Clone();
                 clone.Parent = Document;
                 clone.Page = this;
                 clone.Interlude();
-                var measures = clone.Measure(Size);
+                var measures = clone.Measure(pageItemSize);
+                var pos = measures.Position;
+                pos.X += ContentArea.X;
+                measures.Position = pos;
                 Measurements.Add(measures);
             }
         }

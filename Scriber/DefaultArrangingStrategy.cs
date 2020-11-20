@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Scriber.Drawing.Shapes;
 using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Layout.Shapes;
+using Scriber.Text;
 using Scriber.Variables;
 
 namespace Scriber
@@ -23,7 +26,7 @@ namespace Scriber
             MeasuredDocumentPage? curPage = null;
             double curHeight = boxSize.Height;
 
-            var flexQueue = new Queue<Measurement>();
+            var flexList = new LinkedList<Measurement>();
             var measurements = new List<Measurement>(document.Measurements);
 
             // Stage one:
@@ -46,9 +49,9 @@ namespace Scriber
                         curHeight = boxSize.Height;
                     }
 
-                    FitFlex(curPage, flexQueue, ref curHeight);
+                    FitFlex(curPage, flexList, ref curHeight);
 
-                    if (TryFitMeasurement(curPage, measurement, flexQueue, false, ref curHeight) == FitResult.AddPage)
+                    if (TryFitMeasurement(curPage, measurement, flexList, false, ref curHeight) == FitResult.AddPage)
                     {
                         var split = measurement.Element.Split(measurement, curHeight);
 
@@ -65,6 +68,14 @@ namespace Scriber
                                 measurements.Insert(i + 1, split.Next);
                             }
                         }
+                        else if (curHeight == boxSize.Height)
+                        {
+                            curPage.Measurements.Add(split.Source);
+                            if (split.Source.Element.Page == null)
+                            {
+                                split.Source.Element.Page = curPage;
+                            }
+                        }
 
                         curHeight = boxSize.Height;
                         curPage = AddPage(document, pageSize, contentArea);
@@ -75,28 +86,24 @@ namespace Scriber
             if (curPage != null)
             {
                 // Add leftover flexible items (part of stage one)
-                while (flexQueue.Count > 0)
+                foreach (var m in flexList)
                 {
-                    var m = flexQueue.Peek();
                     m.Flexible = false;
 
-                    if (TryFitMeasurement(curPage, m, flexQueue, false, ref curHeight) == FitResult.AddPage)
+                    if (TryFitMeasurement(curPage, m, flexList, false, ref curHeight) == FitResult.AddPage)
                     {
                         curHeight = boxSize.Height;
                         curPage = AddPage(document, pageSize, contentArea);
-                    }
-                    else
-                    {
-                        flexQueue.Dequeue();
+                        TryFitMeasurement(curPage, m, flexList, false, ref curHeight);
                     }
                 }
             }
+            flexList.Clear();
 
             // Stage two:
             // Layout measurements on each page
             foreach (var page in document.Pages.OfType<MeasuredDocumentPage>())
             {
-
                 var extras = new List<Measurement>();
                 var currentOffset = startOffset;
                 var extraHeight = 0.0;
@@ -110,38 +117,43 @@ namespace Scriber
 
                 foreach (var measurement in page.Measurements)
                 {
-                    var size = measurement.Size;
+                    var size = measurement.TotalSize;
 
-                    currentOffset.Y += measurement.Margin.Top;
-
-                    var visualOffset = currentOffset;
-                    visualOffset.X += measurement.Margin.Left;
-
-                    measurement.Position = visualOffset;
+                    measurement.Position = currentOffset;
                     Realign(measurement, boxSize, pageSize, measurement.Element.HorizontalAlignment);
                     measurement.Element.Arrange(measurement);
 
                     currentOffset.Y += size.Height;
-                    currentOffset.Y += measurement.Margin.Bottom;
                 }
 
                 var extraOffset = new Position(extraStartOffset.X, extraStartOffset.Y - extraHeight);
 
+                // Add footnote bar
+                if (extras.Count > 0)
+                {
+                    var line = new Line(Position.Zero, new Position(boxSize.Width / 2.5, 0));
+                    var path = new PathElement(line)
+                    {
+                        Document = document,
+                        Page = page,
+                        Stroke = Colors.Black,
+                        Fill = Colors.Black
+                    };
+                    var pathMeasurement = path.Measure(boxSize);
+                    pathMeasurement.Position = extraOffset;
+                    path.Arrange(pathMeasurement);
+                    page.Measurements.Add(pathMeasurement);
+                }
+
                 foreach (var extra in extras)
                 {
-                    var size = extra.Size;
+                    var size = extra.TotalSize;
 
-                    extraOffset.Y += extra.Margin.Top;
-
-                    var visualOffset = extraOffset;
-                    visualOffset.X += extra.Margin.Left;
-
-                    extra.Position = visualOffset;
+                    extra.Position = extraOffset;
                     Realign(extra, boxSize, pageSize, extra.Element.HorizontalAlignment);
                     extra.Element.Arrange(extra);
 
                     extraOffset.Y += size.Height;
-                    extraOffset.Y += extra.Margin.Bottom;
                 }
 
                 // Set number at the end of the page layouting
@@ -151,25 +163,24 @@ namespace Scriber
             }
         }
 
-        private static void FitFlex(MeasuredDocumentPage page, Queue<Measurement> queue, ref double height)
+        private static void FitFlex(MeasuredDocumentPage page, LinkedList<Measurement> flexList, ref double height)
         {
-            while (queue.Count > 0)
+            var head = flexList.First;
+
+            while (head != null)
             {
-                var peek = queue.Peek();
-                var result = TryFitMeasurement(page, peek, queue, true, ref height);
-                if (result == FitResult.Stop || result == FitResult.AddPage)
+                var result = TryFitMeasurement(page, head.Value, flexList, true, ref height);
+                var previous = head;
+                head = head.Next;
+                if (result == FitResult.Continue)
                 {
-                    break;
-                }
-                else
-                {
-                    queue.Dequeue();
+                    flexList.Remove(previous);
                 }
             }
         }
 
 
-        private static FitResult TryFitMeasurement(MeasuredDocumentPage page, Measurement measurement, Queue<Measurement> queue, bool flexMode, ref double height)
+        private static FitResult TryFitMeasurement(MeasuredDocumentPage page, Measurement measurement, LinkedList<Measurement> flexList, bool flexMode, ref double height)
         {
             var size = measurement.TotalSize + measurement.AccumulatedExtra.TotalSize;
 
@@ -183,7 +194,7 @@ namespace Scriber
                     }
                     else
                     {
-                        queue.Enqueue(measurement);
+                        flexList.AddLast(measurement);
                         return FitResult.Enqueue;
                     }
                 }
@@ -204,11 +215,6 @@ namespace Scriber
             return FitResult.Continue;
         }
 
-        //private static bool FitAll(IEnumerable<Measurement> measurements, double height)
-        //{
-        //    return measurements.Sum(e => e.TotalSize.Height) <= height;
-        //}
-
         private static MeasuredDocumentPage AddPage(Document document, Size size, Rectangle contentArea)
         {
             var page = new MeasuredDocumentPage(document)
@@ -216,7 +222,7 @@ namespace Scriber
                 Size = size,
                 ContentArea = contentArea
             };
-
+            page.Index = document.Pages.Count;
             document.Pages.Add(page);
             return page;
         }
@@ -228,7 +234,7 @@ namespace Scriber
 
             switch (alignment)
             {
-                case HorizontalAlignment.Left:
+                case HorizontalAlignment.Right:
                     pos.X = pageBox.Width - size.Width;
                     break;
                 case HorizontalAlignment.Center:

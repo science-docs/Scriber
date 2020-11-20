@@ -16,7 +16,8 @@ namespace Scriber.Layout.Document
 
         public Measurement Measure(Size availableSize)
         {
-            return Measurement = MeasureOverride(availableSize);
+            var marginSize = new Size(Margin.Width, Margin.Height);
+            return Measurement = MeasureOverride(availableSize - marginSize);
         }
 
         public void Arrange(Measurement finalMeasurement)

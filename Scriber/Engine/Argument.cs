@@ -46,10 +46,15 @@ namespace Scriber.Engine
                 }
             }
 
-            var targetArgType = typeof(Argument<>).MakeGenericType(type);
+            var targetArgType = MakeGeneric(type);
             var genericArg = Activator.CreateInstance(targetArgType, Source, value) as Argument
                 ?? throw new InvalidOperationException("A newly created argument cannot be null");
             return genericArg;
+        }
+
+        public static Type MakeGeneric(Type type)
+        {
+            return typeof(Argument<>).MakeGenericType(type);
         }
 
         /// <summary>
@@ -104,6 +109,10 @@ namespace Scriber.Engine
                 {
                     Flatten(arg, list);
                 }
+            }
+            else if (argument.Value is string)
+            {
+                list.Add(argument);
             }
             else if (argument.Value is IEnumerable elements)
             {

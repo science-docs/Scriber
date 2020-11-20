@@ -1,5 +1,6 @@
 ﻿using System;
 using Scriber.Drawing;
+using Scriber.Variables;
 
 namespace Scriber.Layout.Document
 {
@@ -64,21 +65,23 @@ namespace Scriber.Layout.Document
 
         private Position CalculatePosition(Size childSize, Size availableSize)
         {
+            var margin = Document?.Variable(PageVariables.Margin) ?? Thickness.Zero;
+
             double x = 0;
             double y = 0;
 
             if (Position.HasFlag(FixedPosition.Top))
             {
-                y = 0;
+                y = Math.Max((margin.Top - childSize.Height) / 2, 0);
             }
             else if (Position.HasFlag(FixedPosition.Bottom))
             {
-                y = availableSize.Height - childSize.Height;
+                y = availableSize.Height - Math.Max((margin.Bottom + childSize.Height) / 2, childSize.Height);
             }
 
             if (Position.HasFlag(FixedPosition.Left))
             {
-                x = 0;
+                x = margin.Left;
             }
             else if (Position.HasFlag(FixedPosition.Center))
             {
@@ -86,7 +89,7 @@ namespace Scriber.Layout.Document
             }
             else if (Position.HasFlag(FixedPosition.Right))
             {
-                x = availableSize.Width - childSize.Width;
+                x = availableSize.Width - childSize.Width - margin.Right;
             }
 
             return new Position(x, y);

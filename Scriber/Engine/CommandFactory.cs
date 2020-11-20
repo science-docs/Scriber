@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using System.Linq;
 using System.Reflection;
 
 namespace Scriber.Engine
@@ -12,19 +13,29 @@ namespace Scriber.Engine
             return commandItem;
         }
 
-        private static CommandExecution CreateDelegate(string command, MethodInfo method, out ParameterInfo[] parameters)
+        private static CommandExecution CreateDelegate(string command, MethodInfo method, out Parameter[] parameters)
         {
             var param = method.GetParameters();
-            parameters = param;
+            var items = new Parameter[param.Length];
+            for (int i = 0; i < param.Length; i++)
+            {
+                items[i] = new Parameter(param[i]);
+            }
+
+            parameters = items;
+            if (items.Length > 0 && items[0].Type == typeof(CompilerState))
+            {
+                parameters = items.Skip(1).ToArray();
+            }
 
             return InvokeDynamic;
 
             // inline method for better debugging
             object? InvokeDynamic(Element element, CompilerState state, Argument[] args)
             {
-                var sorted = DynamicDispatch.PadArguments(command, element, state, args, param);
-                DynamicDispatch.MatchArguments(state, sorted, param);
-                return method.Invoke(null, sorted);
+                var paddedArgs = DynamicDispatch.PadArguments(command, element, state, args, items);
+                var matchedArgs = DynamicDispatch.MatchArguments(state, paddedArgs, items);
+                return method.Invoke(null, matchedArgs);
             }
         }
     }

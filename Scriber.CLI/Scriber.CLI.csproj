@@ -6,11 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta0009" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Scriber\Scriber.csproj" />
   </ItemGroup>
 

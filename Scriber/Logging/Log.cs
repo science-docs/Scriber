@@ -19,18 +19,26 @@ namespace Scriber.Logging
             Timestamp = DateTime.Now;
         }
 
+        public string GetFullMessage()
+        {
+            return string.Join("", GetFullMessageParts());
+        }
+
         public string[] GetFullMessageParts()
         {
             string levelString = Level.ToString().ToUpper(CultureInfo.InvariantCulture);
             var diff = LongestLevelName - levelString.Length;
-
+            var time = $"{Timestamp.Hour:00}:{Timestamp.Minute:00}:{Timestamp.Second:00}";
             var pad = new string(' ', diff);
 
             return new string[]
             {
                 "[",
                 levelString,
-                $"]{pad} {Message}"
+                pad,
+                " - ",
+                time,
+                $"] {Message}"
             };
         }
     }

@@ -12,6 +12,8 @@ namespace Scriber.Util.Tests
         [InlineData(typeof(Argument<>), "Argument<>")]
         [InlineData(typeof(Argument<Index>), "Argument<Index>")]
         [InlineData(typeof(Argument<List<Index>>), "Argument<List<Index>>")]
+        [InlineData(typeof(Argument[]), "Argument[]")]
+        [InlineData(typeof(Argument<Index>[]), "Argument<Index>[]")]
         public void FormattedName(Type type, string value)
         {
             var result = TypeUtility.FormattedName(type);

@@ -23,7 +23,7 @@ namespace Scriber.Engine.Commands
 
                     if (existingCommand == null)
                     {
-                        var command = new Command(name, CreateTemplateCommand(defaultValue), Array.Empty<System.Reflection.ParameterInfo>());
+                        var command = new Command(name, CreateTemplateCommand(defaultValue), Array.Empty<Parameter>());
 
                         state.Commands.Add(command);
                     }
@@ -44,20 +44,15 @@ namespace Scriber.Engine.Commands
                     var name = obj.Key;
                     var value = obj.Value;
 
-                    var command = new Command(name, CreateTemplateCommand(value), Array.Empty<System.Reflection.ParameterInfo>());
+                    var command = new Command(name, CreateTemplateCommand(value), Array.Empty<Parameter>());
 
                     state.Commands.Add(command);
                 }
             }
             
-
-            var uri = state.FileSystem.Path.ConvertToUri(path);
+            var uri = state.Context.ResourceSet.RelativeUri(path);
             var resource = state.Context.ResourceSet.Get(uri);
-            var text = resource.GetContentAsString();
-
-            var tokens = Lexer.Tokenize(text);
-            var elements = Parser.Parse(tokens, resource, state.Context.Logger);
-            Compiler.Compile(state, elements.Elements);
+            Compiler.Compile(state, resource);
 
             if (dynamicDictionary != null)
             {
