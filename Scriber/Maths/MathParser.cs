@@ -5,6 +5,22 @@ namespace Scriber.Maths
 {
     public static class MathParser
     {
+        public static bool TryEvaluate(string expression, out MathResult result)
+        {
+            try
+            {
+                result = Evaluate(expression);
+                return true;
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch
+            {
+                result = new MathResult(double.NaN, expression);
+                return false;
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+        }
+
         public static MathResult Evaluate(string expression)
         {
             return new MathResult(Parse(expression).GetContent(), expression);

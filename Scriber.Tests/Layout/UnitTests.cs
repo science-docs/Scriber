@@ -13,10 +13,11 @@ namespace Scriber.Layout.Tests
         [InlineData("32\tpu", 32, UnitType.Presentation)]
         [InlineData("32 mm", 32, UnitType.Millimeter)]
         [InlineData("32 in", 32, UnitType.Inch)]
+        [InlineData("96 / 3 mm", 32, UnitType.Millimeter)]
         public void ParseSuccess(string input, double value, UnitType type)
         {
             Assert.True(Unit.TryParse(input, out var unit));
-            Assert.Equal(value, unit.Value);
+            Assert.Equal(value, unit.Value, 3);
             Assert.Equal(type, unit.Type);
         }
 

@@ -45,6 +45,18 @@ namespace Scriber.Maths.Tests
         }
 
         [Theory]
+        [InlineData("3.4", true)]
+        [InlineData("3,4", false)]
+        [InlineData("", false)]
+        [InlineData("3 + 8", true)]
+        public void TestTryParse(string input, bool result)
+        {
+            var returnValue = MathParser.TryEvaluate(input, out var mathResult);
+            Assert.NotNull(mathResult);
+            Assert.Equal(result, returnValue);
+        }
+
+        [Theory]
         [InlineData("", "")]
         [InlineData("3.4", "3.4")]
         [InlineData("2+3", "2 + 3")]
