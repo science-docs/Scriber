@@ -17,6 +17,8 @@ namespace Scriber.Language
         public List<Element> LastLine { get; } = new List<Element>();
         public ParserIssueCollection Issues { get; } = new ParserIssueCollection();
 
+        public TokenQueue Tokens { get; set; } = new TokenQueue();
+
         public bool InCommand()
         {
             return Parents.Any(e => e.Type == ElementType.Command);

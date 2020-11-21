@@ -6,6 +6,7 @@ using System.Threading;
 using Scriber.Engine;
 using Scriber.Language;
 using Scriber.Logging;
+using Scriber.Maths;
 
 namespace Scriber.CLI
 {
@@ -24,15 +25,24 @@ namespace Scriber.CLI
 
             StringBuilder sb = new StringBuilder();
 
+            var math = MathParser.Evaluate("3.4");
+
             //sb.AppendLine("\\setlength[baselinestretch]{2}");
             //sb.AppendLine("@IncludePdf(tfl.pdf, { Fields: [ 4711, Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, A16a ] })");
             //sb.AppendLine("Some text");
+            sb.AppendLine("@CenterHeader(@IncludeGraphics(tfl.png))");
             sb.AppendLine("@CenterFooter(@ThePage)");
+            sb.AppendLine("@FontSize(3*4)");
+            sb.AppendLine("@Heading*(1, A)");
+            sb.AppendLine("@TableOfContent()");
+            sb.AppendLine("@Heading(1, B)");
+            sb.AppendLine("Test@Footnote(\"\")");
+            sb.AppendLine("@Pagebreak()").AppendLine();
+            sb.AppendLine("@Color(Red, Red Text)").AppendLine();
             sb.AppendLine("@Pagebreak()");
             sb.AppendLine("@Pagebreak()");
             sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@SetPageNumbering(25, RomanUpper)");
+            sb.AppendLine("@SetPageNumbering(@TextWidth() / 37, RomanUpper)");
             sb.AppendLine("@Pagebreak()");
             sb.AppendLine("@Pagebreak()");
             sb.AppendLine("@Pagebreak()");
