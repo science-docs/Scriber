@@ -9,14 +9,14 @@ namespace Scriber.Language.Syntax
             get => name;
             set => name = SetParent(name, value);
         }
-        public SyntaxNode? Value
+        public ListSyntax<ListSyntax>? Value
         {
             get => value;
             set => this.value = SetParent(this.value, value);
         }
 
         private NameSyntax? name;
-        private SyntaxNode? value;
+        private ListSyntax<ListSyntax>? value;
 
         public override IEnumerable<SyntaxNode> ChildNodes()
         {

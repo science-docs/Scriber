@@ -55,7 +55,7 @@ namespace Scriber.Language
 
                     whitespace = true;
                 }
-                else if (inArguments && token.Type == TokenType.ParenthesesClose)
+                else if (inArguments && (token.Type == TokenType.ParenthesesClose || token.Type == TokenType.Semicolon || token.Type == TokenType.BracketClose))
                 {
                     break;
                 }
@@ -83,7 +83,7 @@ namespace Scriber.Language
 
         private static bool IsTextToken(TokenType type)
         {
-            return type == TokenType.Text || type == TokenType.Backslash || type == TokenType.ParenthesesOpen || type == TokenType.ParenthesesClose || type == TokenType.BracketOpen || type == TokenType.BracketClose;
+            return type == TokenType.Text || type == TokenType.Colon || type == TokenType.Semicolon || type == TokenType.Backslash || type == TokenType.ParenthesesOpen || type == TokenType.ParenthesesClose || type == TokenType.BracketOpen || type == TokenType.BracketClose;
         }
 
         private static SyntaxNode ParseSingleLineComment(ParserContext context)
@@ -114,6 +114,37 @@ namespace Scriber.Language
             {
                 Span = new TextSpan(start, last - start, line),
                 Comment = sb.ToString()
+            };
+        }
+
+        private static SyntaxNode ParseQuotation(ParserContext context)
+        {
+            var token = context.Tokens.Peek();
+            int start = token!.Index;
+            int line = token!.Line;
+            int last = start + token!.Length;
+
+            var sb = new StringBuilder();
+
+            while (token != null)
+            {
+                if (token.Type == TokenType.Quotation)
+                {
+                    context.Tokens.Dequeue();
+                    break;
+                }
+                else
+                {
+                    sb.Append(token.Content);
+                }
+                last = token.Index + token.Length;
+                token = context.Tokens.Dequeue();
+            }
+
+            return new StringLiteralSyntax
+            {
+                Span = new TextSpan(start, last - start, line),
+                Content = sb.ToString()
             };
         }
 
@@ -201,6 +232,10 @@ namespace Scriber.Language
                     context.Tokens.Dequeue();
                     break;
                 }
+                else if (token.Type == TokenType.Semicolon)
+                {
+                    context.Tokens.Dequeue();
+                }
 
                 list.Add(ParseArgument(context));
                 token = context.Tokens.Peek();
@@ -250,13 +285,8 @@ namespace Scriber.Language
 
             while (token != null)
             {
-                if (token.Type == TokenType.ParenthesesClose)
+                if (token.Type == TokenType.ParenthesesClose || token.Type == TokenType.Semicolon)
                 {
-                    break;
-                }
-                else if (token.Type == TokenType.Semicolon)
-                {
-                    context.Tokens.Dequeue();
                     break;
                 }
 
@@ -315,6 +345,166 @@ namespace Scriber.Language
             return list;
         }
 
+        private static ObjectSyntax ParseObject(ParserContext context)
+        {
+            var token = context.Tokens.Dequeue();
+            var span = token!.Span;
+            var last = span.End;
+            var obj = new ObjectSyntax();
+            var list = new ListSyntax<FieldSyntax>();
+            obj.Fields = list;
+
+            SkipWhitespaceTokens(context);
+
+            if (context.Tokens.Peek()?.Type == TokenType.CurlyClose)
+            {
+                context.Tokens.Dequeue();
+                list.Span = span;
+                return obj;
+            }
+
+            while (token != null)
+            {
+                if (token.Type == TokenType.CurlyClose)
+                {
+                    context.Tokens.Dequeue();
+                    break;
+                }
+
+                var field = ParseField(context);
+                if (field != null)
+                {
+                    list.Add(field);
+                }
+                token = context.Tokens.Peek();
+            }
+
+            if (list.Children.Count > 0)
+            {
+                last = list.Children[^1].Span.End;
+            }
+
+            list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            return obj;
+        }
+
+        private static FieldSyntax? ParseField(ParserContext context)
+        {
+            var token = context.Tokens.Peek();
+            var span = token!.Span;
+            var last = span.End;
+            var list = new ListSyntax<ListSyntax>();
+
+            SkipWhitespaceTokens(context);
+
+            var nextToken = context.Tokens.Peek(1);
+            NameSyntax? name;
+            if (nextToken?.Type == TokenType.Colon)
+            {
+                name = ParseName(context);
+                // Remove colon token here
+                context.Tokens.Dequeue(2);
+                token = context.Tokens.Peek();
+            }
+            else
+            {
+                return null;
+            }
+
+            SkipWhitespaceTokens(context);
+
+            var argument = new FieldSyntax
+            {
+                Name = name
+            };
+
+            while (token != null)
+            {
+                if (token.Type == TokenType.CurlyClose)
+                {
+                    break;
+                }
+                else if (token.Type == TokenType.Semicolon)
+                {
+                    context.Tokens.Dequeue();
+                    break;
+                }
+
+                list.Add(ParseBlock(context, true));
+
+                last = token.Index + token.Length;
+                token = context.Tokens.Peek();
+            }
+
+            argument.Value = list;
+            argument.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            return argument;
+        }
+
+        private static ArraySyntax ParseArray(ParserContext context)
+        {
+            var token = context.Tokens.Dequeue();
+            var span = token!.Span;
+            var last = span.End;
+            var array = new ArraySyntax();
+
+            while (token != null)
+            {
+                if (token.Type == TokenType.BracketClose)
+                {
+                    context.Tokens.Dequeue();
+                    break;
+                }
+                if (token.Type == TokenType.Semicolon)
+                {
+                    context.Tokens.Dequeue();
+                }
+
+                array.Add(ParseArrayElement(context));
+                token = context.Tokens.Peek();
+            }
+
+            SkipWhitespaceTokens(context);
+
+            if (array.Children.Count > 0)
+            {
+                last = array.Children[^1].Span.End;
+            }
+
+            array.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            return array;
+        }
+
+        private static ListSyntax<ListSyntax> ParseArrayElement(ParserContext context)
+        {
+            var token = context.Tokens.Peek();
+            var span = token!.Span;
+            var last = span.End;
+            var list = new ListSyntax<ListSyntax>();
+
+            SkipWhitespaceTokens(context);
+
+            while (token != null)
+            {
+                if (token.Type == TokenType.BracketClose || token.Type == TokenType.Semicolon)
+                {
+                    break;
+                }
+
+                list.Add(ParseBlock(context, true));
+
+                last = token.Index + token.Length;
+                token = context.Tokens.Peek();
+            }
+
+            list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            return list;
+        }
+
         public static ParserResult Parse(IEnumerable<Token> tokens)
         {
             return Parse(tokens, null, null);
@@ -366,6 +556,12 @@ namespace Scriber.Language
 
             while (token != null)
             {
+                if (inArguments && token.Type == TokenType.CurlyOpen)
+                {
+                    list.Add(ParseObject(context));
+                    
+                }
+
                 switch (token.Type)
                 {
                     case TokenType.Whitespace:
@@ -381,9 +577,22 @@ namespace Scriber.Language
                     case TokenType.At:
                         list.Add(ParseCommand(context));
                         break;
+                    case TokenType.Quotation:
+                        list.Add(ParseQuotation(context));
+                        break;
                     //case TokenType.Quotation:
                     //    elements.Add(ParseQuotation(context));
                     // Do nothing and end block
+                    case TokenType.BracketOpen:
+                        if (inArguments)
+                        {
+                            list.Add(ParseArray(context));
+                        }
+                        else
+                        {
+                            list.Add(ParseText(context, false));
+                        }
+                        break;
                     case TokenType.CurlyClose:
                     case TokenType.Newline:
                     default:

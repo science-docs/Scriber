@@ -16,8 +16,8 @@ namespace Scriber.Language.Syntax
             if (item != null)
             {
                 item.Parent = this;
+                Children.Add(item);
             }
-            Children.Add(item);
         }
 
         public override IEnumerable<SyntaxNode> ChildNodes()
