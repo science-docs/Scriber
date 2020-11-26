@@ -1,21 +1,22 @@
 ﻿using Scriber.Language;
+using Scriber.Language.Syntax;
 using System;
 
 namespace Scriber.Engine
 {
     public class CompilerException : Exception
     {
-        public Element? Origin { get; set; }
+        public SyntaxNode? Origin { get; set; }
 
-        public CompilerException(Element? origin) : this(origin, null, null)
+        public CompilerException(SyntaxNode? origin) : this(origin, null, null)
         {
         }
 
-        public CompilerException(Element? origin, string? message) : this(origin, message, null)
+        public CompilerException(SyntaxNode? origin, string? message) : this(origin, message, null)
         {
         }
 
-        public CompilerException(Element? origin, string? message, Exception? innerException) : this(message, innerException)
+        public CompilerException(SyntaxNode? origin, string? message, Exception? innerException) : this(message, innerException)
         {
             Origin = origin;
         }

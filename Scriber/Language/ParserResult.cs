@@ -6,7 +6,6 @@ namespace Scriber.Language
 {
     public class ParserResult
     {
-        public IEnumerable<Element> Elements { get; } = Array.Empty<Element>();
         public IEnumerable<SyntaxNode> Nodes { get; }
         public IEnumerable<ParserIssue> Issues { get; }
 

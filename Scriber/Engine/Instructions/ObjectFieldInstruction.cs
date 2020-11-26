@@ -1,23 +1,11 @@
 ﻿using System;
 using Scriber.Language;
+using Scriber.Language.Syntax;
 
 namespace Scriber.Engine.Instructions
 {
-    public class ObjectFieldInstruction : EngineInstruction
+    public class ObjectFieldInstruction : EngineInstruction<FieldSyntax>
     {
-        public string Key { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="origin"></param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="ArgumentNullException"/>
-        public ObjectFieldInstruction(Element origin) : base(origin)
-        {
-            Key = origin.Content ?? throw new ArgumentException("Element content should not be null", nameof(origin));
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -26,24 +14,21 @@ namespace Scriber.Engine.Instructions
         /// <returns></returns>
         /// <exception cref="ArgumentException"/>
         /// <exception cref="ArgumentNullException"/>
-        public override object? Execute(CompilerState state, Argument[] arguments)
+        public override object? Execute(CompilerState state, FieldSyntax field)
         {
-            if (arguments is null)
+            if (field is null)
             {
-                throw new ArgumentNullException(nameof(arguments));
+                throw new ArgumentNullException(nameof(field));
             }
 
-            if (arguments.Length != 1)
+            if (field.Name is null)
             {
-                throw new ArgumentException("An object field can only hold one argument.", nameof(arguments));
+                throw new ArgumentException();
             }
 
-            if (arguments[0] == null)
-            {
-                throw new ArgumentException("Null arguments are not allowed", nameof(arguments));
-            }
+            var fieldArgument = EngineInstruction.Execute(state, field.Value);
 
-            return new ObjectField(Origin, Key, arguments[0]);
+            return new ObjectField(field, field.Name.Value, fieldArgument);
         }
     }
 }

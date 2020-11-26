@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Scriber.Language.Syntax
 {
@@ -9,14 +10,14 @@ namespace Scriber.Language.Syntax
             get => name;
             set => name = SetParent(name, value);
         }
-        public ListSyntax<ListSyntax>? Value
+        public ListSyntax Value
         {
-            get => value;
-            set => this.value = SetParent(this.value, value);
+            get => value ?? throw new NullReferenceException();
+            set => this.value = SetParent(this.value, value ?? throw new NullReferenceException());
         }
 
         private NameSyntax? name;
-        private ListSyntax<ListSyntax>? value;
+        private ListSyntax? value;
 
         public override IEnumerable<SyntaxNode> ChildNodes()
         {
@@ -24,10 +25,7 @@ namespace Scriber.Language.Syntax
             {
                 yield return Name;
             }
-            if (Value != null)
-            {
-                yield return Value;
-            }
+            yield return Value;
         }
     }
 }

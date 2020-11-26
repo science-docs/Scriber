@@ -273,7 +273,6 @@ namespace Scriber.Language
                 name = ParseName(context);
                 // Remove colon token here
                 context.Tokens.Dequeue(2);
-                token = context.Tokens.Peek();
             }
 
             SkipWhitespaceTokens(context);
@@ -283,20 +282,42 @@ namespace Scriber.Language
                 Name = name
             };
 
-            while (token != null)
+            token = context.Tokens.Peek();
+            if (token != null)
             {
-                if (token.Type == TokenType.ParenthesesClose || token.Type == TokenType.Semicolon)
-                {
-                    break;
-                }
-
-                list.Add(ParseBlock(context, true));
-
-                last = token.Index + token.Length;
-                token = context.Tokens.Peek();
+                argument.Content = ParseBlock(context, true);
+            }
+            else
+            {
+                argument.Content = new ListSyntax();
             }
 
-            argument.Content = list;
+            token = context.Tokens.Peek();
+
+            if (token != null)
+            {
+                last = token.Span.End;
+            }
+
+            if (token == null || (token.Type != TokenType.ParenthesesClose && token.Type != TokenType.Semicolon))
+            {
+                // Add issue here
+            }
+
+            //while (token != null)
+            //{
+            //    if (token.Type == TokenType.ParenthesesClose || token.Type == TokenType.Semicolon)
+            //    {
+            //        break;
+            //    }
+
+            //    list.Add(ParseBlock(context, true));
+
+            //    last = token.Index + token.Length;
+            //    token = context.Tokens.Peek();
+            //}
+
+
             argument.Span = new TextSpan(span.Start, last - span.Start, span.Line);
 
             return argument;
@@ -419,25 +440,32 @@ namespace Scriber.Language
                 Name = name
             };
 
-            while (token != null)
+            if (token != null)
             {
-                if (token.Type == TokenType.CurlyClose)
-                {
-                    break;
-                }
-                else if (token.Type == TokenType.Semicolon)
-                {
-                    context.Tokens.Dequeue();
-                    break;
-                }
-
-                list.Add(ParseBlock(context, true));
-
-                last = token.Index + token.Length;
-                token = context.Tokens.Peek();
+                argument.Value = ParseBlock(context, true);
+            }
+            else
+            {
+                argument.Value = new ListSyntax();
             }
 
-            argument.Value = list;
+            if (token != null)
+            {
+                last = token.Span.End;
+                if (token.Type == TokenType.Semicolon)
+                {
+                    context.Tokens.Dequeue();
+                }
+                else if (token.Type != TokenType.CurlyClose)
+                {
+                    // Add issue here
+                }
+            }
+            else
+            {
+                // Add issue here
+            }
+
             argument.Span = new TextSpan(span.Start, last - span.Start, span.Line);
 
             return argument;
@@ -478,26 +506,25 @@ namespace Scriber.Language
             return array;
         }
 
-        private static ListSyntax<ListSyntax> ParseArrayElement(ParserContext context)
+        private static ListSyntax ParseArrayElement(ParserContext context)
         {
+            SkipWhitespaceTokens(context);
             var token = context.Tokens.Peek();
+
+            if (token == null)
+            {
+                return new ListSyntax();
+            }
+
             var span = token!.Span;
             var last = span.End;
-            var list = new ListSyntax<ListSyntax>();
 
-            SkipWhitespaceTokens(context);
+            var list = ParseBlock(context, true);
 
-            while (token != null)
+            token = context.Tokens.Peek();
+            if (token == null || (token.Type != TokenType.BracketClose && token.Type != TokenType.Semicolon))
             {
-                if (token.Type == TokenType.BracketClose || token.Type == TokenType.Semicolon)
-                {
-                    break;
-                }
-
-                list.Add(ParseBlock(context, true));
-
-                last = token.Index + token.Length;
-                token = context.Tokens.Peek();
+                // Add issue here
             }
 
             list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
@@ -532,7 +559,8 @@ namespace Scriber.Language
 
             var context = new ParserContext
             {
-                Tokens = new TokenQueue(tokens)
+                Tokens = new TokenQueue(tokens),
+                Resource = resource
             };
 
             if (context.Tokens.Count == 0)
@@ -559,7 +587,6 @@ namespace Scriber.Language
                 if (inArguments && token.Type == TokenType.CurlyOpen)
                 {
                     list.Add(ParseObject(context));
-                    
                 }
 
                 switch (token.Type)
@@ -594,7 +621,17 @@ namespace Scriber.Language
                         }
                         break;
                     case TokenType.CurlyClose:
+                        goto end;
                     case TokenType.Newline:
+                        if (context.Tokens.Peek(2)?.Type == TokenType.Newline)
+                        {
+                            goto end;
+                        }
+                        else
+                        {
+                            list.Add(ParseText(context, inArguments));
+                        }
+                        break;
                     default:
                         goto end;
                 }
@@ -622,127 +659,127 @@ namespace Scriber.Language
             }
         }
 
-        private static Element TopParent(Element element)
-        {
-            if (element.Parent == null)
-            {
-                return element;
-            }
-            else
-            {
-                return TopParent(element.Parent);
-            }
-        }
+        //private static Element TopParent(Element element)
+        //{
+        //    if (element.Parent == null)
+        //    {
+        //        return element;
+        //    }
+        //    else
+        //    {
+        //        return TopParent(element.Parent);
+        //    }
+        //}
 
-        private static void BuildContent(Element element)
-        {
-            SetContent(element);
+        //private static void BuildContent(Element element)
+        //{
+        //    SetContent(element);
 
-            foreach (var child in element.Children.ToArray())
-            {
-                BuildContent(child);
-            }
+        //    foreach (var child in element.Children.ToArray())
+        //    {
+        //        BuildContent(child);
+        //    }
 
-            if (element.Type == ElementType.Text && string.IsNullOrEmpty(element.Content))
-            {
-                element.Parent?.Children.Remove(element);
-            }
+        //    if (element.Type == ElementType.Text && string.IsNullOrEmpty(element.Content))
+        //    {
+        //        element.Parent?.Children.Remove(element);
+        //    }
 
-            var children = element.Children.ToArray();
+        //    var children = element.Children.ToArray();
 
-            for (int i = 0; i < children.Length; i++)
-            {
-                var child = children[i];
-                if (child.Type == ElementType.Command && i < children.Length - 1)
-                {
-                    var next = children[i + 1];
-                    if (next.Type == ElementType.ExplicitBlock)
-                    {
-                        child.Type = ElementType.Environment;
-                        next.Detach();
-                        next.Parent = child;
-                        child.Children.AddLast(next);
-                        // Skip the next element
-                        i++;
-                    }
-                }
-            }
-        }
+        //    for (int i = 0; i < children.Length; i++)
+        //    {
+        //        var child = children[i];
+        //        if (child.Type == ElementType.Command && i < children.Length - 1)
+        //        {
+        //            var next = children[i + 1];
+        //            if (next.Type == ElementType.ExplicitBlock)
+        //            {
+        //                child.Type = ElementType.Environment;
+        //                next.Detach();
+        //                next.Parent = child;
+        //                child.Children.AddLast(next);
+        //                // Skip the next element
+        //                i++;
+        //            }
+        //        }
+        //    }
+        //}
 
-        private static void SetContent(Element element)
-        {
-            if (element.StringBuilder != null)
-            {
-                var text = element.StringBuilder.ToString();
+        //private static void SetContent(Element element)
+        //{
+        //    if (element.StringBuilder != null)
+        //    {
+        //        var text = element.StringBuilder.ToString();
 
-                if (element.Type == ElementType.ObjectField)
-                {
-                    text = text.Trim(out int advance);
-                    element.Index += advance;
-                }
-                else if (element.Type == ElementType.Text)
-                {
-                    element.Siblings(out var previous, out var next);
+        //        if (element.Type == ElementType.ObjectField)
+        //        {
+        //            text = text.Trim(out int advance);
+        //            element.Index += advance;
+        //        }
+        //        else if (element.Type == ElementType.Text)
+        //        {
+        //            element.Siblings(out var previous, out var next);
 
-                    if (previous == null || CutOffType(previous.Type))
-                    {
-                        text = text.TrimStart(out int advance);
-                        element.Index += advance;
-                    }
-                    if (next == null || CutOffType(next.Type))
-                    {
-                        text = text.TrimEnd();
-                    }
+        //            if (previous == null || CutOffType(previous.Type))
+        //            {
+        //                text = text.TrimStart(out int advance);
+        //                element.Index += advance;
+        //            }
+        //            if (next == null || CutOffType(next.Type))
+        //            {
+        //                text = text.TrimEnd();
+        //            }
 
-                    if (previous != null && previous.Type == ElementType.Command 
-                        && next != null && next.Type == ElementType.ExplicitBlock 
-                        && string.IsNullOrWhiteSpace(text))
-                    {
-                        element.Detach();
-                        return;
-                    }
+        //            if (previous != null && previous.Type == ElementType.Command 
+        //                && next != null && next.Type == ElementType.ExplicitBlock 
+        //                && string.IsNullOrWhiteSpace(text))
+        //            {
+        //                element.Detach();
+        //                return;
+        //            }
 
-                    if (previous == null && next == null && text == "null")
-                    {
-                        element.Type = ElementType.Null;
-                    }
-                }
-                element.Content = text;
-                element.StringBuilder = null;
-                element.Length = element.Content.Length;
+        //            if (previous == null && next == null && text == "null")
+        //            {
+        //                element.Type = ElementType.Null;
+        //            }
+        //        }
+        //        element.Content = text;
+        //        element.StringBuilder = null;
+        //        element.Length = element.Content.Length;
 
-                if (element.Type == ElementType.Quotation)
-                {
-                    element.Length += 2;
-                }
-            }
-        }
+        //        if (element.Type == ElementType.Quotation)
+        //        {
+        //            element.Length += 2;
+        //        }
+        //    }
+        //}
 
-        private static bool CutOffType(ElementType type)
-        {
-            return !(type == ElementType.Text || type == ElementType.Quotation || type == ElementType.Command); 
-        }
+        //private static bool CutOffType(ElementType type)
+        //{
+        //    return !(type == ElementType.Text || type == ElementType.Quotation || type == ElementType.Command); 
+        //}
 
-        private static Element AppendText(ParserContext context, Element previous, Element parent, Token token)
-        {
-            var textItem = previous.Type == ElementType.Text ? previous : new Element(parent, ElementType.Text, token.Index, context.Line);
+        //private static Element AppendText(ParserContext context, Element previous, Element parent, Token token)
+        //{
+        //    var textItem = previous.Type == ElementType.Text ? previous : new Element(parent, ElementType.Text, token.Index, context.Line);
 
-            if (textItem.StringBuilder == null)
-            {
-                textItem.StringBuilder = new StringBuilder(token.Content);
-            }
-            else
-            {
-                textItem.StringBuilder.Append(token.Content);
-            }
+        //    if (textItem.StringBuilder == null)
+        //    {
+        //        textItem.StringBuilder = new StringBuilder(token.Content);
+        //    }
+        //    else
+        //    {
+        //        textItem.StringBuilder.Append(token.Content);
+        //    }
 
-            return textItem;
-        }
+        //    return textItem;
+        //}
 
-        private static bool IsLineMixed(IEnumerable<Element> elements)
-        {
-            return elements.Any(e => e.Type == ElementType.Text);
-        }
+        //private static bool IsLineMixed(IEnumerable<Element> elements)
+        //{
+        //    return elements.Any(e => e.Type == ElementType.Text);
+        //}
 
 
     }

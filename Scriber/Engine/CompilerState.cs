@@ -1,6 +1,9 @@
 ﻿using Scriber.Engine.Instructions;
 using Scriber.Language;
+using Scriber.Language.Syntax;
+using Scriber.Layout.Document;
 using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 
 namespace Scriber.Engine
@@ -9,7 +12,6 @@ namespace Scriber.Engine
     {
         public Context Context { get; }
         public Document Document { get; }
-        public BlockStack Blocks { get; }
         public CompilerIssueCollection Issues { get; }
         public IFileSystem FileSystem => Context.FileSystem;
         public CommandCollection Commands => Context.Commands;
@@ -20,7 +22,6 @@ namespace Scriber.Engine
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
             Document = new Document();
-            Blocks = new BlockStack();
             Issues = new CompilerIssueCollection();
         }
 
@@ -29,22 +30,20 @@ namespace Scriber.Engine
             Continue = false;
         }
 
-        public Argument? Execute(Element element, Argument[] arguments)
+        public Argument? Execute(SyntaxNode node)
         {
-            var instruction = EngineInstruction.Create(element);
-
             try
             {
-                var result = instruction?.Execute(this, arguments);
+                var result = EngineInstruction.Execute(this, node);
 
                 if (result != null)
                 {
-                    return new Argument(element, result);
+                    return new Argument(node, result);
                 }
             }
             catch (CompilerException compilerException)
             {
-                Issues.Add(compilerException.Origin ?? element, CompilerIssueType.Error, compilerException.Message, compilerException.InnerException);
+                Issues.Add(compilerException.Origin ?? node, CompilerIssueType.Error, compilerException.Message, compilerException.InnerException);
             
                 if (Context.FailOnError)
                 {

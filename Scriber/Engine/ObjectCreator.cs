@@ -1,4 +1,4 @@
-﻿using Scriber.Language;
+﻿using Scriber.Language.Syntax;
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,10 @@ using System.Reflection;
 
 namespace Scriber.Engine
 {
-    public class ObjectCreator : Traceable
+    public class ObjectCreator : Traceable<ObjectSyntax>
     {
         public string? TypeName { get; set; }
-        public Element? TypeElement { get; set; }
+        //public Element? TypeElement { get; set; }
         public CompilerState CompilerState { get; set; }
         public List<ObjectField> Fields { get; } = new List<ObjectField>();
 
@@ -22,7 +22,7 @@ namespace Scriber.Engine
         /// <param name="origin"></param>
         /// <param name="compilerState"></param>
         /// <exception cref="ArgumentNullException"/>
-        public ObjectCreator(Element origin, CompilerState compilerState) : base(origin)
+        public ObjectCreator(ObjectSyntax origin, CompilerState compilerState) : base(origin)
         {
             CompilerState = compilerState ?? throw new ArgumentNullException(nameof(compilerState));
         }
@@ -130,7 +130,7 @@ namespace Scriber.Engine
                 }
                 if (objType == null)
                 {
-                    throw new CompilerException(TypeElement ?? Origin, $"Object of type '{TypeName}' cannot be created. It is not a member of the overrides for type '{defaultType.FormattedName()}'.");
+                    throw new CompilerException(Origin, $"Object of type '{TypeName}' cannot be created. It is not a member of the overrides for type '{defaultType.FormattedName()}'.");
                 }
             }
             else
@@ -158,7 +158,7 @@ namespace Scriber.Engine
             }
             catch (Exception ex)
             {
-                throw new CompilerException(TypeElement ?? Origin, $"An exception occured while creating object of type '{objType.FormattedName()}'.", ex);
+                throw new CompilerException(Origin, $"An exception occured while creating object of type '{objType.FormattedName()}'.", ex);
             }
         }
 
@@ -233,7 +233,7 @@ namespace Scriber.Engine
 
             if (issue != null)
             {
-                throw new CompilerException(TypeElement ?? Origin, $"Type '{type.FormattedName()}' {issue}. An object of this type cannot be instantiated.");
+                throw new CompilerException(Origin, $"Type '{type.FormattedName()}' {issue}. An object of this type cannot be instantiated.");
             }
         }
 

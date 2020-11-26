@@ -1,10 +1,9 @@
-﻿using Scriber.Language;
+﻿using Scriber.Language.Syntax;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Scriber.Engine
 {
-    public delegate object? CommandExecution(Element origin, CompilerState state, Argument[] arguments);
+    public delegate object? CommandExecution(SyntaxNode origin, CompilerState state, Argument[] arguments);
 
     public class Command
     {

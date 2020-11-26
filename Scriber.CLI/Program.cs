@@ -33,19 +33,19 @@ namespace Scriber.CLI
             sb.AppendLine("@CenterHeader(@IncludeGraphics(tfl.png))");
             sb.AppendLine("@CenterFooter(@ThePage)");
             sb.AppendLine("@FontSize(3*4)");
-            sb.AppendLine("@Heading*(1, A)");
+            sb.AppendLine("Some Text\nMore Text\n\n@Heading*(1; A)");
             sb.AppendLine("@TableOfContent()");
-            sb.AppendLine("@Heading(1, B)");
+            sb.AppendLine("@Heading(1; B)");
             sb.AppendLine("Test@Footnote(\"\")");
             sb.AppendLine("@Pagebreak()").AppendLine();
-            sb.AppendLine("@Color(Red, Red Text)").AppendLine();
+            sb.AppendLine("Some @Color(Red; Red Text) in a paragraph.").AppendLine();
             sb.AppendLine("@Pagebreak()");
             sb.AppendLine("@Pagebreak()");
             sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@SetPageNumbering(@TextWidth() / 37, RomanUpper)");
+            sb.AppendLine("@SetPageNumbering(@TextWidth() / 37; RomanUpper)");
             sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@Pagebreak()");
+            //sb.AppendLine("@Pagebreak()");
+            //sb.AppendLine("@Pagebreak()");
             ////sb.AppendLine("@Include(include.sc)");
             ////sb.AppendLine("\\section{This is a section}");
 
@@ -218,7 +218,7 @@ namespace Scriber.CLI
             var tokens = Lexer.Tokenize(sb.ToString());
             context.Logger.Logged += Logger_Logged;
             var parserResult = Parser.Parse(tokens, null, context.Logger);
-            var result = Compiler.Compile(context, parserResult.Elements);
+            var result = Compiler.Compile(context, parserResult.Nodes);
 
             var document = result.Document;
             document.Run(context.Logger);

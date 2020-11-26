@@ -1,28 +1,14 @@
-﻿using System;
-using Scriber.Language;
+﻿using Scriber.Language.Syntax;
 
 namespace Scriber.Engine.Instructions
 {
-    public class TextInstruction : EngineInstruction
+    public class TextInstruction : EngineInstruction<TextSyntax>
     {
-        public string Content { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="origin"></param>
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="ArgumentNullException"/>
-        public TextInstruction(Element origin) : base(origin)
-        {
-            Content = origin.Content ?? throw new ArgumentException("Content is not allowed to be null", nameof(origin));
-        }
-
-        public override object Execute(CompilerState state, Argument[] arguments)
+        public override object Execute(CompilerState state, TextSyntax text)
         {
             return new Layout.Document.TextLeaf
             {
-                Content = Content
+                Content = text.Text
             };
         }
     }

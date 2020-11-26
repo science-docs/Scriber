@@ -154,13 +154,6 @@ namespace Scriber.Engine.Commands
                 state.Context.Logger.Debug("Root command skipped.");
                 return;
             }
-
-            // Reset the current state
-            while (!state.Blocks.IsRoot)
-            {
-                state.Blocks.Pop();
-            }
-            state.Blocks.Current.Objects.Clear();
             // Compile the root file
             Include(state, rootFile);
             // Afterwards stop the compilation of the current file

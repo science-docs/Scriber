@@ -1,16 +1,12 @@
-﻿using Scriber.Language;
+﻿using Scriber.Language.Syntax;
 using Scriber.Variables;
 using System.Globalization;
 
 namespace Scriber.Engine.Instructions
 {
-    class PercentInstruction : EngineInstruction
+    public class PercentInstruction : EngineInstruction<PercentSyntax>
     {
-        public PercentInstruction(Element origin) : base(origin)
-        {
-        }
-
-        public override object? Execute(CompilerState state, Argument[] arguments)
+        public override object? Execute(CompilerState state, PercentSyntax node)
         {
             var width = state.Document.Variable(PageVariables.BoxSize).Width.ToString(CultureInfo.InvariantCulture);
             return $"*{width}pt";
