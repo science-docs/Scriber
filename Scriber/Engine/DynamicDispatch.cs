@@ -80,7 +80,18 @@ namespace Scriber.Engine
 
             var restArgs = source[index..];
 
-            var lastArg = new Argument(restArgs[0].Source, new ObjectArray(null, state, restArgs));
+            var span = restArgs[0].Source.Span;
+            var end = restArgs[^1].Source.Span.End;
+
+            var arraySpan = new TextSpan(span.Start, end - span.Start, span.Line);
+            var arraySyntax = new ArraySyntax
+            {
+                Span = arraySpan,
+                Resource = restArgs[0].Source.Resource,
+                Parent = restArgs[0].Source.Parent
+            };
+
+            var lastArg = new Argument(restArgs[0].Source, new ObjectArray(arraySyntax, state, restArgs));
             args[^1] = lastArg;
 
             return args;
@@ -209,7 +220,7 @@ namespace Scriber.Engine
             Argument.IsArgumentType(type, out var argType);
             var innerArgument = false;
 
-            if (type.IsArray)
+            if (type.IsArrayType())
             {
                 var baseType = type.GetElementType()!;
                 innerArgument = Argument.IsArgumentType(baseType, out argType);
@@ -294,7 +305,7 @@ namespace Scriber.Engine
 
         private static bool IsArrayParameter(Parameter parameter, int size, Argument[] args)
         {
-            if (parameter.Type.IsArray)
+            if (parameter.Type.IsArrayType())
             {
                 if (args.Length == size)
                 {

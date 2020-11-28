@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Scriber.Language.Syntax;
 using Scriber.Layout.Document;
 using Scriber.Variables;
@@ -15,7 +16,7 @@ namespace Scriber.Engine.Instructions
         /// <param name="arguments"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"/>
-        public override object Execute(CompilerState state, ListSyntax list)
+        public override object Evaluate(CompilerState state, ListSyntax list)
         {
             if (state is null)
             {
@@ -32,10 +33,10 @@ namespace Scriber.Engine.Instructions
             // Group continueous leafs into one paragraph
             Paragraph? currentParagraph = null;
 
-            for (int i = 0; i < list.Children.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                var child = list.Children[i];
-                var flattened = EngineInstruction.Execute(state, child).Flatten();
+                var child = list[i];
+                var flattened = EngineInstruction.Evaluate(state, child).Flatten();
 
                 foreach (var element in flattened)
                 {
@@ -59,33 +60,16 @@ namespace Scriber.Engine.Instructions
 
                         currentParagraph.Leaves.Add(new TextLeaf(str));
                     }
-                    //else if (item.Value == EmptyInstruction.Object)
-                    //{
-                    //    ResetParagraph(state, ref currentParagraph);
-                    //}
-                    //else if (item.Value == NullInstruction.NullObject)
-                    //{
-                    //    ResetParagraph(state, ref currentParagraph);
-                    //    results.Add(new Argument(item.Source, null));
-                    //}
                     else
                     {
                         ResetParagraph(state, ref currentParagraph);
                         results.Add(element);
                     }
                 }
-
-                
             }
 
             ResetParagraph(state, ref currentParagraph);
-
-            if (results.Count == 0)
-            {
-                // signaling an empty block
-                results.Add(new Argument(list, null));
-                state.Context.Logger.Debug("Empty explicit block found. Adding null element");
-            }
+            FilterEmptyParagraphs(results);
 
             return results.ToArray();
         }
@@ -98,6 +82,20 @@ namespace Scriber.Engine.Instructions
             currentParagraph.FontSize = state.Document.Variable(FontVariables.FontSize);
             currentParagraph.Margin = margin;
             return currentParagraph;
+        }
+
+        private void FilterEmptyParagraphs(List<Argument> arguments)
+        {
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                if (arguments[i].Value is Paragraph paragraph)
+                {
+                    if (paragraph.Leaves.All(e => e is ITextLeaf textLeaf && string.IsNullOrWhiteSpace(textLeaf.Content)))
+                    {
+                        arguments.RemoveAt(i--);
+                    }
+                }
+            }
         }
 
         private void ResetParagraph(CompilerState state, ref Paragraph? paragraph)

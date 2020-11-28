@@ -1,4 +1,4 @@
-﻿using Scriber.Language;
+﻿using Scriber.Language.Syntax;
 using Scriber.Layout.Document;
 using Scriber.Tests.Fixture;
 using System;
@@ -9,7 +9,7 @@ namespace Scriber.Engine.Tests
 {
     public class ObjectArrayTests
     {
-        private Element E => ElementFixtures.EmptyElement();
+        private ArraySyntax E => new ArraySyntax();
         private CompilerState CS => CompilerStateFixtures.ReflectionLoaded();
 
         [Fact]
@@ -71,9 +71,9 @@ namespace Scriber.Engine.Tests
         [Fact]
         public void ObjectCreatorArray()
         {
-            var creator = new ObjectCreator(E, CS);
+            var creator = new ObjectCreator(new ObjectSyntax(), CS);
             var objectArray = Create(creator);
-            creator.Fields.Add(new ObjectField(E, "A", new Argument(E, 123)));
+            creator.Fields.Add(new ObjectField(new FieldSyntax(), "A", new Argument(E, 123)));
 
             var array = objectArray.Get(typeof(SimpleObject));
             Assert.IsType<SimpleObject[]>(array);

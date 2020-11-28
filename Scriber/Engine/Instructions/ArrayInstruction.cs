@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Scriber.Engine.Instructions
 {
-    public class ObjectArrayInstruction : EngineInstruction<ArraySyntax>
+    public class ArrayInstruction : EngineInstruction<ArraySyntax>
     {
         /// <summary>
         /// 
@@ -13,7 +13,7 @@ namespace Scriber.Engine.Instructions
         /// <param name="array"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"/>
-        public override object? Execute(CompilerState state, ArraySyntax array)
+        public override object? Evaluate(CompilerState state, ArraySyntax array)
         {
             if (state is null)
             {
@@ -27,9 +27,9 @@ namespace Scriber.Engine.Instructions
 
             var arguments = new List<Argument>();
 
-            foreach (var arrayElement in array.Children)
+            foreach (var arrayElement in array)
             {
-                arguments.Add(EngineInstruction.Execute(state, arrayElement));
+                arguments.Add(EngineInstruction.Evaluate(state, arrayElement));
             }
 
             return new ObjectArray(array, state, arguments.ToArray());

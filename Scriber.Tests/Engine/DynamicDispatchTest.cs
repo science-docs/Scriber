@@ -1,4 +1,5 @@
 ﻿using Scriber.Engine;
+using Scriber.Language.Syntax;
 using Scriber.Tests.Fixture;
 using System;
 using Xunit;
@@ -16,7 +17,7 @@ namespace Scriber.Engine.Tests
         [InlineData(typeof(Argument<string>))]
         public void SuccessfullSingleString(Type targetType)
         {
-            var element = ElementFixtures.EmptyElement();
+            var element = new ListSyntax();
             var value = "stringValue";
             var argument = new Argument(element, value);
 
@@ -33,7 +34,7 @@ namespace Scriber.Engine.Tests
         [InlineData(typeof(Argument<string[]>))]
         public void SuccessfullArgumentArrayString(Type targetType)
         {
-            var element = ElementFixtures.EmptyElement();
+            var element = new ListSyntax();
             var value = new Argument[] { new Argument(element, "first"), new Argument(element, "second") };
             var argument = new Argument(element, value);
 
@@ -50,7 +51,7 @@ namespace Scriber.Engine.Tests
         [InlineData(typeof(Argument<string[]>))]
         public void SuccessfullArrayString(Type targetType)
         {
-            var element = ElementFixtures.EmptyElement();
+            var element = new ListSyntax();
             var value = new string[] { "first", "second" };
             var argument = new Argument(element, value);
 
@@ -62,7 +63,7 @@ namespace Scriber.Engine.Tests
         [Fact]
         public void FailureNullValue()
         {
-            var element = ElementFixtures.EmptyElement();
+            var element = new ListSyntax();
             var argument = new Argument(element, null);
 
             var success = DynamicDispatch.IsAssignableFrom(loaded, typeof(string), null, argument, out var transformed);

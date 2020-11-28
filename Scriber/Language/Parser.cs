@@ -1,6 +1,5 @@
 ﻿using Scriber.Language.Syntax;
 using Scriber.Logging;
-using Scriber.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -177,7 +176,7 @@ namespace Scriber.Language
 
             if (command.Arity > 0)
             {
-                command.Span = new TextSpan(start, command.Arguments!.Children[^1].Span.End - start, line);
+                command.Span = new TextSpan(start, command.Arguments[^1].Span.End - start, line);
             }
             else
             {
@@ -241,14 +240,14 @@ namespace Scriber.Language
                 token = context.Tokens.Peek();
             }
 
-            for (int i = 0; i < list.Children.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                list.Children[i].Position = i;
+                list[i].Position = i;
             }
 
-            if (list.Children.Count > 0)
+            if (list.Count > 0)
             {
-                last = list.Children[^1].Span.End;
+                last = list[^1].Span.End;
             }
 
             list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
@@ -261,7 +260,6 @@ namespace Scriber.Language
             var token = context.Tokens.Peek();
             var span = token!.Span;
             var last = span.End;
-            var list = new ListSyntax<ListSyntax>();
 
             SkipWhitespaceTokens(context);
 
@@ -283,7 +281,7 @@ namespace Scriber.Language
             };
 
             token = context.Tokens.Peek();
-            if (token != null)
+            if (token != null && token.Type != TokenType.Semicolon && token.Type != TokenType.ParenthesesClose)
             {
                 argument.Content = ParseBlock(context, true);
             }
@@ -304,6 +302,21 @@ namespace Scriber.Language
                 // Add issue here
             }
 
+
+            // Some elements (like objects or arrays) have to be the only syntax node in the argument.
+            // Therefore, we create appropriate issue messages here.
+            if (argument.Content.Count > 1)
+            {
+                if (argument.Content.Any(e => e is ObjectSyntax))
+                {
+                    // Add issue here
+                }
+                if (argument.Content.Any(e => e is ArraySyntax))
+                {
+                    // Add issue here
+                }
+            }
+
             //while (token != null)
             //{
             //    if (token.Type == TokenType.ParenthesesClose || token.Type == TokenType.Semicolon)
@@ -317,10 +330,20 @@ namespace Scriber.Language
             //    token = context.Tokens.Peek();
             //}
 
+            CleanText(argument.Content);
+
 
             argument.Span = new TextSpan(span.Start, last - span.Start, span.Line);
 
             return argument;
+        }
+
+        private static void CleanText(ListSyntax list)
+        {
+            if (list.Count > 0 && list[^1] is TextSyntax textSyntax)
+            {
+                textSyntax.Text = textSyntax.Text.TrimEnd();
+            }
         }
 
         private static void SkipWhitespaceTokens(ParserContext context)
@@ -356,9 +379,9 @@ namespace Scriber.Language
                 token = context.Tokens.Peek();
             }
 
-            if (list.Children.Count > 0)
+            if (list.Count > 0)
             {
-                last = list.Children[^1].Span.End;
+                last = list[^1].Span.End;
             }
 
             list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
@@ -400,9 +423,9 @@ namespace Scriber.Language
                 token = context.Tokens.Peek();
             }
 
-            if (list.Children.Count > 0)
+            if (list.Count > 0)
             {
-                last = list.Children[^1].Span.End;
+                last = list[^1].Span.End;
             }
 
             list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
@@ -415,7 +438,6 @@ namespace Scriber.Language
             var token = context.Tokens.Peek();
             var span = token!.Span;
             var last = span.End;
-            var list = new ListSyntax<ListSyntax>();
 
             SkipWhitespaceTokens(context);
 
@@ -449,6 +471,8 @@ namespace Scriber.Language
                 argument.Value = new ListSyntax();
             }
 
+            token = context.Tokens.Peek();
+
             if (token != null)
             {
                 last = token.Span.End;
@@ -465,6 +489,8 @@ namespace Scriber.Language
             {
                 // Add issue here
             }
+
+            CleanText(argument.Value);
 
             argument.Span = new TextSpan(span.Start, last - span.Start, span.Line);
 
@@ -496,9 +522,9 @@ namespace Scriber.Language
 
             SkipWhitespaceTokens(context);
 
-            if (array.Children.Count > 0)
+            if (array.Count > 0)
             {
-                last = array.Children[^1].Span.End;
+                last = array[^1].Span.End;
             }
 
             array.Span = new TextSpan(span.Start, last - span.Start, span.Line);
@@ -528,6 +554,8 @@ namespace Scriber.Language
             }
 
             list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            CleanText(list);
 
             return list;
         }
@@ -565,6 +593,11 @@ namespace Scriber.Language
 
             if (context.Tokens.Count == 0)
                 return ParserResult.Empty();
+
+            if (logger != null)
+            {
+                context.Issues.CollectionChanged += (_, e) => IssuesChanged(logger, e);
+            }
 
             var nodes = new List<SyntaxNode>();
 
@@ -607,9 +640,6 @@ namespace Scriber.Language
                     case TokenType.Quotation:
                         list.Add(ParseQuotation(context));
                         break;
-                    //case TokenType.Quotation:
-                    //    elements.Add(ParseQuotation(context));
-                    // Do nothing and end block
                     case TokenType.BracketOpen:
                         if (inArguments)
                         {
@@ -640,7 +670,7 @@ namespace Scriber.Language
 
             
             end:
-            var lastSpan = list.Children[^1].Span;
+            var lastSpan = list[^1].Span;
             list.Span = new TextSpan(span.Start, lastSpan.End - span.Start, span.Line);
 
             context.Tokens.SkipWhile(e => e.Type == TokenType.Newline);

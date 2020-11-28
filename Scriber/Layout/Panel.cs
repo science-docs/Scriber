@@ -1,6 +1,5 @@
 ﻿using Scriber.Drawing;
 using Scriber.Layout.Document;
-using System;
 
 namespace Scriber.Layout
 {
@@ -19,6 +18,14 @@ namespace Scriber.Layout
             foreach (var sub in measurement.Subs)
             {
                 sub.Element.Render(drawingContext, sub);
+            }
+        }
+
+        protected override void ArrangeOverride(Measurement finalMeasurement)
+        {
+            foreach (var sub in finalMeasurement.Subs)
+            {
+                sub.Element.Arrange(sub);
             }
         }
 

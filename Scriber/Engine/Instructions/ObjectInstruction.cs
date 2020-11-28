@@ -4,7 +4,7 @@ using Scriber.Language.Syntax;
 
 namespace Scriber.Engine.Instructions
 {
-    public class ObjectCreationInstruction : EngineInstruction<ObjectSyntax>
+    public class ObjectInstruction : EngineInstruction<ObjectSyntax>
     {
         /// <summary>
         /// 
@@ -13,7 +13,7 @@ namespace Scriber.Engine.Instructions
         /// <param name="arguments"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"/>
-        public override object? Execute(CompilerState state, ObjectSyntax obj)
+        public override object? Evaluate(CompilerState state, ObjectSyntax obj)
         {
             if (state is null)
             {
@@ -28,9 +28,9 @@ namespace Scriber.Engine.Instructions
             var creator = new ObjectCreator(obj, state);
             var fields = new List<ObjectField>();
 
-            foreach (var field in obj.Fields.Children)
+            foreach (var field in obj.Fields)
             {
-                fields.Add((EngineInstruction.Execute(state, field).Value as ObjectField)!);
+                fields.Add((EngineInstruction.Evaluate(state, field).Value as ObjectField)!);
             }
 
             creator.Fields.AddRange(fields);

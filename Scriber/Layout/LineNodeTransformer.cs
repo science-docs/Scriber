@@ -8,6 +8,25 @@ namespace Scriber.Layout
 {
     public static class LineNodeTransformer
     {
+        public static void Clean(List<LineNode> nodes)
+        {
+            for (int i = 0; i < nodes.Count - 1; i++)
+            {
+                if (nodes[i].Type == LineNodeType.Glue && nodes[i + 1].Type == LineNodeType.Glue)
+                {
+                    nodes.RemoveAt(i);
+                }
+            }
+            if (nodes.Count > 0 && nodes[0].Type == LineNodeType.Glue)
+            {
+                nodes.RemoveAt(0);
+            }
+            if (nodes.Count > 0 && nodes[^1].Type != LineNodeType.Glue)
+            {
+                nodes.Add(LineNode.Glue(0, 0, 0));
+            }
+        }
+
         public static LineNode GetDefaultGlue(AbstractElement element)
         {
             var font = element.Font ?? throw new ArgumentException("Specified element missing font", nameof(element));

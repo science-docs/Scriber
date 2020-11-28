@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Language.Syntax;
 using Scriber.Tests.Fixture;
 using Scriber.Text;
 using System;
@@ -13,8 +14,9 @@ namespace Scriber.Engine.Tests
         private ObjectCreator Default => new ObjectCreator(E, state);
         private ParameterInfo SimpleParameter => typeof(SimpleObject).GetMethod("SimpleMethod").GetParameters()[0];
         private ParameterInfo OverrideParameter => typeof(SimpleObject).GetMethod("OverrideMethod").GetParameters()[0];
-        private Element E => ElementFixtures.EmptyElement();
-        
+        private ObjectSyntax E => new ObjectSyntax();
+        private FieldSyntax Field => new FieldSyntax();
+
         [Fact]
         public void NullElementConstructionException()
         {
@@ -69,7 +71,7 @@ namespace Scriber.Engine.Tests
         public void CreateWithSimpleParameterInfo()
         {
             var creator = Default;
-            creator.Fields.Add(new ObjectField(E, "A", new Argument(E, "123")));
+            creator.Fields.Add(new ObjectField(Field, "A", new Argument(E, "123")));
             var simple = creator.Create(SimpleParameter);
             Assert.IsType<SimpleObject>(simple);
             Assert.Equal(123, ((SimpleObject)simple).A);
@@ -79,7 +81,7 @@ namespace Scriber.Engine.Tests
         public void CreateWithPropertyInfo()
         {
             var creator = Default;
-            creator.Fields.Add(new ObjectField(E, "Other", new Argument(E, Default)));
+            creator.Fields.Add(new ObjectField(Field, "Other", new Argument(E, Default)));
             var property = typeof(SimpleObject).GetProperty("Other");
             var nestedObject = creator.Create(property);
             Assert.IsType<SimpleObject>(nestedObject);
@@ -90,8 +92,8 @@ namespace Scriber.Engine.Tests
         {
             var creator = Default;
             var nested = Default;
-            creator.Fields.Add(new ObjectField(E, "nested", new Argument(E, nested)));
-            nested.Fields.Add(new ObjectField(E, "key", new Argument(E, "value")));
+            creator.Fields.Add(new ObjectField(Field, "nested", new Argument(E, nested)));
+            nested.Fields.Add(new ObjectField(Field, "key", new Argument(E, "value")));
 
             dynamic top = creator.Create(typeof(object), null);
             Assert.NotNull(top);
@@ -106,13 +108,13 @@ namespace Scriber.Engine.Tests
         public void CreateDynamicObjectArray()
         {
             var arrayObject = Default;
-            arrayObject.Fields.Add(new ObjectField(E, "key", new Argument(E, "value")));
-            var array = new ObjectArray(E, state, new Argument[] {
-                new Argument(E, "a"),
-                new Argument(E, arrayObject)
+            arrayObject.Fields.Add(new ObjectField(Field, "key", new Argument(E, "value")));
+            var array = new ObjectArray(new ArraySyntax(), state, new Argument[] {
+                new Argument(Field, "a"),
+                new Argument(Field, arrayObject)
             });
             var creator = Default;
-            creator.Fields.Add(new ObjectField(E, "array", new Argument(E, array)));
+            creator.Fields.Add(new ObjectField(Field, "array", new Argument(E, array)));
 
             dynamic top = creator.Create(typeof(object), null);
             Assert.NotNull(top);
@@ -133,7 +135,7 @@ namespace Scriber.Engine.Tests
         {
             var creator = Default;
             creator.TypeName = "OverrideObject";
-            creator.Fields.Add(new ObjectField(E, "b", new Argument(E, "override")));
+            creator.Fields.Add(new ObjectField(Field, "b", new Argument(E, "override")));
             var simple = creator.Create(OverrideParameter);
             Assert.IsType<OverrideObject>(simple);
             Assert.Equal("override", ((SimpleObject)simple).B);
@@ -143,7 +145,7 @@ namespace Scriber.Engine.Tests
         public void CreateWithArgumentType()
         {
             var creator = Default;
-            creator.Fields.Add(new ObjectField(E, "A", new Argument(E, "123")));
+            creator.Fields.Add(new ObjectField(Field, "A", new Argument(E, "123")));
             var simple = creator.Create(SimpleParameter);
             Assert.IsType<SimpleObject>(simple);
             Assert.Equal(123, ((SimpleObject)simple).A);
@@ -153,7 +155,7 @@ namespace Scriber.Engine.Tests
         public void CreateWithGenericArgument()
         {
             var creator = Default;
-            creator.Fields.Add(new ObjectField(E, "A", new Argument<string>(E, "123")));
+            creator.Fields.Add(new ObjectField(Field, "A", new Argument<string>(E, "123")));
             var simple = creator.Create(typeof(Argument<SimpleObject>), null);
             Assert.IsType<Argument<SimpleObject>>(simple);
             Assert.Equal(123, ((Argument<SimpleObject>)simple).Value.A);
@@ -174,7 +176,7 @@ namespace Scriber.Engine.Tests
         public void UnmatchedFieldWarning()
         {
             var creator = Default;
-            creator.Fields.Add(new ObjectField(E, "unknown", new Argument(E, "unknown")));
+            creator.Fields.Add(new ObjectField(Field, "unknown", new Argument(E, "unknown")));
             creator.Create(SimpleParameter);
             Assert.Single(creator.CompilerState.Issues);
         }
@@ -193,21 +195,6 @@ namespace Scriber.Engine.Tests
             {
                 Default.Create(type, null);
             });
-        }
-
-        [Fact]
-        public void CheckTypeNameInException()
-        {
-            var typeNameElement = new Element(null, ElementType.Text, 0, 0);
-            var creator = Default;
-            creator.TypeName = "WrongOverrideObject";
-            creator.TypeElement = typeNameElement;
-
-            var exception = Assert.Throws<CompilerException>(() =>
-            {
-                creator.Create(OverrideParameter);
-            });
-            Assert.Equal(typeNameElement, exception.Origin);
         }
     }
 }

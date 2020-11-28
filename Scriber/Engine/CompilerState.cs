@@ -34,7 +34,7 @@ namespace Scriber.Engine
         {
             try
             {
-                var result = EngineInstruction.Execute(this, node);
+                var result = EngineInstruction.Evaluate(this, node);
 
                 if (result != null)
                 {

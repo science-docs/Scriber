@@ -33,17 +33,7 @@ namespace Scriber.Layout.Document
                     lineNodes.AddRange(nodes);
                 }
             }
-            if (lineNodes.Count > 0)
-            {
-                lineNodes.Add(LineNode.Glue(0, 0, 0));
-            }
-            for (int i = 0; i < lineNodes.Count - 1; i++)
-            {
-                if (lineNodes[i].Type == LineNodeType.Glue && lineNodes[i + 1].Type == LineNodeType.Glue)
-                {
-                    lineNodes.RemoveAt(i);
-                }
-            }
+            LineNodeTransformer.Clean(lineNodes);
             if (lineNodes.Count > 0)
             {
                 var linebreak = new Linebreak();
@@ -194,7 +184,7 @@ namespace Scriber.Layout.Document
 
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
-            if (lines == null || lineNodes == null)
+            if (lineNodes == null)
             {
                 throw new InvalidOperationException("Rendering has been called before measuring");
             }

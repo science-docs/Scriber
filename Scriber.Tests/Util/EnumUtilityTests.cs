@@ -16,6 +16,13 @@ namespace Scriber.Util.Tests
         }
 
         [Fact]
+        public void ParseIgnoreWhitespace()
+        {
+            var enumValue = EnumUtility.ParseEnum<FontWeight>("  Bold  \t");
+            Assert.Equal(FontWeight.Bold, enumValue);
+        }
+
+        [Fact]
         public void ParseIgnoreCase()
         {
             var enumValue = EnumUtility.ParseEnum<FontWeight>("BOLD");

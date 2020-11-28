@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Language.Syntax;
 using Scriber.Tests.Fixture;
 using System;
 using Xunit;
@@ -7,7 +8,7 @@ namespace Scriber.Engine.Tests
 {
     public class ArgumentTests
     {
-        private Element E => ElementFixtures.EmptyElement();
+        private SyntaxNode E => new ListSyntax();
 
         [Theory]
         [InlineData(typeof(Argument<string>), typeof(string))]

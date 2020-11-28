@@ -2,6 +2,6 @@
 {
     public class ArraySyntax : ListSyntax<ListSyntax>
     {
-        public int Arity => Children.Count;
+        public int Arity => Count;
     }
 }

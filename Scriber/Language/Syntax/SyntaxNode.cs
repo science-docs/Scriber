@@ -104,5 +104,24 @@ namespace Scriber.Language.Syntax
 
             return descendants;
         }
+
+        public SyntaxNode? ChildAtIndex(int index)
+        {
+            if (index < Span.Start || index > Span.End)
+            {
+                return null;
+            }
+
+            foreach (var child in ChildNodes())
+            {
+                var childAtIndex = child.ChildAtIndex(index);
+                if (childAtIndex != null)
+                {
+                    return child;
+                }
+            }
+
+            return this;
+        }
     }
 }

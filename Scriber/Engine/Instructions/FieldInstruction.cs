@@ -1,10 +1,9 @@
 ﻿using System;
-using Scriber.Language;
 using Scriber.Language.Syntax;
 
 namespace Scriber.Engine.Instructions
 {
-    public class ObjectFieldInstruction : EngineInstruction<FieldSyntax>
+    public class FieldInstruction : EngineInstruction<FieldSyntax>
     {
         /// <summary>
         /// 
@@ -14,7 +13,7 @@ namespace Scriber.Engine.Instructions
         /// <returns></returns>
         /// <exception cref="ArgumentException"/>
         /// <exception cref="ArgumentNullException"/>
-        public override object? Execute(CompilerState state, FieldSyntax field)
+        public override object? Evaluate(CompilerState state, FieldSyntax field)
         {
             if (field is null)
             {
@@ -23,10 +22,10 @@ namespace Scriber.Engine.Instructions
 
             if (field.Name is null)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Field name cannot be empty", nameof(field));
             }
 
-            var fieldArgument = EngineInstruction.Execute(state, field.Value);
+            var fieldArgument = EngineInstruction.Evaluate(state, field.Value);
 
             return new ObjectField(field, field.Name.Value, fieldArgument);
         }

@@ -305,6 +305,11 @@ namespace Scriber.Engine
         {
             var value = field.Argument.Value;
 
+            if (value is Argument[] array && array.Length == 1)
+            {
+                value = array[0].Value;
+            }
+
             if (value is ObjectCreator subCreator)
             {
                 // We can assume that the returned value is a document variable.

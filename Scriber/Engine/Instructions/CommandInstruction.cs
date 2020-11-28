@@ -6,7 +6,6 @@ namespace Scriber.Engine.Instructions
 {
     public class CommandInstruction : EngineInstruction<CommandSyntax>
     {
-
         /// <summary>
         /// 
         /// </summary>
@@ -15,7 +14,7 @@ namespace Scriber.Engine.Instructions
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="CompilerException"/>
-        public override object? Execute(CompilerState state, CommandSyntax commandSyntax)
+        public override object? Evaluate(CompilerState state, CommandSyntax commandSyntax)
         {
             if (state is null)
             {
@@ -29,10 +28,10 @@ namespace Scriber.Engine.Instructions
 
             if (commandSyntax.Name == null)
             {
-                throw new CompilerException(commandSyntax, "");
+                throw new CompilerException(commandSyntax, "Received command without a name.");
             }
 
-            var command = state.Commands.Find(commandSyntax.Name.Value, commandSyntax.Arguments!.Children);
+            var command = state.Commands.Find(commandSyntax.Name.Value, commandSyntax.Arguments);
 
             if (command == null)
             {
@@ -41,10 +40,16 @@ namespace Scriber.Engine.Instructions
 
             var arguments = new List<Argument>();
 
-            foreach (var argSyntax in commandSyntax.Arguments!.Children)
+            foreach (var argSyntax in commandSyntax.Arguments)
             {
-                var argResult = EngineInstruction.Execute(state, argSyntax);
+                var argResult = EngineInstruction.Evaluate(state, argSyntax);
                 arguments.Add(argResult);
+            }
+
+            if (commandSyntax.EnvironmentBlock != null)
+            {
+                var block = EngineInstruction.Evaluate(state, commandSyntax.EnvironmentBlock);
+                arguments.Add(block);
             }
 
             try
