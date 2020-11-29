@@ -69,7 +69,6 @@ namespace Scriber.Engine.Instructions
             }
 
             ResetParagraph(state, ref currentParagraph);
-            FilterEmptyParagraphs(results);
 
             return results.ToArray();
         }
@@ -82,20 +81,6 @@ namespace Scriber.Engine.Instructions
             currentParagraph.FontSize = state.Document.Variable(FontVariables.FontSize);
             currentParagraph.Margin = margin;
             return currentParagraph;
-        }
-
-        private void FilterEmptyParagraphs(List<Argument> arguments)
-        {
-            for (int i = 0; i < arguments.Count; i++)
-            {
-                if (arguments[i].Value is Paragraph paragraph)
-                {
-                    if (paragraph.Leaves.All(e => e is ITextLeaf textLeaf && string.IsNullOrWhiteSpace(textLeaf.Content)))
-                    {
-                        arguments.RemoveAt(i--);
-                    }
-                }
-            }
         }
 
         private void ResetParagraph(CompilerState state, ref Paragraph? paragraph)

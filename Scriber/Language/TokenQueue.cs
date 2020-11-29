@@ -28,7 +28,10 @@ namespace Scriber.Language
         public Token? Dequeue()
         {
             var token = tokens.First;
-            tokens.RemoveFirst();
+            if (token != null)
+            {
+                tokens.RemoveFirst();
+            }
             return token?.Value;
         }
 

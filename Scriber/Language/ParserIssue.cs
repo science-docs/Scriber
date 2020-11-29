@@ -1,5 +1,4 @@
-﻿using Scriber.Language.Syntax;
-using System;
+﻿using System;
 
 namespace Scriber.Language
 {
@@ -13,28 +12,16 @@ namespace Scriber.Language
 
     public class ParserIssue
     {
-        public TextSpan Span => Origin.Span;
+        public TextSpan Span { get; set; }
         public string Message { get; set; }
-        public SyntaxNode Origin { get; set; }
         public Exception? InnerException { get; set; }
         public ParserIssueType Type { get; set; }
 
-        public ParserIssue(SyntaxNode origin, ParserIssueType type, string message, Exception? innerException)
+        public ParserIssue(TextSpan span, ParserIssueType type, string message, Exception? innerException)
         {
-            Type = type;
+            Span = span;
             Message = message;
-            Origin = origin;
-            InnerException = innerException;
-        }
-
-        public ParserIssue(Token origin, ParserIssueType type, string message, Exception? innerException)
-        {
             Type = type;
-            Message = message;
-            Origin = new TextSyntax
-            {
-                Span = origin.Span
-            };
             InnerException = innerException;
         }
     }

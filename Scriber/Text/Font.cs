@@ -1,5 +1,6 @@
 ﻿using PdfSharpCore.Fonts;
 using SixLabors.Fonts;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Scriber.Text
@@ -35,10 +36,21 @@ namespace Scriber.Text
             FontFamily = fontFamily;
         }
 
+        private readonly Dictionary<(string, FontWeight), double> fontWidths = new Dictionary<(string, FontWeight), double>();
+
         public double GetWidth(string text, double size, FontWeight weight)
         {
-            var realizedFont = FontFamily.CreateFont((float)size, (SixLabors.Fonts.FontStyle)(int)weight);
-            return TextMeasurer.Measure(text, new RendererOptions(realizedFont, Dpi)).Width;
+            if (fontWidths.ContainsKey((text, weight)))
+            {
+                return fontWidths[(text, weight)] * size;
+            }
+            else
+            {
+                var realizedFont = FontFamily.CreateFont((float)size, (SixLabors.Fonts.FontStyle)(int)weight);
+                var width = TextMeasurer.Measure(text, new RendererOptions(realizedFont, Dpi)).Width;
+                fontWidths[(text, weight)] = width / size;
+                return width;
+            }
         }
 
         private static Stream LoadFont(string name)

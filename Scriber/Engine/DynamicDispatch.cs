@@ -39,7 +39,9 @@ namespace Scriber.Engine
 
             if (args.Length < required || (args.Length > full && parameters.Length > 0 && !IsArrayParameter(parameters[^1], full, args)))
             {
-                throw new CompilerException(node, $"Command {command} expects between {required} and {required + optional} arguments. {args.Length} arguments where supplied");
+                var argCount = optional == 0 ? required.ToString() : $"{required} to {required + optional}";
+                var addS = optional > 0 || required != 1 ? "s" : string.Empty;
+                throw new CompilerException(node, $"Command {command} expects {argCount} argument{addS}. {args.Length} {args.Length.Pluralify("argument was", "arguments were")} supplied");
             }
 
             if (hasState)

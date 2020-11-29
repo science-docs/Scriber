@@ -56,7 +56,6 @@ namespace Scriber.Engine.Instructions.Tests
 
         [Theory]
         [InlineData(" ")]
-        [InlineData("\n")]
         [InlineData("\t")]
         [InlineData(" \n\t ")]
         public void WhitespaceBlock(string input)
@@ -64,7 +63,7 @@ namespace Scriber.Engine.Instructions.Tests
             var blockContent = ParseBlock(input);
             Assert.IsType<Argument[]>(blockContent);
             var argResult = (Argument[])blockContent;
-            Assert.Empty(argResult);
+            Assert.Single(argResult);
         }
 
         [Fact]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Scriber.Language.Syntax;
 
 namespace Scriber.Engine.Instructions
@@ -46,9 +47,9 @@ namespace Scriber.Engine.Instructions
                 arguments.Add(argResult);
             }
 
-            if (commandSyntax.EnvironmentBlock != null)
+            if (commandSyntax.Environment != null)
             {
-                var block = EngineInstruction.Evaluate(state, commandSyntax.EnvironmentBlock);
+                var block = EngineInstruction.Evaluate(state, commandSyntax.Environment);
                 arguments.Add(block);
             }
 
@@ -65,7 +66,7 @@ namespace Scriber.Engine.Instructions
             }
             catch (Exception ex)
             {
-                throw new CompilerException(commandSyntax, "Unhandled exception occured during execution of command " + command.Name, ex);
+                throw new CompilerException(commandSyntax, ex.Message, ex);
             }
         }
     }

@@ -275,6 +275,11 @@ namespace Scriber.Engine
         {
             var type = info.PropertyType;
 
+            if (value is Argument[] array && array.Length == 1)
+            {
+                value = array[0].Value;
+            }
+
             if (value is ObjectCreator subCreator)
             {
                 value = subCreator.Create(info);

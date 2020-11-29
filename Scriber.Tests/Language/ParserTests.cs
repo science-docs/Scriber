@@ -127,6 +127,17 @@ namespace Scriber.Language.Tests
         }
 
         [Fact]
+        public void CurlyAfterCommand()
+        {
+            var result = ParseAsSyntax<CommandSyntax>("@Command{}");
+            Assert.NotNull(result);
+            Assert.NotNull(result.Environment);
+            Assert.Equal(result, result.Environment.Parent);
+            Assert.Empty(result.Arguments);
+            Assert.Empty(result.Environment);
+        }
+
+        [Fact]
         public void ArrayAsText()
         {
             var result = ParseAsSyntax<TextSyntax>("[value1; value2]");

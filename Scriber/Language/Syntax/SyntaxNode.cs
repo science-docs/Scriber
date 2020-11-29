@@ -99,7 +99,7 @@ namespace Scriber.Language.Syntax
                 {
                     descendants.Add(child);
                 }
-                descendants.AddRange(GetDescendantNodes(includeSelf));
+                descendants.AddRange(child.GetDescendantNodes(includeSelf));
             }
 
             return descendants;
@@ -117,7 +117,7 @@ namespace Scriber.Language.Syntax
                 var childAtIndex = child.ChildAtIndex(index);
                 if (childAtIndex != null)
                 {
-                    return child;
+                    return childAtIndex;
                 }
             }
 

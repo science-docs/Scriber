@@ -19,15 +19,15 @@ namespace Scriber.Language.Syntax
             set => arguments = SetParent(arguments, value ?? throw new NullReferenceException());
         }
 
-        public ListSyntax? EnvironmentBlock
+        public ListSyntax? Environment
         {
-            get => environmentBlock;
-            set => environmentBlock = SetParent(environmentBlock, value);
+            get => environment;
+            set => environment = SetParent(environment, value);
         }
 
         private NameSyntax? name;
         private ListSyntax<ArgumentSyntax>? arguments;
-        private ListSyntax? environmentBlock;
+        private ListSyntax? environment;
 
         public override IEnumerable<SyntaxNode> ChildNodes()
         {
@@ -39,9 +39,9 @@ namespace Scriber.Language.Syntax
             {
                 yield return arguments;
             }
-            if (EnvironmentBlock != null)
+            if (Environment != null)
             {
-                yield return EnvironmentBlock;
+                yield return Environment;
             }
         }
     }

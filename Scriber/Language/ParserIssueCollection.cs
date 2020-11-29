@@ -8,7 +8,7 @@ namespace Scriber.Language
     {
         public void Add(Token origin, ParserIssueType type, string message)
         {
-            Add(new ParserIssue(origin, type, message, null));
+            Add(new ParserIssue(origin.Span, type, message, null));
         }
 
         public void Add(SyntaxNode origin, ParserIssueType type, string message)
@@ -18,12 +18,17 @@ namespace Scriber.Language
 
         public void Add(SyntaxNode origin, ParserIssueType type, string message, Exception? innerException)
         {
-            Add(new ParserIssue(origin, type, message, innerException));
+            Add(new ParserIssue(origin.Span, type, message, innerException));
         }
 
         public void Log(SyntaxNode origin, string message)
         {
             Add(origin, ParserIssueType.Log, message);
+        }
+
+        public void Add(TextSpan span, ParserIssueType type, string message)
+        {
+            Add(new ParserIssue(span, type, message, null));
         }
     }
 }
