@@ -28,13 +28,11 @@ namespace Scriber
 
         public Measurements Measurements { get; }
 
-        public Text.Hyphenator Hyphenator { get; set; }
-
         public IArrangingStrategy ArrangingStrategy { get; set; } = new DefaultArrangingStrategy();
 
-        public Culture Culture { get; set; } = new Culture("en-US");
+        public Culture Culture { get; set; } = Culture.Invariant;
 
-        public Locale Locale { get; set; }
+        public Locale Locale => new Locale(Culture);
 
         public Citations? Citations { get; set; }
 
@@ -43,15 +41,13 @@ namespace Scriber
 
         public Document()
         {
-            Locale = new Locale(Culture);
+            //Locale = new Locale(Culture);
             Elements = new ElementCollection<DocumentElement>(this);
             PageItems = new ElementCollection<DocumentElement>(this);
             Measurements = new Measurements();
             
-            Font = Text.Font.Serif;
-            FontSize = 11;
-
-            Hyphenator = new Text.Hyphenator("en-us");
+            Font = Text.Font.Default;
+            FontSize = 12;
         }
 
         public T Variable<T>(DocumentLocal<T> local)

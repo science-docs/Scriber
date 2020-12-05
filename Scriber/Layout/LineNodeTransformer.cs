@@ -64,7 +64,7 @@ namespace Scriber.Layout
             var nodes = new List<LineNode>();
             Glue(text, out bool start, out bool end);
 
-            Hyphenator? hyph = leaf.Document?.Hyphenator;
+            Hyphenator? hyph = leaf.Document?.Culture?.GetHyphenator();
 
             if (start)
             {

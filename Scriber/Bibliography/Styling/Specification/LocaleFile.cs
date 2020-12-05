@@ -32,18 +32,6 @@ namespace Scriber.Bibliography.Styling.Specification
                     using var stream = typeof(Processor).Assembly.GetManifestResourceStream(x)!;
                     return Load<LocaleFile>(stream);
                 })
-                .Select(l =>
-                {
-                    // split
-                    var parts = l.XmlLang!.Split('-');
-                    if (parts.Length == 2 && parts[0].Length == 2 && string.Compare(parts[0], parts[1], true) == 0)
-                    {
-                        // default
-                        l.XmlLang = parts[0].ToLowerInvariant();
-                    }
-                    // done
-                    return l;
-                })
                 .OrderBy(x => x.XmlLang)
                 .ToArray();
         });
