@@ -122,7 +122,10 @@ namespace Scriber.Layout.Document
         public override SplitResult Split(Measurement source, double height)
         {
             var measurement = new Measurement(this);
-            Measurement? next = new Measurement(this);
+            Measurement? next = new Measurement(this)
+            {
+                Margin = source.Margin
+            };
             double carryOver = -1;
 
             foreach (var sub in source.Subs)

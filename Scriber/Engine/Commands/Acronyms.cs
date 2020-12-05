@@ -10,16 +10,21 @@ namespace Scriber.Engine.Commands
     public static class Acronyms
     {
         [Command("Acronyms")]
-        public static StackPanel ListOfAcronyms(CompilerState state, DynamicDictionary acronyms)
+        public static StackPanel ListOfAcronyms(CompilerState state, Argument<DynamicDictionary> acronyms)
         {
-            var acro = acronyms.GetContents();
+            var acro = acronyms.Value.GetContents();
             var list = AcronymVariables.Acronyms.Get(state.Document);
             var stackPanel = new StackPanel
             {
                 Orientation = Orientation.Vertical
             };
 
-            foreach (var ac in acro)
+            if (list.Count > 0)
+            {
+                state.Issues.Add(acronyms.Source, CompilerIssueType.Warning, "");
+            }
+
+            foreach (var ac in acro.OrderBy(e => e.Key))
             {
                 var key = ac.Key;
                 var value = ac.Value;

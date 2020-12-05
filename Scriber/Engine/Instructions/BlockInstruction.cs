@@ -33,42 +33,34 @@ namespace Scriber.Engine.Instructions
             // Group continueous leafs into one paragraph
             Paragraph? currentParagraph = null;
 
-            for (int i = 0; i < list.Count; i++)
+            foreach (var element in list.SelectMany(e => EngineInstruction.Evaluate(state, e).Flatten()))
             {
-                var child = list[i];
-                var flattened = EngineInstruction.Evaluate(state, child).Flatten();
-
-                foreach (var element in flattened)
+                if (element.Value is Leaf leaf)
                 {
-                    if (element.Value is Leaf leaf)
+                    if (currentParagraph == null)
                     {
-                        if (currentParagraph == null)
-                        {
-                            currentParagraph = CreateNewParagraph(state);
-                            results.Add(new Argument(element.Source, currentParagraph));
-                        }
+                        currentParagraph = CreateNewParagraph(state);
+                        results.Add(new Argument(element.Source, currentParagraph));
+                    }
 
-                        currentParagraph.Leaves.Add(leaf);
-                    }
-                    else if (element.Value is string str)
+                    currentParagraph.Leaves.Add(leaf);
+                }
+                else if (element.Value is string str)
+                {
+                    if (currentParagraph == null)
                     {
-                        if (currentParagraph == null)
-                        {
-                            currentParagraph = CreateNewParagraph(state);
-                            results.Add(new Argument(element.Source, currentParagraph));
-                        }
+                        currentParagraph = CreateNewParagraph(state);
+                        results.Add(new Argument(element.Source, currentParagraph));
+                    }
 
-                        currentParagraph.Leaves.Add(new TextLeaf(str));
-                    }
-                    else
-                    {
-                        ResetParagraph(state, ref currentParagraph);
-                        results.Add(element);
-                    }
+                    currentParagraph.Leaves.Add(new TextLeaf(str));
+                }
+                else
+                {
+                    currentParagraph = null;
+                    results.Add(element);
                 }
             }
-
-            ResetParagraph(state, ref currentParagraph);
 
             return results.ToArray();
         }
@@ -81,15 +73,6 @@ namespace Scriber.Engine.Instructions
             currentParagraph.FontSize = state.Document.Variable(FontVariables.FontSize);
             currentParagraph.Margin = margin;
             return currentParagraph;
-        }
-
-        private void ResetParagraph(CompilerState state, ref Paragraph? paragraph)
-        {
-            if (paragraph != null)
-            {
-                state.Context.Logger.Debug($"Grouping {paragraph.Leaves.Count} {LeafString(paragraph.Leaves.Count)} into a paragraph.");
-                paragraph = null;
-            }
         }
 
         private static string LeafString(int count)
