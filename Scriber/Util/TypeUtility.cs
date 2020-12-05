@@ -1,6 +1,7 @@
 ﻿using Namotion.Reflection;
 using Scriber.Engine;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Scriber.Util
@@ -20,6 +21,23 @@ namespace Scriber.Util
                 type = type.GenericArguments[0];
             }
             return type.Nullability != Nullability.NotNullable;
+        }
+
+        public static bool IsArrayType(this Type type)
+        {
+            if (type.IsArray || type == typeof(Array))
+            {
+                return true;
+            }
+            if (type.IsGenericType)
+            {
+                var genericType = type.GetGenericTypeDefinition();
+                if (genericType == typeof(IReadOnlyCollection<>) || genericType == typeof(IReadOnlyList<>))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static string FormattedName(this Type type)

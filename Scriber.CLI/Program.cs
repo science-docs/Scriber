@@ -6,6 +6,7 @@ using System.Threading;
 using Scriber.Engine;
 using Scriber.Language;
 using Scriber.Logging;
+using Scriber.Maths;
 
 namespace Scriber.CLI
 {
@@ -24,18 +25,27 @@ namespace Scriber.CLI
 
             StringBuilder sb = new StringBuilder();
 
+            var math = MathParser.Evaluate("3.4");
+
             //sb.AppendLine("\\setlength[baselinestretch]{2}");
             //sb.AppendLine("@IncludePdf(tfl.pdf, { Fields: [ 4711, Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, A16a ] })");
             //sb.AppendLine("Some text");
-            sb.AppendLine("@CenterFooter(@ThePage)");
-            sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@SetPageNumbering(25, RomanUpper)");
-            sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@Pagebreak()");
-            sb.AppendLine("@Pagebreak()");
+            //sb.AppendLine("@CenterHeader(@IncludeGraphics(tfl.png))");
+            //sb.AppendLine("@CenterFooter(@ThePage)");
+            //sb.AppendLine("@FontSize(3*4)");
+            //sb.AppendLine("Some Text\nMore Text\n\n@Heading*(1; A)");
+            //sb.AppendLine("@TableOfContent()");
+            //sb.AppendLine("@Heading(1; B)");
+            //sb.AppendLine("Test@Footnote(\"\")");
+            //sb.AppendLine("@Pagebreak()").AppendLine();
+            //sb.AppendLine("Some @Color(Red; Red Text) in a paragraph.").AppendLine();
+            //sb.AppendLine("@Pagebreak()");
+            //sb.AppendLine("@Pagebreak()");
+            //sb.AppendLine("@Pagebreak()");
+            //sb.AppendLine("@SetPageNumbering(@TextWidth() / 37; RomanUpper)");
+            //sb.AppendLine("@Pagebreak()");
+            //sb.AppendLine("@Pagebreak()");
+            //sb.AppendLine("@Pagebreak()");
             ////sb.AppendLine("@Include(include.sc)");
             ////sb.AppendLine("\\section{This is a section}");
 
@@ -131,19 +141,19 @@ namespace Scriber.CLI
             //////sb.AppendLine("\\caption{Second Test Image}");
             //////sb.AppendLine("\\end{figure}");
             //sb.AppendLine("@UseTemplate(nak.sc)");
-            //sb.AppendLine("@TableOfFigures()");
-            //sb.AppendLine("@Acronyms({ CPU: Computer Processing Unit, FP: Floating Point })").AppendLine();
-            //sb.AppendLine("This is the full name '@Acronym(FP)' for acronym '@Acronym(FP)'.");
-            //sb.AppendLine("@VerticalSpace(550pt)");
-            //sb.AppendLine("@FootnoteSize(6)");
-            //sb.AppendLine("@FontSize(14)");
-            //sb.AppendLine("Some text");
+            sb.AppendLine("@TableOfFigures()");
+            sb.AppendLine("@Acronyms({ CPU: Computer Processing Unit; FP: Floating Point })").AppendLine();
+            sb.AppendLine("This is the full name '@Acronym(FP)' for acronym '@Acronym(FP)'.");
+            sb.AppendLine("@VerticalSpace(550pt)");
+            sb.AppendLine("@FootnoteSize(6)");
+            sb.AppendLine("@FontSize(14)");
+            sb.AppendLine("Some text");
 
             //sb.AppendLine("@Section(First)");
             //sb.AppendLine("@Subsection(Second)");
             //sb.AppendLine("@Label(section, x)");
             //sb.AppendLine("blabla @Reference(x)");
-            //sb.AppendLine("@Figure(@Centering(), @IncludeGraphics(https://asia.olympus-imaging.com/content/000107506.jpg), @Caption(Second Test Image@Footnote(More Footnotes)))");
+            sb.AppendLine("@Figure { @Centering()\n @IncludeGraphics(\"https://asia.olympus-imaging.com/content/000107506.jpg\")\n @Caption(Second Test Image@Footnote(More Footnotes)) }");
             //sb.AppendLine("@FontSize(20, Some Larger Text, Some more text)").AppendLine();
             //sb.AppendLine("");
             //sb.AppendLine("");
@@ -208,7 +218,7 @@ namespace Scriber.CLI
             var tokens = Lexer.Tokenize(sb.ToString());
             context.Logger.Logged += Logger_Logged;
             var parserResult = Parser.Parse(tokens, null, context.Logger);
-            var result = Compiler.Compile(context, parserResult.Elements);
+            var result = Compiler.Compile(context, parserResult.Nodes);
 
             var document = result.Document;
             document.Run(context.Logger);

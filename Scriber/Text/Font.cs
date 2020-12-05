@@ -1,61 +1,75 @@
-﻿using PdfSharpCore.Fonts;
-using SixLabors.Fonts;
-using System.IO;
+﻿using PdfSharpCore.Drawing;
+using PdfSharpCore.Fonts;
+using System.Collections.Generic;
 
 namespace Scriber.Text
 {
     public class Font
     {
-        private static readonly FontCollection fonts = new FontCollection();
-
-        private static readonly FontFamily serif = fonts.Install(LoadFont("cmu.serif-roman"));
-        private static readonly FontFamily serifItalic = fonts.Install(LoadFont("cmu.serif-italic"));
-        private static readonly FontFamily serifBold = fonts.Install(LoadFont("cmu.serif-bold"));
-        private static readonly FontFamily serifBoldItalic = fonts.Install(LoadFont("cmu.serif-bolditalic"));
-
-        private const float Dpi = 72;
-
-        public static Font Serif { get; } = new Font(serif);
-        public static Font SerifItalic { get; } = new Font(serifItalic);
-        public static Font SerifBold { get; } = new Font(serifBold);
-        public static Font SerifBoldItalic { get; } = new Font(serifBoldItalic);
+        public static Font Default { get; } = new Font("Times New Roman");
 
         static Font()
         {
             GlobalFontSettings.FontResolver = new FontResolver();
         }
 
-        internal FontFamily FontFamily { get; set; }
+        private static readonly Dictionary<(string, FontWeight, double), XFont> fonts = new Dictionary<(string, FontWeight, double), XFont>();
+        private static readonly XGraphics graphics = XGraphics.CreateMeasureContext(new XSize(100000, 100000), XGraphicsUnit.Point, XPageDirection.Downwards);
+
+        //internal FontFamily FontFamily { get; set; }
 
         public string Name { get; }
 
-        private Font(FontFamily fontFamily)
+        public Font(string name)
         {
-            Name = fontFamily.Name;
-            FontFamily = fontFamily;
+            Name = name;
         }
+
+        private readonly Dictionary<(string, FontWeight), double> fontWidths = new Dictionary<(string, FontWeight), double>();
 
         public double GetWidth(string text, double size, FontWeight weight)
         {
-            var realizedFont = FontFamily.CreateFont((float)size, (SixLabors.Fonts.FontStyle)(int)weight);
-            return TextMeasurer.Measure(text, new RendererOptions(realizedFont, Dpi)).Width;
-        }
-
-        private static Stream LoadFont(string name)
-        {
-            var asm = typeof(Font).Assembly;
-            var fullName = $"Scriber.Resources.Fonts.{name}.ttf";
-            using var stream = asm.GetManifestResourceStream(fullName);
-
-            if (stream == null)
+            if (fontWidths.ContainsKey((text, weight)))
             {
-                throw new IOException("Could not load font: " + name);
+                return fontWidths[(text, weight)] * size;
             }
-
-            using var ms = new MemoryStream();
-            stream.CopyTo(ms);
-            ms.Position = 0;
-            return new MemoryStream(ms.ToArray());
+            else
+            {
+                var width = graphics.MeasureString(text, GetXFont(size, weight)).Width;
+                fontWidths[(text, weight)] = width / size;
+                return width;
+            }
         }
+
+        public XFont GetXFont(double size, FontWeight weight)
+        {
+            if (fonts.TryGetValue((Name, weight, size), out var font))
+            {
+                return font;
+            }
+            else
+            {
+                font = new XFont(Name, size, (XFontStyle)(int)weight);
+                fonts[(Name, weight, size)] = font;
+                return font;
+            }
+        }
+
+        //private static Stream LoadFont(string name)
+        //{
+        //    var asm = typeof(Font).Assembly;
+        //    var fullName = $"Scriber.Resources.Fonts.{name}.ttf";
+        //    using var stream = asm.GetManifestResourceStream(fullName);
+
+        //    if (stream == null)
+        //    {
+        //        return new PdfSharpCore.Utils.FontResolver().GetFont(name);
+        //    }
+
+        //    using var ms = new MemoryStream();
+        //    stream.CopyTo(ms);
+        //    ms.Position = 0;
+        //    return new MemoryStream(ms.ToArray());
+        //}
     }
 }

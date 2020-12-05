@@ -1,42 +1,42 @@
-﻿using Scriber.Layout.Document;
+﻿using Scriber.Language.Syntax;
+using Scriber.Layout.Document;
 using Scriber.Tests.Fixture;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Scriber.Engine.Instructions.Tests
 {
     public class TextInstructionTests
     {
+        private static readonly TextInstruction textInstruction = new TextInstruction();
+
         [Fact]
-        public void ConstructorNullOriginException()
+        public void ExecuteNullStateException()
         {
             var ex = Assert.Throws<ArgumentNullException>(() =>
             {
-                new TextInstruction(null);
+                textInstruction.Evaluate(null, new TextSyntax());
             });
-            Assert.Equal("origin", ex.ParamName);
+            Assert.Equal("state", ex.ParamName);
         }
 
         [Fact]
-        public void ConstructorNullContentException()
+        public void ExecuteNullSyntaxNodeException()
         {
-            var ex = Assert.Throws<ArgumentException>(() =>
+            var ex = Assert.Throws<ArgumentNullException>(() =>
             {
-                new TextInstruction(ElementFixtures.EmptyElement());
+                textInstruction.Evaluate(CompilerStateFixtures.Empty(), null);
             });
-            Assert.Equal("origin", ex.ParamName);
+            Assert.Equal("text", ex.ParamName);
         }
 
         [Fact]
         public void ExecuteSimple()
         {
-            var instruction = new TextInstruction(new Language.Element(null, Language.ElementType.Text, 0, 0)
+            var result = textInstruction.Evaluate(CompilerStateFixtures.Empty(), new TextSyntax
             {
-                Content = "text"
+                Text = "text"
             });
-            var result = instruction.Execute(null, null);
             Assert.IsType<TextLeaf>(result);
             var text = (TextLeaf)result;
             Assert.Equal("text", text.Content);

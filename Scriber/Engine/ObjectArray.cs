@@ -1,17 +1,18 @@
 ﻿using Scriber.Language;
+using Scriber.Language.Syntax;
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
 
 namespace Scriber.Engine
 {
-    public class ObjectArray : Traceable
+    public class ObjectArray : Traceable<ArraySyntax>
     {
         private readonly Argument[] array;
 
         public CompilerState CompilerState { get; }
 
-        public ObjectArray(Element origin, CompilerState compilerState, Argument[] objects) : base(origin)
+        public ObjectArray(ArraySyntax origin, CompilerState compilerState, Argument[] objects) : base(origin)
         {
             CompilerState = compilerState ?? throw new ArgumentNullException(nameof(compilerState));
             array = objects ?? throw new ArgumentNullException(nameof(objects));

@@ -5,8 +5,8 @@
 	<p>
 		A modern typesetting system based on .NET Core
 	</p>
-	<a href="https://ci.appveyor.com/project/science-docs/Scriber/branch/master">
-		<img alt="master-status" src="https://img.shields.io/appveyor/build/darkgaja/scriber/master?style=flat-square&logo=appveyor&label=master">
+	<a href="https://github.com/science-docs/Scriber/actions?query=workflow%3A%22.NET+Core%22">
+		<img alt="master-status" src="https://img.shields.io/github/workflow/status/science-docs/Scriber/.NET%20Core?logo=github&style=flat-square">
 	</a>
 	<a href="https://codecov.io/gh/science-docs/Scriber">
 		<img alt="code-coverage" src="https://img.shields.io/codecov/c/github/science-docs/Scriber/master?style=flat-square&logo=codecov">

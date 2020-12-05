@@ -12,30 +12,16 @@ namespace Scriber.Language
 
     public class ParserIssue
     {
-        public int Index => Origin.Index;
-        public int Length => Origin.Length;
-        public int Line => Origin.Line;
+        public TextSpan Span { get; set; }
         public string Message { get; set; }
-        public Element Origin { get; set; }
         public Exception? InnerException { get; set; }
         public ParserIssueType Type { get; set; }
 
-        public ParserIssue(Element origin, ParserIssueType type, string message, Exception? innerException)
+        public ParserIssue(TextSpan span, ParserIssueType type, string message, Exception? innerException)
         {
-            Type = type;
+            Span = span;
             Message = message;
-            Origin = origin;
-            InnerException = innerException;
-        }
-
-        public ParserIssue(Token origin, ParserIssueType type, string message, Exception? innerException)
-        {
             Type = type;
-            Message = message;
-            Origin = new Element(null, ElementType.Text, origin.Index, origin.Line)
-            {
-                Length = origin.Length
-            };
             InnerException = innerException;
         }
     }

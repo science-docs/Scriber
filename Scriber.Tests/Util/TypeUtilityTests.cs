@@ -19,5 +19,20 @@ namespace Scriber.Util.Tests
             var result = TypeUtility.FormattedName(type);
             Assert.Equal(value, result);
         }
+
+        [Theory]
+        [InlineData(typeof(Array), true)]
+        [InlineData(typeof(object[]), true)]
+        [InlineData(typeof(object), false)]
+        [InlineData(typeof(Argument), false)]
+        [InlineData(typeof(Argument[]), true)]
+        [InlineData(typeof(IReadOnlyCollection<object>), true)]
+        [InlineData(typeof(IReadOnlyCollection<Argument>), true)]
+        [InlineData(typeof(IReadOnlyList<Argument>), true)]
+        public void IsArrayTypeTest(Type type, bool expectedResult)
+        {
+            var result = TypeUtility.IsArrayType(type);
+            Assert.Equal(expectedResult, result);
+        }
     }
 }

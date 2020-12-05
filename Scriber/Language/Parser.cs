@@ -1,5 +1,5 @@
-﻿using Scriber.Logging;
-using Scriber.Util;
+﻿using Scriber.Language.Syntax;
+using Scriber.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,235 +7,552 @@ using System.Text;
 
 namespace Scriber.Language
 {
-    using Function = Func<ParserContext, Token, Element, Element?>;
-
     public static class Parser
     {
-        //private readonly static ParserState StateGraph = new ParserState(null, null);
-        private readonly static Dictionary<TokenType, Function> ParseActions = new Dictionary<TokenType, Function>();
-
-        static Parser()
+        private static SyntaxNode ParsePercent(ParserContext context)
         {
-            ParseActions[TokenType.Text] = ParseText;
-            ParseActions[TokenType.At] = ParseCommand;
-            ParseActions[TokenType.Quotation] = ParseQuotation;
-            ParseActions[TokenType.CurlyOpen] = ParseCurlyOpen;
-            ParseActions[TokenType.CurlyClose] = ParseCurlyClose;
-            ParseActions[TokenType.BracketOpen] = ParseBracketOpen;
-            ParseActions[TokenType.BracketClose] = ParseBracketClose;
-            ParseActions[TokenType.Newline] = ParseNewline;
-            ParseActions[TokenType.Percent] = ParsePercent;
-            ParseActions[TokenType.ParenthesesOpen] = ParseParenthesisOpen;
-            ParseActions[TokenType.ParenthesesClose] = ParseParenthesisClose;
-            ParseActions[TokenType.Comma] = ParseComma;
-            ParseActions[TokenType.Colon] = ParseColon;
-        }
-
-        private static Element ParsePercent(ParserContext context, Token token, Element previous)
-        {
-            context.Comment = true;
-            return new Element(context.Parents.Peek(), ElementType.Comment, token.Index, context.Line) { StringBuilder = new StringBuilder() };
-        }
-
-        private static Element ParseText(ParserContext context, Token token, Element previous)
-        {
-            return AppendText(context, previous, context.Parents.Peek(), token);
-        }
-
-        private static Element? ParseNewline(ParserContext context, Token token, Element previous)
-        {
-            context.Line++;
-            context.Comment = false;
-            context.LastLine.Clear();
-            context.LastLine.AddRange(context.CurrentLine);
-            context.CurrentLine.Clear();
-            if (IsLineMixed(context.LastLine) && !context.Newline)
+            var token = context.Tokens.Dequeue()!;
+            return new PercentSyntax
             {
-                context.Newline = true;
-                return AppendText(context, previous, context.Parents.Peek(), new Token(" ", token.Index, token.Line));
-            }
-            else if (context.Newline)
-            {
-                context.Newline = false;
-                return new Element(context.Parents.Peek(), ElementType.Paragraph, token.Index, context.Line);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public static Element? ParseQuotation(ParserContext context, Token token, Element previous)
-        {
-            if (context.Quotation)
-            {
-                context.Quotation = false;
-                return null;
-            }
-            else
-            {
-                context.Quotation = true;
-                return new Element(context.Parents.Peek(), ElementType.Quotation, token.Index, context.Line) { StringBuilder = new StringBuilder() };
-            }
-        }
-
-        public static Element? ParseComma(ParserContext context, Token token, Element previous)
-        {
-            var secondParent = context.PeekParent(1);
-
-            if (secondParent.Type == ElementType.Command)
-            {
-                context.Parents.Pop();
-                var element = new Element(secondParent, ElementType.Block, token.Index, context.Line);
-                context.Parents.Push(element);
-                return element;
-            }
-            else if (secondParent.Type == ElementType.ObjectField)
-            {
-                context.Parents.Pop();
-                context.Parents.Pop();
-                return null;
-            }
-            else if (secondParent.Type == ElementType.ObjectArray)
-            {
-                context.Parents.Pop();
-                var block = new Element(context.Parents.Peek(), ElementType.Block, token.Index, context.Line);
-                context.Parents.Push(block);
-                return block;
-            }
-            else
-            {
-                return AppendText(context, previous, context.Parents.Peek(), token);
-            }
-        }
-
-        private static Element ParseCommand(ParserContext context, Token token, Element previous)
-        {
-            var command = new Element(context.Parents.Peek(), ElementType.Command, token.Index, context.Line)
-            {
-                Content = token.Content.Substring(1),
-                Length = token.Content.Length
+                Span = token.Span
             };
+        }
+
+        private static SyntaxNode ParseText(ParserContext context, params TokenType[] stop)
+        {
+            var token = context.Tokens.Peek();
+            int start = token!.Index;
+            int line = token!.Line;
+            int last = start + token!.Length;
+            bool whitespace = false;
+            var sb = new StringBuilder();
+
+            while (token != null)
+            {
+                if (token.Type == TokenType.Newline)
+                {
+                    context.Tokens.Dequeue();
+                    var nextNewline = context.Tokens.Peek()?.Type == TokenType.Newline;
+                    if (nextNewline)
+                    {
+                        break;
+                    }
+                    if (!whitespace)
+                    {
+                        sb.Append(' ');
+                    }
+                    
+                    whitespace = true;
+                }
+                else if (token.Type == TokenType.Whitespace)
+                {
+                    context.Tokens.Dequeue();
+                    if (!whitespace)
+                    {
+                        sb.Append(' ');
+                    }
+
+                    whitespace = true;
+                }
+                else if (stop.Contains(token.Type) || NeverTextToken(token.Type)) // && (token.Type == TokenType.ParenthesesClose || token.Type == TokenType.Semicolon || token.Type == TokenType.BracketClose))
+                {
+                    break;
+                }
+                else //if (IsTextToken(token.Type))
+                {
+                    context.Tokens.Dequeue();
+                    whitespace = false;
+                    sb.Append(token.Content);
+                }
+                //else
+                //{
+                //    break;
+                //}
+
+                last = token.Index + token.Length;
+                token = context.Tokens.Peek();
+            }
+
+            return new TextSyntax
+            {
+                Span = new TextSpan(start, last - start, line),
+                Text = sb.ToString()
+            };
+        }
+
+        private static bool NeverTextToken(TokenType type)
+        {
+            return type == TokenType.At || type == TokenType.DoubleSlash || type == TokenType.SlashAsterisk || type == TokenType.AsteriskSlash || type == TokenType.Quotation;
+        }
+
+        private static SyntaxNode ParseSingleLineComment(ParserContext context)
+        {
+            var token = context.Tokens.Peek();
+            int start = token!.Index;
+            int line = token!.Line;
+            int last = start + token!.Length;
+
+            var sb = new StringBuilder();
+
+            while (token != null)
+            {
+                if (token.Type == TokenType.Newline)
+                {
+                    context.Tokens.Dequeue();
+                    break;
+                }
+                else
+                {
+                    sb.Append(token.Content);
+                }
+                last = token.Index + token.Length;
+                token = context.Tokens.Dequeue();
+            }
+
+            return new CommentSyntax
+            {
+                Span = new TextSpan(start, last - start, line),
+                Comment = sb.ToString()
+            };
+        }
+
+        private static SyntaxNode ParseQuotation(ParserContext context)
+        {
+            var token = context.Tokens.Dequeue();
+            int start = token!.Index;
+            int line = token!.Line;
+            int last = start + token!.Length;
+
+            var sb = new StringBuilder();
+
+            token = context.Tokens.Dequeue();
+            while (token != null)
+            {
+                if (token.Type == TokenType.Quotation)
+                {
+                    last = token.Index + token.Length;
+                    break;
+                }
+                else
+                {
+                    sb.Append(token.Content);
+                }
+                last = token.Index + token.Length;
+                token = context.Tokens.Dequeue();
+            }
+
+            return new StringLiteralSyntax
+            {
+                Span = new TextSpan(start, last - start, line),
+                Content = sb.ToString()
+            };
+        }
+
+        private static CommandSyntax ParseCommand(ParserContext context)
+        {
+            var token = context.Tokens.Dequeue();
+            int start = token!.Index;
+            int line = token!.Line;
+            int last = start + token!.Length;
+
+            var command = new CommandSyntax
+            {
+                Name = ParseName(context)
+            };
+
+            var nextTokenParentheses = context.Tokens.Peek()?.Type == TokenType.ParenthesesOpen;
+            if (nextTokenParentheses)
+            {
+                command.Arguments = ParseArguments(context);
+            }
+            else
+            {
+                command.Arguments = new ListSyntax<ArgumentSyntax>();
+            }
+
+            if (context.Tokens.SkipSearchFor(e => e.Type == TokenType.Whitespace || e.Type == TokenType.Newline, e => e.Type == TokenType.CurlyOpen))
+            {
+                command.Environment = ParseExplicitBlock(context);
+            }
+
+            if (command.Arity > 0)
+            {
+                command.Span = new TextSpan(start, command.Arguments[^1].Span.End - start, line);
+            }
+            else
+            {
+                command.Span = new TextSpan(start, command.Name.Span.End - start, line);
+            }
+
             return command;
         }
 
-        private static Element ParseParenthesisOpen(ParserContext context, Token token, Element previous)
+        private static NameSyntax ParseName(ParserContext context)
         {
-            if (previous.Type == ElementType.Command)
+            var token = context.Tokens.Peek();
+            if (token == null)
             {
-                context.Parents.Push(previous);
-                var element = new Element(previous, ElementType.Block, token.Index, context.Line);
-                context.Parents.Push(element);
-                return element;
+                return new NameSyntax();
             }
-            else
+
+            if (token.Type != TokenType.Text)
             {
-                return AppendText(context, previous, context.Parents.Peek(), token);
+                context.Issues.Add(token, ParserIssueType.Error, "Expected a name.");
             }
+
+            context.Tokens.Dequeue();
+
+            return new NameSyntax
+            {
+                Value = token.Content,
+                Span = token.Span
+            };
         }
 
-        private static Element? ParseParenthesisClose(ParserContext context, Token token, Element previous)
+        private static ListSyntax<ArgumentSyntax> ParseArguments(ParserContext context)
         {
-            if (context.InCommand())
-            {
-                context.Parents.Pop();
-                context.Parents.Pop();
-                return null;
-            }
-            else
-            {
-                return AppendText(context, previous, context.Parents.Peek(), token);
-            }
-        }
+            var token = context.Tokens.Dequeue();
+            var span = token!.Span;
+            var last = span.End;
+            var list = new ListSyntax<ArgumentSyntax>();
 
-        private static Element ParseCurlyOpen(ParserContext context, Token token, Element previous)
-        {
-            Element parent;
+            SkipWhitespaceTokens(context);
 
-            if (previous.Type == ElementType.Command && context.Parents.Peek().Type != ElementType.Command)
+            if (context.Tokens.Peek()?.Type == TokenType.ParenthesesClose)
             {
-                context.Parents.Push(previous);
+                context.Tokens.Dequeue();
+                list.Span = span;
+                return list;
             }
 
-            parent = context.Parents.Peek();
-            var element = new Element(parent, ElementType.ExplicitBlock, token.Index, context.Line);
-            context.Parents.Push(element);
-            return element;
-        }
-
-        private static Element? ParseCurlyClose(ParserContext context, Token token, Element previous)
-        {
-            if (context.Parents.Count > 1)
+            while (token != null)
             {
-                if (context.PeekParent(1).Type == ElementType.ObjectField)
+                if (token.Type == TokenType.ParenthesesClose)
                 {
-                    context.Parents.Pop();
-                    context.Parents.Pop();
+                    context.Tokens.Dequeue();
+                    break;
+                }
+                else if (token.Type == TokenType.Semicolon)
+                {
+                    context.Tokens.Dequeue();
                 }
 
-                context.Parents.Pop();
-                return null;
+                list.Add(ParseArgument(context));
+                token = context.Tokens.Peek();
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                list[i].Position = i;
+            }
+
+            if (list.Count > 0)
+            {
+                last = list[^1].Span.End;
+            }
+
+            list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            return list;
+        } 
+
+        private static ArgumentSyntax ParseArgument(ParserContext context)
+        {
+            var token = context.Tokens.Peek();
+            var span = token!.Span;
+            var last = span.End;
+
+            SkipWhitespaceTokens(context);
+
+            var nextToken = context.Tokens.Peek(1);
+            NameSyntax? name = null;
+
+            if (nextToken?.Type == TokenType.Colon)
+            {
+                name = ParseName(context);
+                // Remove colon token here
+                context.Tokens.Dequeue(2);
+            }
+
+            SkipWhitespaceTokens(context);
+
+            var argument = new ArgumentSyntax
+            {
+                Name = name
+            };
+
+            token = context.Tokens.Peek();
+            if (token != null && token.Type != TokenType.Semicolon && token.Type != TokenType.ParenthesesClose)
+            {
+                argument.Content = ParseBlock(context, TokenType.Semicolon, TokenType.ParenthesesClose);
             }
             else
             {
-                // Too many closing brackets
-                context.Issues.Add(token, ParserIssueType.Error, "No block to close exists.");
-                return null;
+                argument.Content = new ListSyntax();
+            }
+
+            token = context.Tokens.Peek();
+
+            if (token != null)
+            {
+                last = token.Span.End;
+            }
+
+            if (token == null || (token.Type != TokenType.ParenthesesClose && token.Type != TokenType.Semicolon))
+            {
+                // Add issue here
+            }
+
+            CleanText(argument.Content);
+
+
+            argument.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            // Some elements (like objects or arrays) have to be the only syntax node in the argument.
+            // Therefore, we create appropriate issue messages here.
+            if (argument.Content.Count > 1)
+            {
+                if (argument.Content.Any(e => e is ObjectSyntax))
+                {
+                    context.Issues.Add(argument, ParserIssueType.Error, "Objects have to be the only element in an argument.");
+                }
+                if (argument.Content.Any(e => e is ArraySyntax))
+                {
+                    context.Issues.Add(argument, ParserIssueType.Error, "Arrays have to be the only element in an argument.");
+                }
+            }
+
+            return argument;
+        }
+
+        private static void CleanText(ListSyntax list)
+        {
+            if (list.Count > 0 && list[^1] is TextSyntax textSyntax)
+            {
+                textSyntax.Text = textSyntax.Text.TrimEnd();
             }
         }
 
-        private static Element ParseBracketOpen(ParserContext context, Token token, Element previous)
+        private static void SkipWhitespaceTokens(ParserContext context)
         {
-            var commandParent = context.PeekParent(1);
-            if (commandParent.Type == ElementType.Command && previous.Type == ElementType.Block && previous.Children.Count == 0 || previous.Type == ElementType.ObjectCreation || commandParent.Type == ElementType.ObjectCreation || commandParent.Type == ElementType.ObjectField)
+            context.Tokens.SkipWhile(e => e.Type == TokenType.Newline || e.Type == TokenType.Whitespace);
+        }
+
+        private static ListSyntax ParseExplicitBlock(ParserContext context)
+        {
+            var token = context.Tokens.Dequeue();
+            var span = token!.Span;
+            var last = span.End;
+            var list = new ListSyntax();
+
+            SkipWhitespaceTokens(context);
+
+            if (context.Tokens.Peek()?.Type == TokenType.CurlyClose)
             {
-                if (commandParent.Type == ElementType.ObjectCreation || commandParent.Type == ElementType.ObjectField)
+                context.Tokens.Dequeue();
+                list.Span = span;
+                return list;
+            }
+
+            while (token != null)
+            {
+                if (token.Type == TokenType.CurlyClose)
                 {
-                    previous = context.Parents.Peek();
+                    context.Tokens.Dequeue();
+                    break;
                 }
 
-                var array = new Element(previous, ElementType.ObjectArray, token.Index, context.Line);
-                context.Parents.Push(array);
-                var block = new Element(array, ElementType.Block, token.Index, context.Line);
-                context.Parents.Push(block);
-                return block;
+                list.Add(ParseBlock(context));
+                token = context.Tokens.Peek();
+            }
+
+            if (list.Count > 0)
+            {
+                last = list[^1].Span.End;
+            }
+
+            list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            return list;
+        }
+
+        private static ObjectSyntax ParseObject(ParserContext context)
+        {
+            var token = context.Tokens.Dequeue();
+            var span = token!.Span;
+            var last = span.End;
+            var obj = new ObjectSyntax();
+            var list = new ListSyntax<FieldSyntax>();
+            obj.Fields = list;
+
+            SkipWhitespaceTokens(context);
+
+            if (context.Tokens.Peek()?.Type == TokenType.CurlyClose)
+            {
+                context.Tokens.Dequeue();
+                list.Span = span;
+                return obj;
+            }
+
+            while (token != null)
+            {
+                if (token.Type == TokenType.CurlyClose)
+                {
+                    context.Tokens.Dequeue();
+                    break;
+                }
+
+                var field = ParseField(context);
+                if (field != null)
+                {
+                    list.Add(field);
+                    token = context.Tokens.Peek();
+                }
+                else
+                {
+                    token = context.Tokens.Dequeue();
+                }
+            }
+
+            if (list.Count > 0)
+            {
+                last = list[^1].Span.End;
+            }
+
+            list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            return obj;
+        }
+
+        private static FieldSyntax? ParseField(ParserContext context)
+        {
+            var token = context.Tokens.Peek();
+            var span = token!.Span;
+            var last = span.End;
+
+            SkipWhitespaceTokens(context);
+
+            var nextToken = context.Tokens.Peek(1);
+            NameSyntax? name;
+            if (nextToken?.Type == TokenType.Colon)
+            {
+                name = ParseName(context);
+                // Remove colon token here
+                context.Tokens.Dequeue(2);
+                token = context.Tokens.Peek();
             }
             else
             {
-                return AppendText(context, previous, context.Parents.Peek(), token);
-            }
-        }
-
-        private static Element? ParseBracketClose(ParserContext context, Token token, Element previous)
-        {
-            if (context.PeekParent(1).Type == ElementType.ObjectArray)
-            {
-                context.Parents.Pop();
-                context.Parents.Pop();
+                // In order to parse the next field correctly, we read the current field to the end.
+                ParseBlock(context, TokenType.Semicolon, TokenType.CurlyClose);
+                context.Issues.Add(token.Span, ParserIssueType.Error, "Field name and : expected.");
                 return null;
             }
+
+            SkipWhitespaceTokens(context);
+
+            var argument = new FieldSyntax
+            {
+                Name = name
+            };
+
+            if (token != null)
+            {
+                argument.Value = ParseBlock(context, TokenType.Semicolon, TokenType.CurlyClose);
+            }
             else
             {
-                return AppendText(context, previous, context.Parents.Peek(), token);
+                argument.Value = new ListSyntax();
             }
+
+            token = context.Tokens.Peek();
+
+            if (token != null)
+            {
+                last = token.Span.End;
+                if (token.Type == TokenType.Semicolon)
+                {
+                    context.Tokens.Dequeue();
+                }
+                else if (token.Type != TokenType.CurlyClose)
+                {
+                    context.Issues.Add(token, ParserIssueType.Error, "Expected the end of a field via ; or }.");
+                }
+            }
+            else
+            {
+                context.Issues.Add(argument, ParserIssueType.Error, "Expected the end of a field via ; or }.");
+            }
+
+            CleanText(argument.Value);
+
+            argument.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            return argument;
         }
 
-        private static Element? ParseColon(ParserContext context, Token token, Element previous)
+        private static ArraySyntax ParseArray(ParserContext context)
         {
-            var parent = context.Parents.Peek();
-            if (context.InCommand() && (parent.Type == ElementType.ExplicitBlock || parent.Type == ElementType.ObjectCreation))
+            var token = context.Tokens.Dequeue();
+            var span = token!.Span;
+            var last = span.End;
+            var array = new ArraySyntax();
+
+            while (token != null)
             {
-                parent.Type = ElementType.ObjectCreation;
-                previous.Type = ElementType.ObjectField;
-                context.Parents.Push(previous);
-                var block = new Element(previous, ElementType.Block, token.Index, context.Line);
-                context.Parents.Push(block);
-                return block;
+                if (token.Type == TokenType.BracketClose)
+                {
+                    context.Tokens.Dequeue();
+                    break;
+                }
+                if (token.Type == TokenType.Semicolon)
+                {
+                    context.Tokens.Dequeue();
+                }
+
+                array.Add(ParseArrayElement(context));
+                token = context.Tokens.Peek();
             }
-            else
+
+            SkipWhitespaceTokens(context);
+
+            if (array.Count > 0)
             {
-                return AppendText(context, previous, parent, token);
+                last = array[^1].Span.End;
             }
+
+            array.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            return array;
+        }
+
+        private static ListSyntax ParseArrayElement(ParserContext context)
+        {
+            SkipWhitespaceTokens(context);
+            var token = context.Tokens.Peek();
+
+            if (token == null)
+            {
+                return new ListSyntax();
+            }
+
+            var span = token!.Span;
+            var last = span.End;
+
+            var list = ParseBlock(context, TokenType.Semicolon, TokenType.BracketClose);
+
+            token = context.Tokens.Peek();
+            
+            list.Span = new TextSpan(span.Start, last - span.Start, span.Line);
+
+            CleanText(list);
+
+            if (token == null || (token.Type != TokenType.BracketClose && token.Type != TokenType.Semicolon))
+            {
+                context.Issues.Add(list, ParserIssueType.Error, "Expected the end of an array element via ; or ].");
+            }
+
+            return list;
         }
 
         public static ParserResult Parse(IEnumerable<Token> tokens)
@@ -263,90 +580,118 @@ namespace Scriber.Language
             if (tokens == null)
                 throw new ArgumentNullException(nameof(tokens));
 
-            var items = tokens.ToArray();
-
-            if (items.Length == 0)
-                return ParserResult.Empty();
-
-            Element cur = new Element(null, ElementType.Block, 0, 0)
+            var context = new ParserContext
             {
+                Tokens = new TokenQueue(tokens),
                 Resource = resource
             };
-            var context = new ParserContext();
-            var elements = new List<Element>();
+
+            if (context.Tokens.Count == 0)
+                return ParserResult.Empty();
 
             if (logger != null)
             {
                 context.Issues.CollectionChanged += (_, e) => IssuesChanged(logger, e);
             }
 
-            context.Parents.Push(cur);
+            var nodes = new List<SyntaxNode>();
 
-            foreach (var token in items)
+            while (context.Tokens.Count > 0)
             {
-                var action = ParseActions[token.Type];
-                bool isNewline = token.Type == TokenType.Newline;
-                bool isCurlyOpen = token.Type == TokenType.CurlyOpen;
-                bool isBracketOpen = token.Type == TokenType.BracketOpen;
+                nodes.Add(ParseBlock(context));
+            }
 
-                if (token.Type != TokenType.Quotation && context.Quotation)
-                {
-                    cur.StringBuilder?.Append(token.Content);
-                    continue;
-                }
+            return new ParserResult(nodes, context.Issues);
+        }
 
-                if (!isNewline && context.Comment)
-                {
-                    cur.StringBuilder?.Append(token.Content);
-                    continue;
-                }
-                else if (!isNewline)
-                {
-                    context.Newline = false;
-                }
+        private static ListSyntax ParseBlock(ParserContext context, params TokenType[] stop)
+        {
+            var token = context.Tokens.Peek();
+            var startToken = token;
+            var span = token!.Span;
+            var list = new ListSyntax();
 
-                var element = action(context, token, cur);
-
-                if (element == null)
+            while (token != null)
+            {
+                switch (token.Type)
                 {
-                    if (!context.Parents.TryPeek(out var top))
-                    {
-                        cur = TopParent(cur);
-                        BuildContent(cur);
-                        elements.Add(cur);
-                        cur = new Element(null, ElementType.Block, token.Index, context.Line)
+                    case TokenType.Whitespace:
+                    case TokenType.Text:
+                        list.Add(ParseText(context, stop));
+                        break;
+                    case TokenType.Percent:
+                        list.Add(ParsePercent(context));
+                        break;
+                    case TokenType.DoubleSlash:
+                        list.Add(ParseSingleLineComment(context));
+                        break;
+                    case TokenType.At:
+                        list.Add(ParseCommand(context));
+                        break;
+                    case TokenType.Quotation:
+                        list.Add(ParseQuotation(context));
+                        break;
+                    case TokenType.CurlyOpen:
+                        if (stop.Contains(TokenType.Semicolon))
                         {
-                            Resource = resource
-                        };
-                        context.Parents.Push(cur);
-                    }
-                    else
-                    {
-                        cur = top;
-                    }
+                            list.Add(ParseObject(context));
+                        }
+                        else
+                        {
+                            list.Add(ParseText(context, stop));
+                        }
+                        break;
+                    case TokenType.BracketOpen:
+                        if (stop.Contains(TokenType.Semicolon))
+                        {
+                            list.Add(ParseArray(context));
+                        }
+                        else
+                        {
+                            list.Add(ParseText(context, stop));
+                        }
+                        break;
+                    case TokenType.Newline:
+                        SkipWhitespaceTokens(context);
+                        goto end;
+                    //if (context.Tokens.Peek(2)?.Type == TokenType.Newline)
+                    //{
+
+                    //}
+                    //else
+                    //{
+                    //    list.Add(ParseText(context, stop));
+                    //}
+                    //break;
+                    default:
+                        if (!stop.Contains(token.Type))
+                        {
+                            list.Add(ParseText(context, stop));
+                            break;
+                        }
+                        else
+                        {
+                            goto end;
+                        }
                 }
-                else
-                {
-                    // if at top parent
-                    if (context.Parents.Count == 1)
-                    {
-                        context.CurrentLine.Add(element);
-                    }
-                    cur = element;
-                }
+                token = context.Tokens.Peek();
             }
 
-            // If blocks or commands where left hanging open
-            if (context.Parents.Count > 2)
+            
+            end:
+
+            if (list.Count > 0)
             {
-                context.Issues.Add(items[^1], ParserIssueType.Error, "A block was left hanging open");
+                var lastSpan = list[^1].Span;
+                list.Span = new TextSpan(span.Start, lastSpan.End - span.Start, span.Line);
             }
+            else
+            {
+                list.Span = span;
+            }
+            context.Tokens.SkipWhile(e => e.Type == TokenType.Newline);
 
-            cur = TopParent(cur);
-            BuildContent(cur);
-            elements.Add(cur);
-
-            return new ParserResult(elements, context.Issues);
+            return list;
         }
 
         private static void IssuesChanged(Logger logger, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -358,128 +703,6 @@ namespace Scriber.Language
                     logger.Log((LogLevel)(int)issue.Type, issue.Message);
                 }
             }
-        }
-
-        private static Element TopParent(Element element)
-        {
-            if (element.Parent == null)
-            {
-                return element;
-            }
-            else
-            {
-                return TopParent(element.Parent);
-            }
-        }
-
-        private static void BuildContent(Element element)
-        {
-            SetContent(element);
-
-            foreach (var child in element.Children.ToArray())
-            {
-                BuildContent(child);
-            }
-
-            if (element.Type == ElementType.Text && string.IsNullOrEmpty(element.Content))
-            {
-                element.Parent?.Children.Remove(element);
-            }
-
-            var children = element.Children.ToArray();
-
-            for (int i = 0; i < children.Length; i++)
-            {
-                var child = children[i];
-                if (child.Type == ElementType.Command && i < children.Length - 1)
-                {
-                    var next = children[i + 1];
-                    if (next.Type == ElementType.ExplicitBlock)
-                    {
-                        child.Type = ElementType.Environment;
-                        next.Detach();
-                        next.Parent = child;
-                        child.Children.AddLast(next);
-                        // Skip the next element
-                        i++;
-                    }
-                }
-            }
-        }
-
-        private static void SetContent(Element element)
-        {
-            if (element.StringBuilder != null)
-            {
-                var text = element.StringBuilder.ToString();
-
-                if (element.Type == ElementType.ObjectField)
-                {
-                    text = text.Trim(out int advance);
-                    element.Index += advance;
-                }
-                else if (element.Type == ElementType.Text)
-                {
-                    element.Siblings(out var previous, out var next);
-
-                    if (previous == null || CutOffType(previous.Type))
-                    {
-                        text = text.TrimStart(out int advance);
-                        element.Index += advance;
-                    }
-                    if (next == null || CutOffType(next.Type))
-                    {
-                        text = text.TrimEnd();
-                    }
-
-                    if (previous != null && previous.Type == ElementType.Command 
-                        && next != null && next.Type == ElementType.ExplicitBlock 
-                        && string.IsNullOrWhiteSpace(text))
-                    {
-                        element.Detach();
-                        return;
-                    }
-
-                    if (previous == null && next == null && text == "null")
-                    {
-                        element.Type = ElementType.Null;
-                    }
-                }
-                element.Content = text;
-                element.StringBuilder = null;
-                element.Length = element.Content.Length;
-
-                if (element.Type == ElementType.Quotation)
-                {
-                    element.Length += 2;
-                }
-            }
-        }
-
-        private static bool CutOffType(ElementType type)
-        {
-            return !(type == ElementType.Text || type == ElementType.Quotation || type == ElementType.Command); 
-        }
-
-        private static Element AppendText(ParserContext context, Element previous, Element parent, Token token)
-        {
-            var textItem = previous.Type == ElementType.Text ? previous : new Element(parent, ElementType.Text, token.Index, context.Line);
-
-            if (textItem.StringBuilder == null)
-            {
-                textItem.StringBuilder = new StringBuilder(token.Content);
-            }
-            else
-            {
-                textItem.StringBuilder.Append(token.Content);
-            }
-
-            return textItem;
-        }
-
-        private static bool IsLineMixed(IEnumerable<Element> elements)
-        {
-            return elements.Any(e => e.Type == ElementType.Text);
         }
     }
 }

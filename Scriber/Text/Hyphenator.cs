@@ -11,12 +11,28 @@ namespace Scriber.Text
         private readonly NHyphenator.Hyphenator hyphenator;
         private readonly AssemblyPatternsLoader loader;
 
+        private static readonly Dictionary<string, Hyphenator> hyphenators = new Dictionary<string, Hyphenator>();
+
         private readonly Dictionary<string, string[]> cache = new Dictionary<string, string[]>();
 
-        public Hyphenator(Culture culture)
+        private Hyphenator(string culture)
         {
-            loader = new AssemblyPatternsLoader(culture.ToString());
-            hyphenator = new NHyphenator.Hyphenator(loader, Symbol);
+            loader = new AssemblyPatternsLoader(culture);
+            hyphenator = new NHyphenator.Hyphenator(loader, Symbol, 5, 3, false, culture.StartsWith("de"));
+        }
+
+        public static Hyphenator FromCulture(string culture)
+        {
+            if (hyphenators.TryGetValue(culture, out Hyphenator? hyph))
+            {
+                return hyph;
+            }
+            else
+            {
+                hyph = new Hyphenator(culture);
+                hyphenators[culture] = hyph;
+                return hyph;
+            }
         }
 
         public string[] Hyphenate(string value)
@@ -55,6 +71,10 @@ namespace Scriber.Text
 
             private string GetResourcePath(string langCode, string pat)
             {
+                if (langCode == "de" || langCode == "de-de")
+                {
+                    langCode = "de-1996";
+                }
                 return $"Scriber.Resources.Hyphenator.hyph-{langCode}.{pat}.txt";
             }
 

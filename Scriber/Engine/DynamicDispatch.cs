@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Language.Syntax;
 using Scriber.Logging;
 using Scriber.Util;
 using System;
@@ -18,12 +19,12 @@ namespace Scriber.Engine
         /// <param name="parameters"></param>
         /// <returns></returns>
         /// <exception cref="CompilerException"/>
-        public static object[] PadArguments(string command, Element element, CompilerState state, Argument[] args, Parameter[] parameters)
+        public static object[] PadArguments(string command, SyntaxNode node, CompilerState state, Argument[] args, Parameter[] parameters)
         {
             if (command is null)
                 throw new ArgumentNullException(nameof(command));
-            if (element is null)
-                throw new ArgumentNullException(nameof(element));
+            if (node is null)
+                throw new ArgumentNullException(nameof(node));
             if (state is null)
                 throw new ArgumentNullException(nameof(state));
             if (args is null)
@@ -38,7 +39,9 @@ namespace Scriber.Engine
 
             if (args.Length < required || (args.Length > full && parameters.Length > 0 && !IsArrayParameter(parameters[^1], full, args)))
             {
-                throw new CompilerException(element, $"Command {command} expects between {required} and {required + optional} arguments. {args.Length} arguments where supplied");
+                var argCount = optional == 0 ? required.ToString() : $"{required} to {required + optional}";
+                var addS = optional > 0 || required != 1 ? "s" : string.Empty;
+                throw new CompilerException(node, $"Command {command} expects {argCount} argument{addS}. {args.Length} {args.Length.Pluralify("argument was", "arguments were")} supplied");
             }
 
             if (hasState)
@@ -79,7 +82,18 @@ namespace Scriber.Engine
 
             var restArgs = source[index..];
 
-            var lastArg = new Argument(restArgs[0].Source, new ObjectArray(restArgs[0].Source, state, restArgs));
+            var span = restArgs[0].Source.Span;
+            var end = restArgs[^1].Source.Span.End;
+
+            var arraySpan = new TextSpan(span.Start, end - span.Start, span.Line);
+            var arraySyntax = new ArraySyntax
+            {
+                Span = arraySpan,
+                Resource = restArgs[0].Source.Resource,
+                Parent = restArgs[0].Source.Parent
+            };
+
+            var lastArg = new Argument(restArgs[0].Source, new ObjectArray(arraySyntax, state, restArgs));
             args[^1] = lastArg;
 
             return args;
@@ -176,6 +190,11 @@ namespace Scriber.Engine
             var value = argument.Value!;
             Argument.IsArgumentType(type, out var argType);
 
+            if (value is Array array)
+            {
+                value = array.GetValue(0)!;
+            }
+
             if (type == typeof(Argument))
             {
                 return argument;
@@ -203,7 +222,7 @@ namespace Scriber.Engine
             Argument.IsArgumentType(type, out var argType);
             var innerArgument = false;
 
-            if (type.IsArray)
+            if (type.IsArrayType())
             {
                 var baseType = type.GetElementType()!;
                 innerArgument = Argument.IsArgumentType(baseType, out argType);
@@ -288,7 +307,7 @@ namespace Scriber.Engine
 
         private static bool IsArrayParameter(Parameter parameter, int size, Argument[] args)
         {
-            if (parameter.Type.IsArray)
+            if (parameter.Type.IsArrayType())
             {
                 if (args.Length == size)
                 {

@@ -26,7 +26,9 @@ namespace Scriber.Language
 
                 if (c == '\n')
                 {
-                    line++;
+                    EndCurrentToken(tokens, sb, ref cur);
+                    tokens.Add(new Token(TokenType.Newline, i, line++));
+                    continue;
                 }
                 else
                 {
@@ -59,6 +61,29 @@ namespace Scriber.Language
                         // do not return empty text passages
                         tokens.Add(cur);
                         cur = null;
+                    }
+                    else if (c == '/' && i < span.Length - 1)
+                    {
+                        var next = span[i + 1];
+                        if (next == '/')
+                        {
+                            EndCurrentToken(tokens, sb, ref cur);
+                            tokens.Add(new Token(TokenType.DoubleSlash, i++, line));
+                        }
+                        else if (next == '*')
+                        {
+                            EndCurrentToken(tokens, sb, ref cur);
+                            tokens.Add(new Token(TokenType.SlashAsterisk, i++, line));
+                        }
+                        else
+                        {
+                            sb.Append(c);
+                        }
+                    }
+                    else if (c == '*' && i < span.Length - 1 && span[i + 1] == '/')
+                    {
+                        EndCurrentToken(tokens, sb, ref cur);
+                        tokens.Add(new Token(TokenType.AsteriskSlash, i++, line));
                     }
                     else
                     {
@@ -99,16 +124,26 @@ namespace Scriber.Language
             return tokens;
         }
 
+        private static void EndCurrentToken(List<Token> tokens, StringBuilder sb, ref Token? token)
+        {
+            if (token != null && sb.Length > 0)
+            {
+                token.Content = sb.ToString();
+                sb.Clear();
+                tokens.Add(token);
+                token = null;
+            }
+        }
+
         private static bool IsSpecialCharacter(char c)
         {
-            return c == '\\' || c == ',' || c == ':' || c == '"' || c == '@' || c == '%' || c == '\n' || c == '$' || c == '&' || c == '~' || c == '_' || c == '(' || c == ')' || c == '{' || c == '}' || c == '^' || c == '[' || c == ']';
+            return char.IsWhiteSpace(c) || c == ';' || c == ':' || c == '"' || c == '@' || c == '%' || c == '\n' || c == '$' || c == '&' || c == '~' || c == '_' || c == '(' || c == ')' || c == '{' || c == '}' || c == '^' || c == '[' || c == ']';
         }
 
         private static bool IsSingleToken(TokenType token)
         {
             return token switch
             {
-                TokenType.At => false,
                 TokenType.Backslash => false,
                 TokenType.Text => false,
                 TokenType.Underscore => false,
@@ -119,6 +154,11 @@ namespace Scriber.Language
 
         private static TokenType GetTokenType(char c)
         {
+            if (char.IsWhiteSpace(c))
+            {
+                return TokenType.Whitespace;
+            }
+
             return c switch
             {
                 '@' => TokenType.At,
@@ -126,7 +166,6 @@ namespace Scriber.Language
                 '%' => TokenType.Percent,
                 '\n' => TokenType.Newline,
                 '$' => TokenType.Currency,
-                '&' => TokenType.Ampersand,
                 '~' => TokenType.Tilde,
                 '_' => TokenType.Underscore,
                 '(' => TokenType.ParenthesesOpen,
@@ -136,7 +175,7 @@ namespace Scriber.Language
                 '[' => TokenType.BracketOpen,
                 ']' => TokenType.BracketClose,
                 ':' => TokenType.Colon,
-                ',' => TokenType.Comma,
+                ';' => TokenType.Semicolon,
                 '^' => TokenType.Caret,
                 _ => TokenType.Text
             };

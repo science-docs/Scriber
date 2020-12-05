@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Scriber.Language;
+using Scriber.Language.Syntax;
 using Scriber.Layout.Document;
 using Scriber.Logging;
 
@@ -9,7 +11,7 @@ namespace Scriber.Engine
 {
     public static class Compiler
     {
-        public static CompilerResult Compile(Context context, IEnumerable<Element> elements)
+        public static CompilerResult Compile(Context context, IEnumerable<SyntaxNode> elements)
         {
             var state = new CompilerState(context);
             state.Issues.CollectionChanged += (_, e) => IssuesChanged(context.Logger, e);
@@ -18,11 +20,9 @@ namespace Scriber.Engine
             {
                 if (state.Continue)
                 {
-                    Execute(state, element);
+                    state.Document.Elements.AddRange(Execute(state, element));
                 }
             }
-
-            state.Document.Elements.AddRange(state.Blocks.Current.Objects.Select(e => e.Value).OfType<DocumentElement>());
 
             ResolveCallbacks(state.Document.Elements);
 
@@ -30,17 +30,12 @@ namespace Scriber.Engine
             return result;
         }
 
-        public static void Compile(CompilerState state, IEnumerable<Element> elements)
+        public static void Compile(CompilerState state, IEnumerable<SyntaxNode> elements)
         {
-            var block = state.Blocks.Push();
             foreach (var element in elements)
             {
-                Execute(state, element);
+                state.Document.Elements.AddRange(Execute(state, element));
             }
-            state.Blocks.Pop();
-            // As the @Include Command is nested 1 block deep,
-            // we need to add the elements to parent block
-            state.Blocks.Peek(1).Objects.AddRange(block.Objects);
         }
 
         public static CompilerResult Compile(Context context, Resource resource)
@@ -48,7 +43,7 @@ namespace Scriber.Engine
             context.ResourceSet.PushResource(resource);
             var tokens = Lexer.Tokenize(resource.GetContentAsString());
             var parserResult = Parser.Parse(tokens, resource, context.Logger);
-            var result = Compile(context, parserResult.Elements);
+            var result = Compile(context, parserResult.Nodes);
             context.ResourceSet.PopResource();
             return result;
         }
@@ -58,7 +53,7 @@ namespace Scriber.Engine
             state.Context.ResourceSet.PushResource(resource);
             var tokens = Lexer.Tokenize(resource.GetContentAsString());
             var parserResult = Parser.Parse(tokens, resource, state.Context.Logger);
-            Compile(state, parserResult.Elements);
+            Compile(state, parserResult.Nodes);
             state.Context.ResourceSet.PopResource();
         }
 
@@ -73,56 +68,21 @@ namespace Scriber.Engine
             }
         }
 
-        private static void Execute(CompilerState state, Element element)
+        private static IEnumerable<DocumentElement> Execute(CompilerState state, SyntaxNode element)
         {
-            if (BlockElement(element))
-            {
-                state.Blocks.Push();
-            }
+            var obj = state.Execute(element);
 
-            foreach (var inline in element.Children)
-            {
-                if (state.Continue)
-                {
-                    Execute(state, inline);
-                }
-            }
-
-            var obj = state.Execute(element, state.Blocks.Current.Objects.ToArray());
-
-            if (BlockElement(element))
-            {
-                state.Blocks.Pop();
-            }
+            var elements = new List<DocumentElement>();
 
             if (obj != null)
             {
-                // basically pass the returned object to the previous block
                 var flattened = obj.Flatten();
-                if (IsEnvironmentArgument(element))
-                {
-                    flattened = new Argument[] { new Argument(element, flattened) };
-                }
-                state.Blocks.Current.Objects.AddRange(flattened);
+                return flattened.Select(e => e.Value).OfType<DocumentElement>();
             }
-        }
-
-        private static bool IsEnvironmentArgument(Element element)
-        {
-            element.Siblings(out var _, out var next);
-            return element.Type == ElementType.ExplicitBlock && element.Parent != null && element.Parent.Type == ElementType.Environment && next == null;
-        }
-
-        private static bool BlockElement(Element element)
-        {
-            // return element.Children.Count > 0;
-            return element.Type == ElementType.Block 
-                || element.Type == ElementType.Command 
-                || element.Type == ElementType.Environment
-                || element.Type == ElementType.ExplicitBlock 
-                || element.Type == ElementType.ObjectArray 
-                || element.Type == ElementType.ObjectCreation 
-                || element.Type == ElementType.ObjectField;
+            else
+            {
+                return Array.Empty<DocumentElement>();
+            }
         }
 
         private static void ResolveCallbacks(ElementCollection<DocumentElement> blocks)

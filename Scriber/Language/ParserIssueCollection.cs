@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Language.Syntax;
+using System;
 using System.Collections.ObjectModel;
 
 namespace Scriber.Language
@@ -7,22 +8,27 @@ namespace Scriber.Language
     {
         public void Add(Token origin, ParserIssueType type, string message)
         {
-            Add(new ParserIssue(origin, type, message, null));
+            Add(new ParserIssue(origin.Span, type, message, null));
         }
 
-        public void Add(Element origin, ParserIssueType type, string message)
+        public void Add(SyntaxNode origin, ParserIssueType type, string message)
         {
             Add(origin, type, message, null);
         }
 
-        public void Add(Element origin, ParserIssueType type, string message, Exception? innerException)
+        public void Add(SyntaxNode origin, ParserIssueType type, string message, Exception? innerException)
         {
-            Add(new ParserIssue(origin, type, message, innerException));
+            Add(new ParserIssue(origin.Span, type, message, innerException));
         }
 
-        public void Log(Element origin, string message)
+        public void Log(SyntaxNode origin, string message)
         {
             Add(origin, ParserIssueType.Log, message);
+        }
+
+        public void Add(TextSpan span, ParserIssueType type, string message)
+        {
+            Add(new ParserIssue(span, type, message, null));
         }
     }
 }

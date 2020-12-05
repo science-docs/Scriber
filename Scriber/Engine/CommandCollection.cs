@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Language.Syntax;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +55,7 @@ namespace Scriber.Engine
             return command.FirstOrDefault();
         }
 
-        public Command? Find(string name, int argumentCount)
+        public Command? Find(string name, IEnumerable<ArgumentSyntax> arguments)
         {
             if (name is null)
             {
@@ -65,7 +66,7 @@ namespace Scriber.Engine
             {
                 foreach (var command in list)
                 {
-                    if (command.Parameters.Count <= argumentCount)
+                    if (command.Parameters.Count <= arguments.Count())
                     {
                         return command;
                     }

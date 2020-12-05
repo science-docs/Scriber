@@ -13,18 +13,40 @@ namespace Scriber.Localization
         
         public Locale(Culture culture)
         {
-            Culture = Culture;
+            Culture = culture;
             File = LocaleFile.Defaults.FirstOrDefault(e => e.XmlLang == culture.ToString());
         }
 
         public Locale(LocaleFile file)
         {
-            Culture = new Culture(file.XmlLang);
+            Culture = Culture.GetCulture(file.XmlLang!);
             File = file;
         }
 
         public string OpenQuote => GetTerm(TermName.OpenQuote) ?? "\"";
         public string CloseQuote => GetTerm(TermName.CloseQuote) ?? "\"";
+
+        public string GetTerm(Term term)
+        {
+            if (Culture.Language == "en")
+            {
+                return term.ToString();
+            }
+            else if (Culture.Language == "de")
+            {
+                return term switch
+                {
+                    Term.Figure => "Abbildung",
+                    Term.Listing => "Listing",
+                    Term.Table => "Tabelle",
+                    _ => ""
+                };
+            }
+            else
+            {
+                return term.ToString();
+            }
+        }
 
         public string FormatNumber(double value)
         {
@@ -70,16 +92,16 @@ namespace Scriber.Localization
                 .Reverse());
         }
 
-        private string FormatOrdinal(int value, bool _long)
+        private string FormatOrdinal(int value, bool isLong)
         {
-            var term = GetOrdinalNumberTerm(value, _long);
+            var term = GetOrdinalNumberTerm(value, isLong);
             string? termValue = GetTerm(term);
 
             if (termValue == null)
             {
                 return FormatNumber(value);
             }
-            else if (_long)
+            else if (isLong)
             {
                 return termValue;
             }
@@ -108,11 +130,11 @@ namespace Scriber.Localization
 
             if (format != null && gender != null)
             {
-                comparer = e => e.Name == name && e.FormatSpecified && e.Format == format && e.Gender == gender;
+                comparer = e => e.Name == name && e.Format == format && e.Gender == gender;
             }
             else if (format != null)
             {
-                comparer = e => e.Name == name && e.FormatSpecified && e.Format == format;
+                comparer = e => e.Name == name && e.Format == format;
             }
             else
             {

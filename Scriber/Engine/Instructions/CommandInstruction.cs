@@ -1,22 +1,12 @@
 ﻿using System;
-using Scriber.Language;
+using System.Collections.Generic;
+using System.Reflection;
+using Scriber.Language.Syntax;
 
 namespace Scriber.Engine.Instructions
 {
-    public class CommandInstruction : EngineInstruction
+    public class CommandInstruction : EngineInstruction<CommandSyntax>
     {
-        public string Name { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="origin"></param>
-        /// <exception cref="ArgumentNullException"/>
-        public CommandInstruction(Element origin) : base(origin)
-        {
-            Name = origin.Content ?? throw new ArgumentNullException($"{nameof(origin)}.{nameof(origin.Content)}");
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -25,39 +15,58 @@ namespace Scriber.Engine.Instructions
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="CompilerException"/>
-        public override object? Execute(CompilerState state, Argument[] arguments)
+        public override object? Evaluate(CompilerState state, CommandSyntax commandSyntax)
         {
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (arguments is null)
+            if (commandSyntax is null)
             {
-                throw new ArgumentNullException(nameof(arguments));
+                throw new ArgumentNullException(nameof(commandSyntax));
             }
 
-            var command = state.Commands.Find(Name, arguments.Length);
+            if (commandSyntax.Name == null)
+            {
+                throw new CompilerException(commandSyntax, "Received command without a name.");
+            }
+
+            var command = state.Commands.Find(commandSyntax.Name.Value, commandSyntax.Arguments);
 
             if (command == null)
             {
-                throw new CompilerException(Origin, $"Could not find command '{Name}'.");
+                throw new CompilerException(commandSyntax, $"Could not find command '{commandSyntax.Name.Value}'.");
+            }
+
+            var arguments = new List<Argument>();
+
+            foreach (var argSyntax in commandSyntax.Arguments)
+            {
+                var argResult = EngineInstruction.Evaluate(state, argSyntax);
+                arguments.Add(argResult);
+            }
+
+            if (commandSyntax.Environment != null)
+            {
+                var block = EngineInstruction.Evaluate(state, commandSyntax.Environment);
+                arguments.Add(block);
             }
 
             try
             {
-                var obj = command.Execution(Origin, state, arguments);
-                state.Context.Logger.Debug($"Successfully executed command '{Name}'.");
+                var obj = command.Execution(commandSyntax, state, arguments.ToArray());
+                state.Context.Logger.Debug($"Successfully executed command '{command.Name}'.");
                 return obj;
             }
             catch (CompilerException e)
             {
-                e.Origin ??= Origin;
+                e.Origin ??= commandSyntax;
                 throw;
             }
             catch (Exception ex)
             {
-                throw new CompilerException(Origin, "Unhandled exception occured during execution of command " + Name, ex);
+                throw new CompilerException(commandSyntax, ex.Message, ex);
             }
         }
     }

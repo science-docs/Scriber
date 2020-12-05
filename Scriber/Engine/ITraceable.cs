@@ -1,25 +1,30 @@
-﻿using Scriber.Language;
+﻿using Scriber.Language.Syntax;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Scriber.Engine
 {
-    public interface ITraceable
+    public interface ITraceable<T> where T : SyntaxNode
     {
-        Element Origin { get; set; }
+        T Origin { get; set; }
     }
 
-    public abstract class Traceable : ITraceable
+    public abstract class Traceable : Traceable<SyntaxNode>
     {
-        public Element Origin { get; set; }
+        protected Traceable(SyntaxNode origin) : base(origin)
+        {
+        }
+    }
+
+    public abstract class Traceable<T> : ITraceable<T> where T: SyntaxNode
+    {
+        public T Origin { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="origin"></param>
         /// <exception cref="ArgumentNullException"/>
-        protected Traceable(Element origin)
+        protected Traceable(T origin)
         {
             Origin = origin ?? throw new ArgumentNullException(nameof(origin));
         }

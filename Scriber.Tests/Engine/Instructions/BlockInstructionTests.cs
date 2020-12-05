@@ -1,21 +1,22 @@
 ﻿using Scriber.Language;
+using Scriber.Language.Syntax;
 using Scriber.Layout.Document;
 using Scriber.Tests.Fixture;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace Scriber.Engine.Instructions.Tests
 {
     public class BlockInstructionTests
     {
-        private Element E => ElementFixtures.EmptyElement();
-        private BlockInstruction Block => new BlockInstruction(E);
+        private BlockInstruction Block => new BlockInstruction();
         private CompilerState CS => CompilerStateFixtures.ReflectionLoaded();
 
         [Fact]
         public void EmptyBlock()
         {
-            var blockContent = Block.Execute(CS, Array.Empty<Argument>());
+            var blockContent = Block.Evaluate(CS, new ListSyntax());
             Assert.IsType<Argument[]>(blockContent);
             Assert.Empty((Argument[])blockContent);
         }
@@ -25,7 +26,7 @@ namespace Scriber.Engine.Instructions.Tests
         {
             var ex = Assert.Throws<ArgumentNullException>(() =>
             {
-                Block.Execute(null, Array.Empty<Argument>());
+                Block.Evaluate(null, new ListSyntax());
             });
             Assert.Equal("state", ex.ParamName);
         }
@@ -35,112 +36,58 @@ namespace Scriber.Engine.Instructions.Tests
         {
             var ex = Assert.Throws<ArgumentNullException>(() =>
             {
-                Block.Execute(CS, null);
+                Block.Evaluate(CS, null);
             });
-            Assert.Equal("arguments", ex.ParamName);
+            Assert.Equal("list", ex.ParamName);
         }
 
         [Fact]
         public void GroupedLeafBlock()
         {
-            var firstLeaf = new TextLeaf("first");
-            var secondLeaf = new TextLeaf("second");
-            var blockContent = Block.Execute(CS, new Argument[] {
-                new Argument(E, firstLeaf),
-                new Argument(E, secondLeaf)
-            });
+            var blockContent = ParseBlock("some text");
             Assert.IsType<Argument[]>(blockContent);
             var argResult = (Argument[])blockContent;
             Assert.Single(argResult);
             Assert.IsType<Paragraph>(argResult[0].Value);
             var paragraph = (Paragraph)argResult[0].Value;
-            Assert.Equal(firstLeaf, paragraph.Leaves[0]);
-            Assert.Equal(secondLeaf, paragraph.Leaves[1]);
+            var leaf = paragraph.Leaves[0] as ITextLeaf;
+            Assert.Equal("some text", leaf.Content);
+        }
+
+        [Theory]
+        [InlineData(" ")]
+        [InlineData("\t")]
+        [InlineData(" \n\t ")]
+        public void WhitespaceBlock(string input)
+        {
+            var blockContent = ParseBlock(input);
+            Assert.IsType<Argument[]>(blockContent);
+            var argResult = (Argument[])blockContent;
+            Assert.Single(argResult);
         }
 
         [Fact]
         public void MixedBlock()
         {
-            var firstLeaf = new TextLeaf("first");
-            var paragraph = Paragraph.FromText("intermediate");
-            var secondLeaf = new TextLeaf("second");
-            var blockContent = Block.Execute(CS, new Argument[] { 
-                new Argument(E, firstLeaf),
-                new Argument(E, paragraph),
-                new Argument(E, secondLeaf)
-            });
+            var blockContent = ParseBlock("first @Heading(1; A) second");
             Assert.IsType<Argument[]>(blockContent);
             var argResult = (Argument[])blockContent;
             Assert.Equal(3, argResult.Length);
             Assert.All(argResult, arg => Assert.IsType<Paragraph>(arg.Value));
             var firstParagraph = (Paragraph)argResult[0].Value;
+            var firstLeaf = firstParagraph.Leaves[0] as ITextLeaf;
             var secondParagraph = (Paragraph)argResult[2].Value;
-            Assert.Equal(firstLeaf, firstParagraph.Leaves[0]);
-            Assert.Equal(paragraph, argResult[1].Value);
-            Assert.Equal(secondLeaf, secondParagraph.Leaves[0]);
+            var secondLeaf = secondParagraph.Leaves[0] as ITextLeaf;
+            Assert.Equal("first ", firstLeaf.Content);
+            Assert.Equal(" second", secondLeaf.Content);
         }
 
-        [Fact]
-        public void BlockWithParagraphBreak()
+        private object ParseBlock(string input)
         {
-            var firstLeaf = new TextLeaf("first");
-            var paragraphBreak = EmptyInstruction.Object;
-            var secondLeaf = new TextLeaf("second");
-            var blockContent = Block.Execute(CS, new Argument[] {
-                new Argument(E, firstLeaf),
-                new Argument(E, paragraphBreak),
-                new Argument(E, secondLeaf)
-            });
-            Assert.IsType<Argument[]>(blockContent);
-            var argResult = (Argument[])blockContent;
-            Assert.Equal(2, argResult.Length);
-            Assert.All(argResult, arg => Assert.IsType<Paragraph>(arg.Value));
-            var firstParagraph = (Paragraph)argResult[0].Value;
-            var secondParagraph = (Paragraph)argResult[1].Value;
-            Assert.Equal(firstLeaf, firstParagraph.Leaves[0]);
-            Assert.Equal(secondLeaf, secondParagraph.Leaves[0]);
-        }
-
-        [Fact]
-        public void BlockWithNullElement()
-        {
-            var paragraphBreak = NullInstruction.NullObject;
-            var blockContent = Block.Execute(CS, new Argument[] {
-                new Argument(E, paragraphBreak),
-            });
-            Assert.IsType<Argument[]>(blockContent);
-            var argResult = (Argument[])blockContent;
-            Assert.Single(argResult);
-            Assert.Null(argResult[0].Value);
-        }
-
-        [Fact]
-        public void BlockWithStringElement()
-        {
-            var blockContent = Block.Execute(CS, new Argument[] {
-                new Argument(E, "some"),
-                new Argument(E, "text")
-            });
-            Assert.IsType<Argument[]>(blockContent);
-            var argResult = (Argument[])blockContent;
-            Assert.Single(argResult);
-            Assert.IsType<Paragraph>(argResult[0].Value);
-            var paragraph = (Paragraph)argResult[0].Value;
-            Assert.Equal("some", (paragraph.Leaves[0] as TextLeaf).Content);
-            Assert.Equal("text", (paragraph.Leaves[1] as TextLeaf).Content);
-        }
-
-        [Fact]
-        public void EmptyExplicitBlock()
-        {
-            var e = E;
-            e.Type = ElementType.ExplicitBlock;
-            var block = new BlockInstruction(e);
-            var blockContent = block.Execute(CS, Array.Empty<Argument>());
-            Assert.IsType<Argument[]>(blockContent);
-            var argResult = (Argument[])blockContent;
-            Assert.Single(argResult);
-            Assert.Null(argResult[0].Value);
+            var nodes = Parser.ParseFromString(input).Nodes;
+            var node = nodes.First() as ListSyntax;
+            var result = Block.Evaluate(CS, node);
+            return result;
         }
     }
 }

@@ -62,7 +62,7 @@ namespace Scriber.Util
 
             public static TTarget? Convert(string value)
             {
-                if (Dict.TryGetValue(value.ToLowerInvariant(), out var target))
+                if (Dict.TryGetValue(value.Trim().ToLowerInvariant(), out var target))
                 {
                     return target;
                 }

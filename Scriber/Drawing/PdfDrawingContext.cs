@@ -46,15 +46,7 @@ namespace Scriber.Drawing
             double yOffset = FontStyler.ScaleOffset(run.Typeface.Style, run.Typeface.Size);
             double size = FontStyler.ScaleSize(run.Typeface.Style, run.Typeface.Size);
             var transformedOffset = Offset.Transform(GetTransform());
-            G.DrawString(run.Text, ToXFont(run.Typeface.Font, size, run.Typeface.Weight), ToXBrush(color), new XPoint(transformedOffset.X, transformedOffset.Y + yOffset));
-        }
-
-        private XFont ToXFont(Font font, double size, FontWeight weight)
-        {
-            // Quick convert via integer casting
-            var xWeight = (XFontStyle)(int)weight;
-            var xFont = new XFont(font.Name, size, xWeight);
-            return xFont;
+            G.DrawString(run.Text, run.Typeface.Font.GetXFont(size, run.Typeface.Weight), ToXBrush(color), new XPoint(transformedOffset.X, transformedOffset.Y + yOffset));
         }
 
         private XBrush ToXBrush(Color color)

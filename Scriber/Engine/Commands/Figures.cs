@@ -1,5 +1,6 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Localization;
 using Scriber.Variables;
 using System.Linq;
 
@@ -32,7 +33,7 @@ namespace Scriber.Engine.Commands
 
                 var text = new TextLeaf
                 {
-                    Content = "Figure " + figureCount + ": "
+                    Content = $"{state.Document.Locale.GetTerm(Term.Figure)} {figureCount}: "
                 };
                 caption.Leaves.Insert(0, text);
 

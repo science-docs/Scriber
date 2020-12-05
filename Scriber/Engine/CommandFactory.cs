@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Language.Syntax;
 using System.Linq;
 using System.Reflection;
 
@@ -31,11 +32,29 @@ namespace Scriber.Engine
             return InvokeDynamic;
 
             // inline method for better debugging
-            object? InvokeDynamic(Element element, CompilerState state, Argument[] args)
+            object? InvokeDynamic(SyntaxNode element, CompilerState state, Argument[] args)
             {
                 var paddedArgs = DynamicDispatch.PadArguments(command, element, state, args, items);
                 var matchedArgs = DynamicDispatch.MatchArguments(state, paddedArgs, items);
-                return method.Invoke(null, matchedArgs);
+                try
+                {
+                    return method.Invoke(null, matchedArgs);
+                }
+                catch (TargetInvocationException ex)
+                {
+                    if (ex.InnerException is CompilerException compilerException)
+                    {
+                        throw compilerException;
+                    }
+                    else if (ex.InnerException != null)
+                    {
+                        throw new CompilerException(element, ex.InnerException.Message, ex.InnerException);
+                    }
+                    else
+                    {
+                        throw new CompilerException(element, ex.Message, ex);
+                    }
+                }
             }
         }
     }

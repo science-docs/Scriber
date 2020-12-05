@@ -1,4 +1,4 @@
-﻿using Scriber.Language;
+﻿using Scriber.Language.Syntax;
 using Scriber.Util;
 using System;
 using System.Collections;
@@ -9,7 +9,7 @@ namespace Scriber.Engine
     public class Argument
     {
         public object? Value { get; }
-        public Element Source { get; }
+        public SyntaxNode Source { get; }
 
         /// <summary>
         /// 
@@ -17,7 +17,7 @@ namespace Scriber.Engine
         /// <param name="source"></param>
         /// <param name="value"></param>
         /// <exception cref="ArgumentNullException"/>
-        public Argument(Element source, object? value)
+        public Argument(SyntaxNode source, object? value)
         {
             Source = source ?? throw new ArgumentNullException(nameof(source));
             Value = value;
@@ -103,6 +103,10 @@ namespace Scriber.Engine
 
         private static void Flatten(Argument argument, List<Argument> list)
         {
+            if (argument.Value is Argument argValue)
+            {
+                Flatten(argValue, list);
+            }
             if (argument.Value is IEnumerable<Argument> arguments)
             {
                 foreach (var arg in arguments)
@@ -132,7 +136,7 @@ namespace Scriber.Engine
     {
         public new T Value { get; }
 
-        public Argument(Element source, T value) : base(source, value)
+        public Argument(SyntaxNode source, T value) : base(source, value)
         {
             Value = value;
         }

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Scriber.Text;
+using System;
 using System.Globalization;
+using System.Linq;
 
 namespace Scriber.Localization
 {
@@ -14,11 +16,60 @@ namespace Scriber.Localization
         /// Constructor.
         /// </summary>
         /// <param name="xmlLang"></param>
-        public Culture(string? xmlLang)
+        private Culture(string? xmlLang)
         {
             var parts = (xmlLang ?? "").Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-            Language = parts.Length == 0 || string.IsNullOrEmpty(parts[0]) || parts[0].Length != 2 ? throw new ArgumentException() : parts[0].ToLower();
+            Language = parts.Length == 0 || string.IsNullOrEmpty(parts[0]) || parts[0].Length != 2 ? throw new ArgumentException("Language part of the culture needs to be two characters long.") : parts[0].ToLower();
             Dialect = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) && parts[1].Length == 2 && !string.IsNullOrEmpty(Language) ? parts[1].ToUpper() : null;
+        }
+
+        public static Culture[] GetCultures()
+        {
+            return new Culture[]
+            {
+                new Culture("en-US"),
+                new Culture("en-GB"),
+                new Culture("de-DE")
+            };
+        }
+
+
+        public static Culture GetCulture(string name)
+        {
+            if (!TryGetCulture(name, out var culture))
+            {
+                throw new Exception();
+            }
+            return culture;
+        }
+
+        public static bool TryGetCulture(string name, out Culture culture)
+        {
+            var cultures = GetCultures();
+
+            var cult = cultures.FirstOrDefault(culture => string.Equals(culture.Language, name, StringComparison.CurrentCultureIgnoreCase)
+                                             || string.Equals(culture.ToString(), name, StringComparison.CurrentCultureIgnoreCase));
+
+            if (cult == null)
+            {
+                culture = Invariant;
+                return false;
+            }
+            else
+            {
+                culture = cult;
+                return true;
+            }
+        }
+
+        public static bool IsCultureLanguage(string cultureName)
+        {
+            return TryGetCulture(cultureName, out _);
+        }
+
+        public Hyphenator GetHyphenator()
+        {
+            return Hyphenator.FromCulture(ToString());
         }
 
         /// <summary>

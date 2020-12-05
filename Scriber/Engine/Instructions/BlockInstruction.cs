@@ -1,22 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using Scriber.Language;
+using System.Linq;
+using Scriber.Language.Syntax;
 using Scriber.Layout.Document;
 using Scriber.Variables;
 
 namespace Scriber.Engine.Instructions
 {
-    public class BlockInstruction : EngineInstruction
+    public class BlockInstruction : EngineInstruction<ListSyntax>
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="origin"></param>
-        /// <exception cref="ArgumentNullException"/>
-        public BlockInstruction(Element origin) : base(origin)
-        {
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -24,16 +16,16 @@ namespace Scriber.Engine.Instructions
         /// <param name="arguments"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"/>
-        public override object Execute(CompilerState state, Argument[] arguments)
+        public override object Evaluate(CompilerState state, ListSyntax list)
         {
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (arguments is null)
+            if (list is null)
             {
-                throw new ArgumentNullException(nameof(arguments));
+                throw new ArgumentNullException(nameof(list));
             }
 
             var results = new List<Argument>();
@@ -41,52 +33,33 @@ namespace Scriber.Engine.Instructions
             // Group continueous leafs into one paragraph
             Paragraph? currentParagraph = null;
 
-            for (int i = 0; i < arguments.Length; i++)
+            foreach (var element in list.SelectMany(e => EngineInstruction.Evaluate(state, e).Flatten()))
             {
-                var item = arguments[i];
-                if (item.Value is Leaf leaf)
+                if (element.Value is Leaf leaf)
                 {
                     if (currentParagraph == null)
                     {
                         currentParagraph = CreateNewParagraph(state);
-                        results.Add(new Argument(item.Source, currentParagraph));
+                        results.Add(new Argument(element.Source, currentParagraph));
                     }
 
                     currentParagraph.Leaves.Add(leaf);
                 }
-                else if (item.Value is string str)
+                else if (element.Value is string str)
                 {
                     if (currentParagraph == null)
                     {
                         currentParagraph = CreateNewParagraph(state);
-                        results.Add(new Argument(item.Source, currentParagraph));
+                        results.Add(new Argument(element.Source, currentParagraph));
                     }
 
                     currentParagraph.Leaves.Add(new TextLeaf(str));
                 }
-                else if (item.Value == EmptyInstruction.Object)
-                {
-                    ResetParagraph(state, ref currentParagraph);
-                }
-                else if (item.Value == NullInstruction.NullObject)
-                {
-                    ResetParagraph(state, ref currentParagraph);
-                    results.Add(new Argument(item.Source, null));
-                }
                 else
                 {
-                    ResetParagraph(state, ref currentParagraph);
-                    results.Add(item);
+                    currentParagraph = null;
+                    results.Add(element);
                 }
-            }
-
-            ResetParagraph(state, ref currentParagraph);
-
-            if (results.Count == 0 && Origin.Type == ElementType.ExplicitBlock)
-            {
-                // signaling an empty block
-                results.Add(new Argument(Origin, null));
-                state.Context.Logger.Debug("Empty explicit block found. Adding null element");
             }
 
             return results.ToArray();
@@ -100,15 +73,6 @@ namespace Scriber.Engine.Instructions
             currentParagraph.FontSize = state.Document.Variable(FontVariables.FontSize);
             currentParagraph.Margin = margin;
             return currentParagraph;
-        }
-
-        private void ResetParagraph(CompilerState state, ref Paragraph? paragraph)
-        {
-            if (paragraph != null)
-            {
-                state.Context.Logger.Debug($"Grouping {paragraph.Leaves.Count} {LeafString(paragraph.Leaves.Count)} into a paragraph.");
-                paragraph = null;
-            }
         }
 
         private static string LeafString(int count)

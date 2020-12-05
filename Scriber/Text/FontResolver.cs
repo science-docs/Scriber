@@ -7,6 +7,7 @@ namespace Scriber.Text
     public class FontResolver : IFontResolver
     {
         public string DefaultFontName => "CMU Serif";
+        private readonly PdfSharpCore.Utils.FontResolver defaultFontResolver = new PdfSharpCore.Utils.FontResolver();
 
         public byte[] GetFont(string faceName)
         {
@@ -16,7 +17,7 @@ namespace Scriber.Text
 
             if (stream == null)
             {
-                throw new IOException("Could not load font: " + faceName);
+                return defaultFontResolver.GetFont(faceName);
             }
 
             using var ms = new MemoryStream();
@@ -45,7 +46,7 @@ namespace Scriber.Text
                     return new FontResolverInfo("cmu.serif-roman");
                 }
             }
-            return null;
+            return defaultFontResolver.ResolveTypeface(familyName, isBold, isItalic);
         }
     }
 }

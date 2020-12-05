@@ -633,6 +633,10 @@ namespace Scriber.Bibliography.BibTex
             {
                 cb.Accessed(urlDateVariable);
             }
+            if (!string.IsNullOrWhiteSpace(Url))
+            {
+                cb.Url(new TextVariable(Url));
+            }
 
             if (Date != null && DateVariable.TryParse(Date, out var dateVariable))
             {

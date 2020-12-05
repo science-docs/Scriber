@@ -1,5 +1,6 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Variables;
 
 namespace Scriber.Engine.Commands
 {
@@ -9,7 +10,10 @@ namespace Scriber.Engine.Commands
         [Command("ListItem")]
         public static Paragraph Item(CompilerState state, Paragraph content)
         {
-            return new ListItem(content);
+            var listItem = new ListItem(content);
+            var margin = new Thickness(0, 0, state.Document.Variable(ParagraphVariables.Skip), 0);
+            listItem.Margin = margin;
+            return listItem;
         }
 
         [Command("List")]

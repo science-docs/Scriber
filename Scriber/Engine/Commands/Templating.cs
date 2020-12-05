@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Language.Syntax;
 using Scriber.Util;
 using System;
 
@@ -69,7 +70,7 @@ namespace Scriber.Engine.Commands
         {
             return InvokeDynamic;
 
-            object? InvokeDynamic(Element _, CompilerState __, Argument[] ___)
+            object? InvokeDynamic(SyntaxNode _, CompilerState __, Argument[] ___)
             {
                 return value;
             }

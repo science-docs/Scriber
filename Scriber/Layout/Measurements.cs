@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Scriber.Layout.Document;
 
@@ -13,6 +14,7 @@ namespace Scriber.Layout
         public bool IsReadOnly { get; private set; }
 
         public Measurement this[int index] => measurements[index];
+        public Measurement this[Index index] => measurements[index];
 
         public void Add(Measurement item)
         {

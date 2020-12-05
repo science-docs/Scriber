@@ -8,7 +8,7 @@ namespace Scriber.Tests
 {
     public class ResourceSetTests
     {
-        private static readonly ResourceSet rs = new ResourceSet(FileSystemMock.FileSystem);
+        private readonly ResourceSet rs = new ResourceSet(FileSystemMock.FileSystem);
 
         [Theory]
         [InlineData("https://www.dummy.com/folder/sample.pdf", "test.png", "https://www.dummy.com/folder/test.png")]
@@ -17,6 +17,11 @@ namespace Scriber.Tests
         [InlineData("C:/Test/image.png", "item.pdf", "file:///C:/Test/item.pdf")]
         public void RelativeUriWithResource(string current, string srcPath, string targetUri)
         {
+            if (current.StartsWith("C:/") && Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                return;
+            }
+
             var uri = new Uri(current);
             var resource = new Resource(uri, Array.Empty<byte>());
             rs.PushResource(resource);
@@ -33,6 +38,11 @@ namespace Scriber.Tests
         [InlineData("https://www.dummy.com/item.pdf", "https://www.dummy.com/item.pdf")]
         public void RelativeUriWithoutResource(string srcPath, string targetUri)
         {
+            if (targetUri.Contains("C:/") && Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                targetUri = targetUri.Replace("C:/", "");
+            }
+
             var relativeUri = rs.RelativeUri(srcPath);
             Assert.Equal(targetUri, relativeUri.ToString());
         }
@@ -83,7 +93,8 @@ namespace Scriber.Tests
         [Fact]
         public void GetStringTest()
         {
-            Assert.Equal("Hello World!", rs.GetString(rs.RelativeUri("C:/Test.txt")));
+            var path = Environment.OSVersion.Platform == PlatformID.Unix ? "/Test.txt" : "C:/Test.txt";
+            Assert.Equal("Hello World!", rs.GetString(rs.RelativeUri(path)));
         }
 
         [Fact]
@@ -99,10 +110,12 @@ namespace Scriber.Tests
         [Fact]
         public void GetBytesTest()
         {
+            var path = Environment.OSVersion.Platform == PlatformID.Unix ? "/Test.txt" : "C:/Test.txt";
+
             var utf8bom = new UTF8Encoding(true);
             var bytes = utf8bom.GetBytes("Hello World!");
             var preamble = utf8bom.Preamble;
-            Assert.Equal(bytes, rs.GetBytes(rs.RelativeUri("C:/Test.txt")).Skip(preamble.Length).ToArray());
+            Assert.Equal(bytes, rs.GetBytes(rs.RelativeUri(path)).Skip(preamble.Length).ToArray());
         }
 
         [Fact]

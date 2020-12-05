@@ -184,6 +184,11 @@ namespace Scriber
         {
             var size = measurement.TotalSize + measurement.AccumulatedExtra.TotalSize;
 
+            if (measurement.AccumulatedExtra.Subs.Count > 0)
+            {
+                height -= 5;
+            }
+
             if (size.Height > height)
             {
                 if (measurement.Flexible)

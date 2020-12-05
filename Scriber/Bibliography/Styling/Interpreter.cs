@@ -40,7 +40,7 @@ namespace Scriber.Bibliography.Styling
 
         public IVariable? Variable(string name)
         {
-            if (variables.TryGetValue(name, out var variable))
+            if (variables.TryGetValue(name.ToLowerInvariant(), out var variable))
             {
                 return variable;
             }
@@ -49,7 +49,7 @@ namespace Scriber.Bibliography.Styling
 
         public void SuppressVariable(string name)
         {
-            variables.Remove(name);
+            variables.Remove(name.ToLowerInvariant());
         }
 
         private Citation? citation;

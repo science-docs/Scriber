@@ -13,5 +13,10 @@
             advance = value.Length - trimmed.Length;
             return trimmed;
         }
+
+        public static string Pluralify(this int count, string single, string plural)
+        {
+            return count == 1 ? single : plural;
+        }
     }
 }

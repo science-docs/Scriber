@@ -1,4 +1,5 @@
 ﻿using Scriber.Language;
+using Scriber.Language.Syntax;
 using System;
 
 namespace Scriber.Engine
@@ -12,15 +13,13 @@ namespace Scriber.Engine
 
     public class CompilerIssue
     {
-        public int Index => Origin.Index;
-        public int Length => Origin.Length;
-        public int Line => Origin.Line;
+        public TextSpan Span => Origin.Span;
         public string Message { get; set; }
-        public Element Origin { get; set; }
+        public SyntaxNode Origin { get; set; }
         public Exception? InnerException { get; set; }
         public CompilerIssueType Type { get; set; }
 
-        public CompilerIssue(Element origin, CompilerIssueType type, string message, Exception? innerException)
+        public CompilerIssue(SyntaxNode origin, CompilerIssueType type, string message, Exception? innerException)
         {
             Type = type;
             Message = message;
