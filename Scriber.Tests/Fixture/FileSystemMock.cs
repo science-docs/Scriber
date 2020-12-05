@@ -4,6 +4,7 @@ using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Scriber.Tests.Fixture
 {
@@ -21,8 +22,8 @@ namespace Scriber.Tests.Fixture
 
                 foreach (var name in names)
                 {
-                    var fileName = name[prefix.Length..].Replace('.', '\\');
-                    var lastIndex = fileName.LastIndexOf('\\');
+                    var fileName = name[prefix.Length..].Replace('.', '/');
+                    var lastIndex = fileName.LastIndexOf('/');
                     fileName = fileName.Remove(lastIndex, 1).Insert(lastIndex, ".").Replace('_', '.');
                     byte[] bytes;
                     using (var stream = asm.GetManifestResourceStream(name))
@@ -34,7 +35,15 @@ namespace Scriber.Tests.Fixture
                     dict.Add(fileName, new MockFileData(bytes));
                 }
 
-                var fileSystem = new MockFileSystem(dict, @"C:\");
+                MockFileSystem fileSystem;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    fileSystem = new MockFileSystem(dict, @"C:\");
+                }
+                else
+                {
+                    fileSystem = new MockFileSystem(dict, "/");
+                }
                 return fileSystem;
             }
         }
