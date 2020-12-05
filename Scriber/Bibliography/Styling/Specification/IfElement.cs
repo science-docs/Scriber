@@ -168,6 +168,11 @@ namespace Scriber.Bibliography.Styling.Specification
                         }
                     }
                 }
+
+                if (Match == Match.All)
+                {
+                    return true;
+                }
             }
 
             return null;

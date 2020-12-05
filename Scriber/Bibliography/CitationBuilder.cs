@@ -257,7 +257,7 @@ namespace Scriber.Bibliography
 
         public void Url(ITextVariable url)
         {
-            Set(url, "original-title");
+            Set(url);
         }
 
         public void Version(ITextVariable version)
