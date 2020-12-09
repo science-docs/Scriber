@@ -1,6 +1,6 @@
 <div align="center">
 	<a href="https://github.com/science-docs/Scriber">
-		<img alt="logo" src="https://user-images.githubusercontent.com/4377073/93219922-2fe09f00-f76c-11ea-9796-3a6fbffa3522.png">
+		<img alt="logo" src="https://user-images.githubusercontent.com/4377073/104926964-1dd46e80-59a1-11eb-85ca-5981c18b732c.png">
 	</a>
 	<p>
 		A modern typesetting system based on .NET Core
