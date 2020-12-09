@@ -55,7 +55,7 @@ namespace Scriber.Engine.Instructions
 
                     currentParagraph.Leaves.Add(new TextLeaf(str));
                 }
-                else
+                else if (element.Value != null)
                 {
                     currentParagraph = null;
                     results.Add(element);

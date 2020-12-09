@@ -31,8 +31,14 @@ namespace Scriber.Engine.Commands
                     {
                         image.Angle = options.Angle;
                         image.Scale = options.Scale;
-                        image.Height = options.Height;
-                        image.Width = options.Width;
+                        if (options.Height.Value > 0)
+                        {
+                            image.Height = options.Height;
+                        }
+                        if (options.Width.Value > 0)
+                        {
+                            image.Width = options.Width;
+                        }
                     }
 
                     return image;
@@ -58,7 +64,7 @@ namespace Scriber.Engine.Commands
         {
             public double Angle { get; set; }
             public bool Draft { get; set; }
-            public double Scale { get; set; }
+            public double Scale { get; set; } = 1.0;
             public Unit Height { get; set; }
             public Unit Width { get; set; }
         }

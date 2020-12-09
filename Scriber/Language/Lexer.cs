@@ -27,7 +27,7 @@ namespace Scriber.Language
                 if (c == '\n')
                 {
                     EndCurrentToken(tokens, sb, ref cur);
-                    tokens.Add(new Token(TokenType.Newline, i, line++));
+                    tokens.Add(new Token(c, TokenType.Newline, i, line++));
                     continue;
                 }
                 else
@@ -52,9 +52,9 @@ namespace Scriber.Language
 
                 ignore = false;
 
-                if (cur != null)
+                if (IsSpecialCharacter(c))
                 {
-                    if (IsSpecialCharacter(c))
+                    if (cur != null)
                     {
                         cur.Content = sb.ToString();
                         sb.Clear();
@@ -62,56 +62,49 @@ namespace Scriber.Language
                         tokens.Add(cur);
                         cur = null;
                     }
-                    else if (c == '/' && i < span.Length - 1)
+
+                    var type = GetTokenType(c);
+                    if (IsSingleToken(type))
                     {
-                        var next = span[i + 1];
-                        if (next == '/')
-                        {
-                            EndCurrentToken(tokens, sb, ref cur);
-                            tokens.Add(new Token(TokenType.DoubleSlash, i++, line));
-                        }
-                        else if (next == '*')
-                        {
-                            EndCurrentToken(tokens, sb, ref cur);
-                            tokens.Add(new Token(TokenType.SlashAsterisk, i++, line));
-                        }
-                        else
-                        {
-                            sb.Append(c);
-                        }
-                    }
-                    else if (c == '*' && i < span.Length - 1 && span[i + 1] == '/')
-                    {
-                        EndCurrentToken(tokens, sb, ref cur);
-                        tokens.Add(new Token(TokenType.AsteriskSlash, i++, line));
+                        tokens.Add(new Token(c, type, i, line));
                     }
                     else
                     {
+                        cur = new Token(c, GetTokenType(c), i, line);
                         sb.Append(c);
                     }
                 }
-                // as cur can become null during the previous branch, we have to check it again
-                if (cur == null)
+                else if (c == '/' && i < span.Length - 1)
                 {
-                    if (IsSpecialCharacter(c))
+                    var next = span[i + 1];
+                    if (next == '/')
                     {
-                        var type = GetTokenType(c);
-                        if (IsSingleToken(type))
-                        {
-                            tokens.Add(new Token(type, i, line, c.ToString()));
-                        }
-                        else
-                        {
-                            cur = new Token(GetTokenType(c), i, line);
-                            sb.Append(c);
-                        }
+                        EndCurrentToken(tokens, sb, ref cur);
+                        tokens.Add(new Token(c, TokenType.DoubleSlash, i++, line));
+                    }
+                    else if (next == '*')
+                    {
+                        EndCurrentToken(tokens, sb, ref cur);
+                        tokens.Add(new Token(c, TokenType.SlashAsterisk, i++, line));
                     }
                     else
                     {
-                        cur = new Token(TokenType.Text, i, line);
+                        cur = new Token(c, TokenType.Text, i, line);
                         sb.Append(c);
                     }
-
+                }
+                else if (c == '*' && i < span.Length - 1 && span[i + 1] == '/')
+                {
+                    EndCurrentToken(tokens, sb, ref cur);
+                    tokens.Add(new Token(c, TokenType.AsteriskSlash, i++, line));
+                }
+                else
+                {
+                    if (cur == null)
+                    {
+                        cur = new Token(c, TokenType.Text, i, line);
+                    }
+                    sb.Append(c);
                 }
             }
             
@@ -144,7 +137,6 @@ namespace Scriber.Language
         {
             return token switch
             {
-                TokenType.Backslash => false,
                 TokenType.Text => false,
                 TokenType.Underscore => false,
                 TokenType.Caret => false,

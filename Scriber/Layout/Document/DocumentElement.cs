@@ -7,7 +7,7 @@ namespace Scriber.Layout.Document
     {
         public Measurement Measurement { get; private set; }
         public Transform? Transform { get; set; }
-        public virtual bool IsVisible => true;
+        public bool IsVisible { get; set; } = true;
 
         protected DocumentElement()
         {
@@ -16,6 +16,11 @@ namespace Scriber.Layout.Document
 
         public Measurement Measure(Size availableSize)
         {
+            if (!IsVisible)
+            {
+                return Measurement = new Measurement(this);
+            }
+
             var marginSize = new Size(Margin.Width, Margin.Height);
             return Measurement = MeasureOverride(availableSize - marginSize);
         }
@@ -69,6 +74,11 @@ namespace Scriber.Layout.Document
 
         public void Render(IDrawingContext drawingContext, Measurement measurement)
         {
+            if (!IsVisible)
+            {
+                return;
+            }
+
             var pos = measurement.Position;
             pos.X += measurement.Margin.Left;
             pos.Y += measurement.Margin.Top;

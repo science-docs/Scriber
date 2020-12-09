@@ -1,6 +1,5 @@
 ﻿using Scriber.Language.Syntax;
 using System;
-using System.Collections.Generic;
 
 namespace Scriber.Engine.Instructions
 {
@@ -40,6 +39,7 @@ namespace Scriber.Engine.Instructions
                 ArraySyntax arraySyntax => arrayInstruction.Evaluate(state, arraySyntax),
                 PercentSyntax percentSyntax => percentInstruction.Evaluate(state, percentSyntax),
                 ListSyntax list => blockInstruction.Evaluate(state, list),
+                CommentSyntax _ => null,
                 _ => throw new ArgumentException($"Evaluation of node type {node.GetType().Name} not implemented.", nameof(node)),
             };
 

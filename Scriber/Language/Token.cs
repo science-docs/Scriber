@@ -10,10 +10,6 @@ namespace Scriber.Language
         /// </summary>
         At,
         /// <summary>
-        /// Special backslash character used for escaping and hyphenation
-        /// </summary>
-        Backslash,
-        /// <summary>
         /// Double forward slash indicates a single-line comment
         /// </summary>
         DoubleSlash,
@@ -73,12 +69,18 @@ namespace Scriber.Language
             Type = TokenType.Text;
         }
 
-        public Token(TokenType type, int index, int line)
+        public Token(char c, TokenType type, int index, int line)
         {
             Type = type;
             Index = index;
             Line = line;
-            Content = null ?? string.Empty;
+            Content = type switch
+            {
+                TokenType.DoubleSlash => "//",
+                TokenType.SlashAsterisk => "/*",
+                TokenType.AsteriskSlash => "*/",
+                _ => c.ToString()
+            };
         }
 
         public Token(TokenType type, int index, int line, string content)

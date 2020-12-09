@@ -92,7 +92,10 @@ namespace Scriber.Language.Tests
         [Fact]
         public void CommandNestedObjectParsing()
         {
-            var command = ParseAsSyntax<CommandSyntax>("@Command(obj: { top: { nested: value }})");
+            const string input = "@Command(obj: { top: { nested: value }})";
+            var command = ParseAsSyntax<CommandSyntax>(input);
+            Assert.Equal(0, command.Span.Start);
+            Assert.Equal(input.Length, command.Span.End);
             Assert.Equal(1, command.Arity);
             var argument = command.Arguments.FirstOrDefault();
             Assert.NotNull(argument);
@@ -135,6 +138,18 @@ namespace Scriber.Language.Tests
             Assert.Equal(result, result.Environment.Parent);
             Assert.Empty(result.Arguments);
             Assert.Empty(result.Environment);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("some content")]
+        [InlineData("some  spaced   content")]
+        [InlineData("some \n newline content")]
+        public void QuotationTest(string input)
+        {
+            var quotation = ParseAsSyntax<StringLiteralSyntax>('"' + input + '"');
+            Assert.Equal(input, quotation.Content);
         }
 
         [Fact]

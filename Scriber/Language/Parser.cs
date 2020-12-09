@@ -82,12 +82,12 @@ namespace Scriber.Language
 
         private static bool NeverTextToken(TokenType type)
         {
-            return type == TokenType.At || type == TokenType.DoubleSlash || type == TokenType.SlashAsterisk || type == TokenType.AsteriskSlash || type == TokenType.Quotation;
+            return type == TokenType.Percent || type == TokenType.At || type == TokenType.DoubleSlash || type == TokenType.SlashAsterisk || type == TokenType.AsteriskSlash || type == TokenType.Quotation;
         }
 
-        private static SyntaxNode ParseSingleLineComment(ParserContext context)
+        private static SyntaxNode ParseSinglelineComment(ParserContext context)
         {
-            var token = context.Tokens.Peek();
+            var token = context.Tokens.Dequeue();
             int start = token!.Index;
             int line = token!.Line;
             int last = start + token!.Length;
@@ -114,6 +114,43 @@ namespace Scriber.Language
                 Span = new TextSpan(start, last - start, line),
                 Comment = sb.ToString()
             };
+        }
+
+        private static SyntaxNode ParseMultilineComment(ParserContext context)
+        {
+            var token = context.Tokens.Dequeue();
+            int start = token!.Index;
+            int line = token!.Line;
+            var lastSpan = token!.Span;
+
+            var sb = new StringBuilder();
+
+            while (token != null)
+            {
+                sb.Append(token.Content);
+                lastSpan = token.Span;
+                if (token.Type == TokenType.AsteriskSlash)
+                {
+                    context.Tokens.Dequeue();
+                    break;
+                }
+                token = context.Tokens.Dequeue();
+            }
+
+            var comment = new CommentSyntax
+            {
+                Span = new TextSpan(start, lastSpan.End - start, line),
+                Multiline = true,
+                Comment = sb.ToString()
+            };
+
+            if (token == null)
+            {
+                var end = lastSpan.End;
+                context.Issues.Add(new TextSpan(end - 1, 1, lastSpan.Line), ParserIssueType.Error, "Expected end of multiline comment */");
+            }
+
+            return comment;
         }
 
         private static SyntaxNode ParseQuotation(ParserContext context)
@@ -406,12 +443,8 @@ namespace Scriber.Language
                 if (field != null)
                 {
                     list.Add(field);
-                    token = context.Tokens.Peek();
                 }
-                else
-                {
-                    token = context.Tokens.Dequeue();
-                }
+                token = context.Tokens.Peek();
             }
 
             if (list.Count > 0)
@@ -445,7 +478,14 @@ namespace Scriber.Language
             {
                 // In order to parse the next field correctly, we read the current field to the end.
                 ParseBlock(context, TokenType.Semicolon, TokenType.CurlyClose);
-                context.Issues.Add(token.Span, ParserIssueType.Error, "Field name and : expected.");
+                nextToken = context.Tokens.Peek() ?? nextToken;
+                if (nextToken != null)
+                {
+                    last = nextToken.Span.Start;
+                }
+                span = new TextSpan(span.Start, last - span.Start, span.Line);
+                
+                context.Issues.Add(span, ParserIssueType.Error, "Field name and : expected.");
                 return null;
             }
 
@@ -623,7 +663,10 @@ namespace Scriber.Language
                         list.Add(ParsePercent(context));
                         break;
                     case TokenType.DoubleSlash:
-                        list.Add(ParseSingleLineComment(context));
+                        list.Add(ParseSinglelineComment(context));
+                        break;
+                    case TokenType.SlashAsterisk:
+                        list.Add(ParseMultilineComment(context));
                         break;
                     case TokenType.At:
                         list.Add(ParseCommand(context));

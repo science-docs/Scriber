@@ -11,7 +11,7 @@ namespace Scriber.Layout.Document
 
         public string[] FormInput { get; set; } = Array.Empty<string>();
 
-        public override bool IsVisible => false;
+        //public override bool IsVisible => false;
 
         private readonly PdfDocument document;
 

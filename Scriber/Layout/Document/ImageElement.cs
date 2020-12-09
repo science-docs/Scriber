@@ -76,7 +76,7 @@ namespace Scriber.Layout.Document
                 if (width != null)
                 {
                     var aspectRatio = OriginalWidth.Presentation / OriginalHeight.Presentation;
-                    height = new Unit(width.Value.Presentation * aspectRatio, UnitType.Presentation);
+                    height = new Unit(width.Value.Presentation / aspectRatio, UnitType.Presentation);
                 }
                 else if (height != null)
                 {
