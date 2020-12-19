@@ -6,10 +6,13 @@ namespace Scriber.Language
 {
     public static class Lexer
     {
+
+
         public static IEnumerable<Token> Tokenize(ReadOnlySpan<char> span)
         {
             int line = 0;
             bool ignore = false;
+            bool inStringLiteral = false;
             char c;
             Token? cur = null;
             StringBuilder sb = new StringBuilder();
@@ -27,7 +30,7 @@ namespace Scriber.Language
                 if (c == '\n')
                 {
                     EndCurrentToken(tokens, sb, ref cur);
-                    tokens.Add(new Token(c, TokenType.Newline, i, line++));
+                    tokens.Add(new Token(TokenType.Newline, i, line++, c.ToString()));
                     continue;
                 }
                 else
@@ -52,57 +55,53 @@ namespace Scriber.Language
 
                 ignore = false;
 
-                if (IsSpecialCharacter(c))
-                {
-                    if (cur != null)
-                    {
-                        cur.Content = sb.ToString();
-                        sb.Clear();
-                        // do not return empty text passages
-                        tokens.Add(cur);
-                        cur = null;
-                    }
-
-                    var type = GetTokenType(c);
-                    if (IsSingleToken(type))
-                    {
-                        tokens.Add(new Token(c, type, i, line));
-                    }
-                    else
-                    {
-                        cur = new Token(c, GetTokenType(c), i, line);
-                        sb.Append(c);
-                    }
-                }
-                else if (c == '/' && i < span.Length - 1)
-                {
-                    var next = span[i + 1];
-                    if (next == '/')
-                    {
-                        EndCurrentToken(tokens, sb, ref cur);
-                        tokens.Add(new Token(c, TokenType.DoubleSlash, i++, line));
-                    }
-                    else if (next == '*')
-                    {
-                        EndCurrentToken(tokens, sb, ref cur);
-                        tokens.Add(new Token(c, TokenType.SlashAsterisk, i++, line));
-                    }
-                    else
-                    {
-                        cur = new Token(c, TokenType.Text, i, line);
-                        sb.Append(c);
-                    }
-                }
-                else if (c == '*' && i < span.Length - 1 && span[i + 1] == '/')
+                int index = i;
+                if (IsNext(span, ref i, "/*"))
                 {
                     EndCurrentToken(tokens, sb, ref cur);
-                    tokens.Add(new Token(c, TokenType.AsteriskSlash, i++, line));
+                    tokens.Add(new Token(TokenType.SlashAsterisk, index, line, "/*"));
+                }
+                else if (IsNext(span, ref i, "//"))
+                {
+                    EndCurrentToken(tokens, sb, ref cur);
+                    tokens.Add(new Token(TokenType.DoubleSlash, index, line, "//"));
+                }
+                else if (IsNext(span, ref i, "*/"))
+                {
+                    EndCurrentToken(tokens, sb, ref cur);
+                    tokens.Add(new Token(TokenType.AsteriskSlash, index, line, "*/"));
+                }
+                else if (IsNext(span, ref i, "@\""))
+                {
+                    inStringLiteral = true;
+                    EndCurrentToken(tokens, sb, ref cur);
+                    tokens.Add(new Token(TokenType.QuotedRaw, index, line, "@\""));
+                }
+                else if (inStringLiteral && IsNext(span, ref i, "{{"))
+                {
+                    EndCurrentToken(tokens, sb, ref cur);
+                    tokens.Add(new Token(TokenType.DoubleCurlyOpen, index, line, "{{"));
+                }
+                else if (inStringLiteral && IsNext(span, ref i, "}}"))
+                {
+                    EndCurrentToken(tokens, sb, ref cur);
+                    tokens.Add(new Token(TokenType.DoubleCurlyClose, index, line, "}}"));
+                }
+                else if (IsSpecialCharacter(c))
+                {
+                    EndCurrentToken(tokens, sb, ref cur);
+                    tokens.Add(new Token(GetTokenType(c), i, line, c.ToString()));
+
+                    if (c == '"')
+                    {
+                        inStringLiteral = false;
+                    }
                 }
                 else
                 {
                     if (cur == null)
                     {
-                        cur = new Token(c, TokenType.Text, i, line);
+                        cur = new Token(i, line);
                     }
                     sb.Append(c);
                 }
@@ -133,15 +132,24 @@ namespace Scriber.Language
             return char.IsWhiteSpace(c) || c == ';' || c == ':' || c == '"' || c == '@' || c == '%' || c == '\n' || c == '$' || c == '&' || c == '~' || c == '_' || c == '(' || c == ')' || c == '{' || c == '}' || c == '^' || c == '[' || c == ']';
         }
 
-        private static bool IsSingleToken(TokenType token)
+        private static bool IsNext(ReadOnlySpan<char> span, ref int index, string value)
         {
-            return token switch
+            if (value.Length + index > span.Length)
             {
-                TokenType.Text => false,
-                TokenType.Underscore => false,
-                TokenType.Caret => false,
-                _ => true
-            };
+                return false;
+            }
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (span[i + index] != value[i])
+                {
+                    return false;
+                }
+            }
+
+
+            index += value.Length - 1;
+            return true;
         }
 
         private static TokenType GetTokenType(char c)

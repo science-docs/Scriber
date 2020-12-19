@@ -8,6 +8,6 @@ namespace Scriber.Language
     {
         public Resource? Resource { get; set; }
         public ParserIssueCollection Issues { get; } = new ParserIssueCollection();
-        public TokenQueue Tokens { get; set; } = new TokenQueue();
+        public TokenQueue Tokens { get; set; } = new TokenQueue(Array.Empty<Token>());
     }
 }

@@ -11,6 +11,7 @@ namespace Scriber.Engine.Instructions
     public static class EngineInstruction
     {
         private static readonly TextInstruction textInstruction = new TextInstruction();
+        private static readonly QuoteInstruction quoteInstruction = new QuoteInstruction();
         private static readonly BlockInstruction blockInstruction = new BlockInstruction();
         private static readonly CommandInstruction commandInstruction = new CommandInstruction();
         private static readonly ArgumentInstruction argumentInstruction = new ArgumentInstruction();
@@ -31,6 +32,7 @@ namespace Scriber.Engine.Instructions
             var result = node switch
             {
                 TextSyntax text => textInstruction.Evaluate(state, text),
+                QuoteSyntax quote => quoteInstruction.Evaluate(state, quote),
                 StringLiteralSyntax stringLiteral => stringInstruction.Evaluate(state, stringLiteral),
                 ArgumentSyntax argumentSyntax => argumentInstruction.Evaluate(state, argumentSyntax),
                 CommandSyntax command => commandInstruction.Evaluate(state, command),

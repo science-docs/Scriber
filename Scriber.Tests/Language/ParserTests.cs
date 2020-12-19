@@ -35,7 +35,7 @@ namespace Scriber.Language.Tests
         [Theory]
         [InlineData("@Command()", 0)]
         [InlineData("@Command(x)", 1)]
-        [InlineData("@Command(\"\")", 1)]
+        [InlineData("@Command(@\"\")", 1)]
         [InlineData("@Command(Some text)", 1)]
         [InlineData("@Command(Some text; some more)", 2)]
         [InlineData("@Command(;)", 2)]
@@ -146,10 +146,16 @@ namespace Scriber.Language.Tests
         [InlineData("some content")]
         [InlineData("some  spaced   content")]
         [InlineData("some \n newline content")]
-        public void QuotationTest(string input)
+        public void StringLiteralTest(string input)
         {
-            var quotation = ParseAsSyntax<StringLiteralSyntax>('"' + input + '"');
+            var quotation = ParseAsSyntax<StringLiteralSyntax>("@\"" + input + '"');
             Assert.Equal(input, quotation.Content);
+        }
+
+        [Fact]
+        public void QuoteTest()
+        {
+            ParseAsSyntax<QuoteSyntax>("\"");
         }
 
         [Fact]

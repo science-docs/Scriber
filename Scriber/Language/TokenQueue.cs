@@ -7,15 +7,12 @@ namespace Scriber.Language
     public class TokenQueue
     {
         private readonly LinkedList<Token> tokens;
-
-        public TokenQueue()
-        {
-            tokens = new LinkedList<Token>();
-        }
+        private Token? lastToken;
 
         public TokenQueue(IEnumerable<Token> tokens)
         {
             this.tokens = new LinkedList<Token>(tokens);
+            lastToken = this.tokens.Last?.Value;
         }
 
         public int Count => tokens.Count;
@@ -25,14 +22,14 @@ namespace Scriber.Language
             tokens.AddLast(token);
         }
 
-        public Token? Dequeue()
+        public Token Dequeue()
         {
             var token = tokens.First;
             if (token != null)
             {
                 tokens.RemoveFirst();
             }
-            return token?.Value;
+            return token?.Value ?? CreateEndToken();
         }
 
         public void Dequeue(int count)
@@ -87,23 +84,37 @@ namespace Scriber.Language
             return false;
         }
 
-        public Token? Peek()
+        public Token Peek()
         {
-            return tokens?.First?.Value;
+            var token = tokens.First?.Value;
+
+            if (token == null)
+            {
+                return CreateEndToken();
+            }
+
+            return token;
         }
 
-        public Token? Peek(int depth)
+        public Token Peek(int depth)
         {
             var token = tokens.First;
             for (int i = 0; i < depth; i++)
             {
                 if (token == null)
                 {
-                    return null;
+                    return CreateEndToken();
                 }
                 token = token.Next;
             }
-            return token?.Value;
+            return token?.Value ?? CreateEndToken();
+        }
+
+        private Token CreateEndToken()
+        {
+            var span = lastToken == null ? new TextSpan(0, 0, 0) : lastToken.Span;
+            var token = new Token(TokenType.None, span.End, span.Line, string.Empty);
+            return token;
         }
     }
 }

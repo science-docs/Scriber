@@ -17,6 +17,11 @@ namespace Scriber.Language
             Line = line;
         }
 
+        public TextSpan WithEnd(int end)
+        {
+            return new TextSpan(Start, end - Start, Line);
+        }
+
         public override bool Equals(object? obj)
         {
             if (obj is TextSpan textSpan)
