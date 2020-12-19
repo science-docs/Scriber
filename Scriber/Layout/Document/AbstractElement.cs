@@ -1,4 +1,6 @@
 ﻿using Scriber.Text;
+using System;
+using System.Collections.Generic;
 
 namespace Scriber.Layout.Document
 {
@@ -57,6 +59,8 @@ namespace Scriber.Layout.Document
             get => document ?? Parent?.Document;
             set => document = value;
         }
+
+        public virtual IEnumerable<Symbol> Symbols => Array.Empty<Symbol>();
 
         public object? Tag { get; set; }
 

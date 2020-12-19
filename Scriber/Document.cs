@@ -11,6 +11,8 @@ using Scriber.Bibliography;
 using Scriber.Localization;
 using Scriber.Variables;
 using System.Threading.Tasks;
+using System.Linq;
+using Scriber.Text;
 
 namespace Scriber
 {
@@ -39,13 +41,15 @@ namespace Scriber
         public string? Title { get; set; }
         public string? Author { get; set; }
 
+        public override IEnumerable<Symbol> Symbols => Elements.SelectMany(e => e.Symbols);
+
         public Document()
         {
             //Locale = new Locale(Culture);
             Elements = new ElementCollection<DocumentElement>(this);
             PageItems = new ElementCollection<DocumentElement>(this);
             Measurements = new Measurements();
-            
+
             Font = Text.Font.Default;
             FontSize = 12;
         }

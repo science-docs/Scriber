@@ -1,24 +1,30 @@
-﻿namespace Scriber.Layout.Document
+﻿using Scriber.Text;
+using System;
+using System.Collections.Generic;
+
+namespace Scriber.Layout.Document
 {
     public class FootnoteLeaf : Leaf, ITextLeaf
     {
-        public string? Content { get; }
+        public string Content { get; }
         public Paragraph Element { get; }
 
-        public FootnoteLeaf(string? content, Paragraph value) : this(content, value, true)
+        public override IEnumerable<Symbol> Symbols => Element.Symbols;
+
+        public FootnoteLeaf(string content, Paragraph value) : this(content, value, true)
         {
         }
 
-        private FootnoteLeaf(string? content, Paragraph value, bool addPrefix)
+        private FootnoteLeaf(string content, Paragraph value, bool addPrefix)
         {
-            FontStyle = Text.FontStyle.Superscript;
+            FontStyle = FontStyle.Superscript;
             Content = content;
-            Element = value;
+            Element = value ?? throw new ArgumentNullException(nameof(value));
             value.VerticalAlignment = VerticalAlignment.Bottom;
 
             if (addPrefix)
             {
-                value.Leaves.Insert(0, new TextLeaf(content) { FontStyle = Text.FontStyle.Superscript });
+                value.Leaves.Insert(0, new TextLeaf(content) { FontStyle = FontStyle.Superscript });
             }
         }
 
@@ -35,10 +41,6 @@
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (Content == null)
-            {
-                throw new LayoutException("Content property is null");
-            }
             if (Font == null)
             {
                 throw new LayoutException("Font property is null");

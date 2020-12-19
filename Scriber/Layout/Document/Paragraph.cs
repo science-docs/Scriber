@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Scriber.Drawing;
+using Scriber.Text;
 using Scriber.Variables;
 
 namespace Scriber.Layout.Document
@@ -12,6 +13,8 @@ namespace Scriber.Layout.Document
 
         private List<LineNode>? lineNodes;
         private PositionedItem[][]? lines;
+
+        public override IEnumerable<Symbol> Symbols => Leaves.SelectMany(e => e.Symbols);
 
         public Paragraph()
         {
