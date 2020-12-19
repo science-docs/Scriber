@@ -23,15 +23,18 @@ namespace Scriber.Text
 
         public static Hyphenator FromCulture(string culture)
         {
-            if (hyphenators.TryGetValue(culture, out Hyphenator? hyph))
+            lock (hyphenators)
             {
-                return hyph;
-            }
-            else
-            {
-                hyph = new Hyphenator(culture);
-                hyphenators[culture] = hyph;
-                return hyph;
+                if (hyphenators.TryGetValue(culture, out Hyphenator? hyph))
+                {
+                    return hyph;
+                }
+                else
+                {
+                    hyph = new Hyphenator(culture);
+                    hyphenators[culture] = hyph;
+                    return hyph;
+                }
             }
         }
 
@@ -45,7 +48,10 @@ namespace Scriber.Text
             {
                 var hyphenatedText = hyphenator.HyphenateText(value);
                 hyphenated = hyphenatedText.Split(Symbol);
-                cache[value] = hyphenated;
+                lock (cache)
+                {
+                    cache[value] = hyphenated;
+                }
                 return hyphenated;
             }
         }

@@ -36,8 +36,11 @@ namespace Scriber.Text
             else
             {
                 var width = graphics.MeasureString(text, GetXFont(size, weight)).Width;
-                fontWidths[(text, weight)] = width / size;
-                return width;
+                lock (fontWidths)
+                {
+                    fontWidths[(text, weight)] = width / size;
+                    return width;
+                }
             }
         }
 
@@ -50,8 +53,11 @@ namespace Scriber.Text
             else
             {
                 font = new XFont(Name, size, (XFontStyle)(int)weight);
-                fonts[(Name, weight, size)] = font;
-                return font;
+                lock (fonts)
+                {
+                    fonts[(Name, weight, size)] = font;
+                    return font;
+                }
             }
         }
 
