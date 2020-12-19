@@ -54,6 +54,7 @@ namespace Scriber.Engine
             foreach (var package in packages)
             {
                 FindCommands(context, package);
+                FindVariables(context, package);
             }
 
             var converters = asm.GetTypes().Where(e => IsConverter(e));
@@ -97,6 +98,24 @@ namespace Scriber.Engine
                     context.Commands.Add(CommandFactory.Create(command, method));
                 }
             }
+        }
+
+        private void FindVariables(Context context, Type type)
+        {
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Static);
+
+            foreach (var property in properties)
+            {
+                if (IsVariable(property))
+                {
+                    context.Variables.Add(Variable.FromPropertyInfo(property));
+                }
+            }
+        }
+
+        private bool IsVariable(PropertyInfo property)
+        {
+            return property.GetCustomAttribute<VariableAttribute>() != null;
         }
 
         private bool IsCommand(MethodInfo method, out CommandAttribute? command)
