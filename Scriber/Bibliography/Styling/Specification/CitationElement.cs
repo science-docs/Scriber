@@ -20,6 +20,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the 'disambiguate-add-names' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
@@ -41,6 +42,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the 'disambiguate-add-givenname' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
@@ -63,6 +65,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the 'givenname-disambiguation-rule' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
@@ -89,6 +92,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the 'disambiguate-add-year-suffix' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
@@ -110,6 +114,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the 'cite-group-delimiter' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
@@ -129,6 +134,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the 'collapse' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
@@ -150,6 +156,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the 'year-suffix-delimiter' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
@@ -171,6 +178,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the 'after-collapse-delimiter' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
@@ -192,6 +200,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the 'near-note-distance' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>

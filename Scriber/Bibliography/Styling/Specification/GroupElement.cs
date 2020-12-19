@@ -18,30 +18,18 @@ namespace Scriber.Bibliography.Styling.Specification
         /// into one or more text blocks. If used, all rendering elements should be under the control of a display attribute. 
         /// </summary>
         [XmlAttribute("display")]
-        public Display Display
-        {
-            get;
-            set;
-        }
+        public Display Display { get; set; }
         /// <summary>
         /// Indicates whether the 'display' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
         [XmlIgnore]
-        public bool DisplaySpecified
-        {
-            get;
-            set;
-        }
+        public bool DisplaySpecified { get; set; }
 
         /// <summary>
         /// The delimiter attribute delimits non-empty pieces of output.
         /// </summary>
         [XmlAttribute("delimiter")]
-        public string? Delimiter
-        {
-            get;
-            set;
-        }
+        public string? Delimiter { get; set; }
 
         /// <summary>
         /// Gets or sets the rendering elements to be grouped.
@@ -53,11 +41,7 @@ namespace Scriber.Bibliography.Styling.Specification
         [XmlElement("names", Type = typeof(NamesElement))]
         [XmlElement("label", Type = typeof(LabelElement))]
         [XmlElement("text", Type = typeof(TextElement))]
-        public List<RenderingElement> Children
-        {
-            get;
-            set;
-        } = new List<RenderingElement>();
+        public List<RenderingElement> Children { get; set; } = new List<RenderingElement>();
 
         public override void EvaluateOverride(Interpreter interpreter)
         {

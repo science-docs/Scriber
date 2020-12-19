@@ -12,7 +12,6 @@ namespace Scriber.Autocomplete
 
         public FileProposalProvider() : this("*")
         {
-
         }
 
         public FileProposalProvider(string filter)

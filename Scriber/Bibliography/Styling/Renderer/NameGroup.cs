@@ -1,4 +1,5 @@
 ﻿using Scriber.Bibliography.Styling.Specification;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,24 +9,21 @@ namespace Scriber.Bibliography.Styling.Renderer
     {
         public NameGroup(string? variable, TermName? term, IEnumerable<IName> names)
         {
-            // init
+            if (names is null)
+            {
+                throw new ArgumentNullException(nameof(names));
+            }
+
             Variable = variable;
             Term = term;
-            Names = names?.ToArray();
+            Names = names.ToArray();
         }
 
-        public string? Variable
-        {
-            get;
-        }
-        public TermName? Term
-        {
-            get;
-        }
-        public IReadOnlyList<IName>? Names
-        {
-            get;
-        }
+        public string? Variable { get; }
+
+        public TermName? Term { get; }
+
+        public IReadOnlyList<IName> Names { get; }
 
         public static bool AreNamesEqual(IName name1, IName name2)
         {

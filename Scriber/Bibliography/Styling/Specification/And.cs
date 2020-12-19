@@ -17,11 +17,13 @@ namespace Scriber.Bibliography.Styling.Specification
         /// </summary>
         [XmlIgnore]
         Delimiter,
+
         /// <summary>
         /// Selects the “and” term, e.g. “Doe, Johnson and Smith”.
         /// </summary>
         [XmlEnum("text")]
         Text,
+
         /// <summary>
         /// Selects the ampersand, e.g. “Doe, Johnson &amp; Smith”.
         /// </summary>

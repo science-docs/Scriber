@@ -17,21 +17,25 @@ namespace Scriber.Bibliography.Styling.Specification
         /// </summary>
         [XmlEnum("numeric")]
         Numeric,
+
         /// <summary>
         /// “numeric-leading-zeros” - e.g. “01” - allowed for day and month parts.
         /// </summary>
         [XmlEnum("numeric-leading-zeros")]
         NumericLeadingZeros,
+
         /// <summary>
         /// “ordinal” - e.g. “1st” - allowed for day parts.
         /// </summary>
         [XmlEnum("ordinal")]
         Ordinal,
+
         /// <summary>
         /// “long” - (default), e.g. “January” or “2005” - allowed for month and year parts.
         /// </summary>
         [XmlEnum("long")]
         Long,
+
         /// <summary>
         /// “short” - e.g. “Jan.” (month) or “05” (year) - allowed for month and year parts.
         /// </summary>

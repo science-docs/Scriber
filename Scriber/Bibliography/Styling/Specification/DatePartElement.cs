@@ -181,6 +181,5 @@ namespace Scriber.Bibliography.Styling.Specification
         //    method.AddLiteral(this.TextCaseSpecified ? (object)this.TextCase : null);
         //    method.AddDefaultParameters();
         //}
-
     }
 }

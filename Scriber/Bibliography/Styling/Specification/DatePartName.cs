@@ -17,11 +17,13 @@ namespace Scriber.Bibliography.Styling.Specification
         /// </summary>
         [XmlEnum("day")]
         Day,
+
         /// <summary>
         /// Month part.
         /// </summary>
         [XmlEnum("month")]
         Month,
+
         /// <summary>
         /// Year part.
         /// </summary>

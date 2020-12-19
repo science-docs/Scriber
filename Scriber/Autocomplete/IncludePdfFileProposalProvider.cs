@@ -4,7 +4,6 @@
     {
         public IncludePdfFileProposalProvider() : base(BuildFilter("pdf"))
         {
-
         }
     }
 }

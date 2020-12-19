@@ -31,13 +31,9 @@ namespace Scriber.Bibliography.Styling.Formatting
 
         internal override IEnumerable<TextRun> GetTextRuns()
         {
-            return this.Children
+            return Children
                 .SelectMany(x => x.GetTextRuns());
         }
-        internal IEnumerable<ComposedRun> GetComposedRuns()
-        {
-            // done
-            return new ComposedRun[] { this }.Concat(this.Children.OfType<ComposedRun>().SelectMany(x => x.GetComposedRuns()));
-        }
+
     }
 }

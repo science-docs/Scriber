@@ -1,5 +1,4 @@
-﻿using Scriber.Bibliography.Styling.Formatting;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace Scriber.Bibliography.Styling.Specification
 {
@@ -59,14 +58,7 @@ namespace Scriber.Bibliography.Styling.Specification
         /// <summary>
         /// Specifies the text string used to separate names in a name variable. Default is ”, ” (e.g. “Doe, Smith”).
         /// </summary>
-        string? INameOptions.Delimiter
-        {
-            get
-            {
-                return this.NameDelimiter;
-            }
-        }
-
+        string? INameOptions.Delimiter => NameDelimiter;
 
         /// <summary>
         /// Specifies the delimiter for names of the different name variables (e.g. the semicolon in “Doe, Smith (editors); Johnson (translator)”).
@@ -80,13 +72,7 @@ namespace Scriber.Bibliography.Styling.Specification
         /// <summary>
         /// Specifies the delimiter for names of the different name variables (e.g. the semicolon in “Doe, Smith (editors); Johnson (translator)”).
         /// </summary>
-        string? INamesOptions.Delimiter
-        {
-            get
-            {
-                return NamesDelimiter;
-            }
-        }
+        string? INamesOptions.Delimiter => NamesDelimiter;
 
         /// <summary>
         /// Determines when the name delimiter or a space is used between a truncated name list and the “et-al”
@@ -253,23 +239,11 @@ namespace Scriber.Bibliography.Styling.Specification
         /// that would otherwise be rendered by the use of the cs:names element (taking into account the effects of et-al abbreviation
         /// and editor/translator collapsing), which allows for advanced sorting.
         /// </summary>
-        NameFormat INameOptions.Format
-        {
-            get
-            {
-                return this.NameFormat;
-            }
-        }
+        NameFormat INameOptions.Format => NameFormat;
         /// <summary>
         /// Indicates whether the 'name-form' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
-        bool INameOptions.FormatSpecified
-        {
-            get
-            {
-                return this.NameFormatSpecified;
-            }
-        }
+        bool INameOptions.FormatSpecified => NameFormatSpecified;
 
         /// <summary>
         /// When set to “false” (the default is “true”), given names are no longer initialized when “initialize-with” is set. However,

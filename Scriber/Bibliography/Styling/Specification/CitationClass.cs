@@ -17,6 +17,7 @@ namespace Scriber.Bibliography.Styling.Specification
         /// </summary>
         [XmlEnum("in-text")]
         InText,
+
         /// <summary>
         /// Note citations.
         /// </summary>

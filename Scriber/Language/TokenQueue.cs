@@ -7,7 +7,7 @@ namespace Scriber.Language
     public class TokenQueue
     {
         private readonly LinkedList<Token> tokens;
-        private Token? lastToken;
+        private readonly Token? lastToken;
 
         public TokenQueue(IEnumerable<Token> tokens)
         {

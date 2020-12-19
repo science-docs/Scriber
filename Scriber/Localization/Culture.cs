@@ -76,6 +76,7 @@ namespace Scriber.Localization
         /// The language of the culture, in lowercase.
         /// </summary>
         public string Language { get; }
+
         /// <summary>
         /// The dialect of the culture, in uppercase.
         /// </summary>
@@ -91,6 +92,7 @@ namespace Scriber.Localization
                 return !string.IsNullOrEmpty(Language) && !string.IsNullOrEmpty(Dialect);
             }
         }
+
         /// <summary>
         /// Indicates whether language is set but dialect is not set. 
         /// </summary>
@@ -101,6 +103,7 @@ namespace Scriber.Localization
                 return !string.IsNullOrEmpty(Language) && string.IsNullOrEmpty(Dialect);
             }
         }
+
         /// <summary>
         /// Indicates whether both language and dialect are not set. 
         /// </summary>
@@ -121,6 +124,7 @@ namespace Scriber.Localization
         {
             return new Culture(value);
         }
+
         /// <summary>
         /// Implicit conversion operator from string.
         /// </summary>
@@ -154,6 +158,7 @@ namespace Scriber.Localization
             // Return true if the fields match:
             return a.Equals(b);
         }
+
         /// <summary>
         /// Inequal operator.
         /// </summary>
@@ -164,6 +169,7 @@ namespace Scriber.Localization
         {
             return !(a == b);
         }
+
         /// <summary>
         /// Indicates whether this instance and a specified object are equal.
         /// </summary>
@@ -173,6 +179,7 @@ namespace Scriber.Localization
         {
             return obj is Culture culture && Equals(culture);
         }
+
         /// <summary>
         /// Indicates whether this instance and a specified object are equal.
         /// </summary>
@@ -182,13 +189,14 @@ namespace Scriber.Localization
         {
             return other != null && other.Language == Language && other.Dialect == Dialect;
         }
+
         /// <summary>
         /// Returns the hash code for this instance.
         /// </summary>
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return HashCode.Combine(Language, Dialect);
         }
 
         public CultureInfo GetCultureInfo()
