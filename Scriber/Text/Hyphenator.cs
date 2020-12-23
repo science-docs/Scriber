@@ -1,4 +1,4 @@
-﻿using Scriber.Localization;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 
@@ -13,7 +13,7 @@ namespace Scriber.Text
 
         private static readonly Dictionary<string, Hyphenator> hyphenators = new Dictionary<string, Hyphenator>();
 
-        private readonly Dictionary<string, string[]> cache = new Dictionary<string, string[]>();
+        private readonly ConcurrentDictionary<string, string[]> cache = new ConcurrentDictionary<string, string[]>();
 
         private Hyphenator(string culture)
         {
@@ -23,18 +23,15 @@ namespace Scriber.Text
 
         public static Hyphenator FromCulture(string culture)
         {
-            lock (hyphenators)
+            if (hyphenators.TryGetValue(culture, out Hyphenator? hyph))
             {
-                if (hyphenators.TryGetValue(culture, out Hyphenator? hyph))
-                {
-                    return hyph;
-                }
-                else
-                {
-                    hyph = new Hyphenator(culture);
-                    hyphenators[culture] = hyph;
-                    return hyph;
-                }
+                return hyph;
+            }
+            else
+            {
+                hyph = new Hyphenator(culture);
+                hyphenators[culture] = hyph;
+                return hyph;
             }
         }
 
@@ -48,10 +45,7 @@ namespace Scriber.Text
             {
                 var hyphenatedText = hyphenator.HyphenateText(value);
                 hyphenated = hyphenatedText.Split(Symbol);
-                lock (cache)
-                {
-                    cache[value] = hyphenated;
-                }
+                cache[value] = hyphenated;
                 return hyphenated;
             }
         }

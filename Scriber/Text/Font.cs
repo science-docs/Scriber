@@ -1,5 +1,6 @@
 ﻿using PdfSharpCore.Drawing;
 using PdfSharpCore.Fonts;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Scriber.Text
@@ -25,7 +26,7 @@ namespace Scriber.Text
             Name = name;
         }
 
-        private readonly Dictionary<(string, FontWeight), double> fontWidths = new Dictionary<(string, FontWeight), double>();
+        private readonly ConcurrentDictionary<(string, FontWeight), double> fontWidths = new ConcurrentDictionary<(string, FontWeight), double>();
 
         public double GetWidth(string text, double size, FontWeight weight)
         {
@@ -36,11 +37,8 @@ namespace Scriber.Text
             else
             {
                 var width = graphics.MeasureString(text, GetXFont(size, weight)).Width;
-                lock (fontWidths)
-                {
-                    fontWidths[(text, weight)] = width / size;
-                    return width;
-                }
+                fontWidths[(text, weight)] = width / size;
+                return width;
             }
         }
 

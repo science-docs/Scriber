@@ -69,8 +69,18 @@ namespace Scriber.Localization
 
         public Hyphenator GetHyphenator()
         {
-            return Hyphenator.FromCulture(ToString());
+            if (hyphenator != null)
+            {
+                return hyphenator;
+            }
+
+            lock (this)
+            {
+                return hyphenator = Hyphenator.FromCulture(ToString());
+            }
         }
+
+        private Hyphenator? hyphenator;
 
         /// <summary>
         /// The language of the culture, in lowercase.
