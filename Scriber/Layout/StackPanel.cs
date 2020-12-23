@@ -1,4 +1,5 @@
 ﻿using Scriber.Layout.Document;
+using Scriber.Layout.Styling;
 
 namespace Scriber.Layout
 {
@@ -8,7 +9,7 @@ namespace Scriber.Layout
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            var measurement = new Measurement(this, null, Margin);
+            var measurement = new Measurement(this, null, Style.Get(StyleKeys.Margin));
 
             if (Orientation == Orientation.Vertical)
             {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Scriber.Engine;
-using Scriber.Language;
 using Scriber.Logging;
 using Scriber.Maths;
 
@@ -32,10 +32,10 @@ namespace Scriber.CLI
             //sb.AppendLine("Some text");
             //sb.AppendLine("@CenterHeader(@IncludeGraphics(tfl.png))");
             //sb.AppendLine("@CenterFooter(@ThePage)");
-            //sb.AppendLine("@FontSize(3*4)");
+            sb.AppendLine("@Language(de)");
             //sb.AppendLine("Some Text\nMore Text\n\n@Heading*(1; A)");
-            //sb.AppendLine("@TableOfContent()");
-            //sb.AppendLine("@Heading(1; B)");
+            sb.AppendLine("@TableOfContent()");
+            sb.AppendLine("@Heading(1; B)");
             //sb.AppendLine("Test@Footnote(\"\")");
             //sb.AppendLine("@Pagebreak()").AppendLine();
             //sb.AppendLine("Some @Color(Red; Red Text) in a paragraph.").AppendLine();
@@ -141,19 +141,23 @@ namespace Scriber.CLI
             //////sb.AppendLine("\\caption{Second Test Image}");
             //////sb.AppendLine("\\end{figure}");
             //sb.AppendLine("@UseTemplate(nak.sc)");
-            sb.AppendLine("@TableOfFigures()");
-            sb.AppendLine("@Acronyms({ CPU: Computer Processing Unit; FP: Floating Point })").AppendLine();
-            sb.AppendLine("This is the full name '@Acronym(FP)' for acronym '@Acronym(FP)'.");
-            sb.AppendLine("@VerticalSpace(550pt)");
-            sb.AppendLine("@FootnoteSize(6)");
-            sb.AppendLine("@FontSize(14)");
-            sb.AppendLine("Some text");
+            //sb.AppendLine("@TableOfFigures()");
+            //sb.AppendLine("@Acronyms({ CPU: Computer Processing Unit; FP: Floating Point })").AppendLine();
+            //sb.AppendLine("This is the full name '@Acronym(FP)' for acronym '@Acronym(FP)'.");
+            //sb.AppendLine("@VerticalSpace(550pt)");
+            //sb.AppendLine("@Geometry({ Top: 2cm; Bottom: 2cm; Left: 2cm; Right: 2cm })");
+            //sb.AppendLine("@FontSize(14)");
+            sb.AppendLine("@Language(de)");
+            sb.AppendLine("@BibliographyStyle(ieee.csl)");
+            sb.AppendLine("@Bibliography(lib.bib)");
+            sb.AppendLine("@Cite(WinNT)");
+            sb.AppendLine("@PrintBibliography()");
 
             //sb.AppendLine("@Section(First)");
             //sb.AppendLine("@Subsection(Second)");
             //sb.AppendLine("@Label(section, x)");
             //sb.AppendLine("blabla @Reference(x)");
-            sb.AppendLine("@Figure { @Centering()\n @IncludeGraphics(\"https://asia.olympus-imaging.com/content/000107506.jpg\")\n @Caption(Second Test Image@Footnote(More Footnotes)) }");
+            //sb.AppendLine("@Figure { @Centering()\n @IncludeGraphics(\"https://asia.olympus-imaging.com/content/000107506.jpg\")\n @Caption(Second Test Image@Footnote(More Footnotes)) }");
             //sb.AppendLine("@FontSize(20, Some Larger Text, Some more text)").AppendLine();
             //sb.AppendLine("");
             //sb.AppendLine("");
@@ -215,12 +219,19 @@ namespace Scriber.CLI
             //sb.Append("@Figure() { }");
             //sb.AppendLine("@includegraphics(\"test-image.png\")");
 
-            var tokens = Lexer.Tokenize(sb.ToString());
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    sb.AppendLine().AppendLine("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem");
+            //}
+
+            var resource = context.ResourceSet.Get(new Uri("C:\\Users\\Mark\\Desktop\\Docdown\\test.sc"));
+            //var tokens = Lexer.Tokenize(resource.GetContentAsString());
             context.Logger.Logged += Logger_Logged;
-            var parserResult = Parser.Parse(tokens, null, context.Logger);
-            var result = Compiler.Compile(context, parserResult.Nodes);
+            //var parserResult = Parser.Parse(tokens, resource, context.Logger);
+            var result = Compiler.Compile(context, resource);
 
             var document = result.Document;
+            document.Symbols.Count();
             document.Run(context.Logger);
 
             var s = sb.ToString();

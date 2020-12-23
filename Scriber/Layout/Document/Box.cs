@@ -1,4 +1,5 @@
 ﻿using Scriber.Drawing;
+using Scriber.Layout.Styling;
 
 namespace Scriber.Layout.Document
 {
@@ -23,7 +24,7 @@ namespace Scriber.Layout.Document
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            return new Measurement(this, Size, Margin);
+            return new Measurement(this, Size, Style.Get(StyleKeys.Margin));
         }
     }
 }

@@ -16,14 +16,14 @@ namespace Scriber.Engine.Commands
             {
                 Orientation = Orientation.Vertical,
                 Flexible = true,
-                Margin = new Thickness(12, 0)
+                Tag = "figure"
             };
 
             var elements = content.Select(e => e.Value).OfType<DocumentElement>().ToArray();
 
             panel.Elements.AddRange(elements);
 
-            var caption = elements.OfType<Paragraph>().Where(e => Equals(e.Tag, "caption")).FirstOrDefault();
+            var caption = elements.OfType<Paragraph>().Where(e => "caption".Equals(e.Tag, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             
             if (caption != null)
             {
@@ -53,7 +53,7 @@ namespace Scriber.Engine.Commands
                 var panel = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Margin = new Thickness(12, 0)
+                    Tag = "div"
                 };
 
                 var figures = TableVariables.TableOfFigures.Get(state.Document);

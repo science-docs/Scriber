@@ -128,14 +128,15 @@ namespace Scriber.Engine.Commands
                 lvl = Math.Clamp(lvl, 1, MaxLevel);
             }
             var paragraph = content.Value;
-            paragraph.FontSize = lvl switch
-            {
-                1 => 18,
-                2 => 16,
-                3 => 14,
-                _ => 12
-            };
-            paragraph.Margin = new Thickness(14 - lvl * 2, 0);
+            paragraph.Tag = "h" + lvl;
+            //paragraph.FontSize = lvl switch
+            //{
+            //    1 => 18,
+            //    2 => 16,
+            //    3 => 14,
+            //    _ => 12
+            //};
+            //paragraph.Margin = new Thickness(14 - lvl * 2, 0);
             AddOutline(state, lvl, paragraph);
 
             if (preamble != null)

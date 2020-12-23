@@ -1,4 +1,5 @@
 ﻿using Scriber.Drawing;
+using Scriber.Layout.Styling;
 
 namespace Scriber.Layout.Document
 {
@@ -16,7 +17,7 @@ namespace Scriber.Layout.Document
         public TableElement(string? preamble, int level, Paragraph content, AbstractElement reference)
         {
             Preamble = preamble;
-            Margin = new Thickness(3, 0);
+            //Margin = new Thickness(3, 0);
             Columns.Add(new GridLength(GridUnit.Point, CalculateLeft(level)));
             Columns.Add(new GridLength(GridUnit.Star, 1));
             Columns.Add(new GridLength(GridUnit.Auto, 0));
@@ -25,14 +26,15 @@ namespace Scriber.Layout.Document
             {
                 preambleParagraph = Paragraph.FromText(Preamble);
                 preambleParagraph.Parent = this;
-                preambleParagraph.Margin = new Thickness(0, CalculateLeft(level - 1), 0, 0);
+                preambleParagraph.Style.Set(StyleKeys.MarginLeft, CalculateLeft(level - 1));
+                //preambleParagraph.Margin = new Thickness(0, , 0, 0);
                 Set(preambleParagraph, 0, 0);
             }
             Level = level;
             original = reference;
             Content = content.Clone();
-            Content.Margin = new Thickness(0);
-            Content.FontSize = 11;
+            //Content.Margin = new Thickness(0);
+            //Content.FontSize = 11;
             Reference = new PageReference(original);
             referenceParagraph = Paragraph.FromLeaves(Reference);
             referenceParagraph.Parent = this;
@@ -46,20 +48,21 @@ namespace Scriber.Layout.Document
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             base.OnRender(drawingContext, measurement);
-
+            var font = Style.Get(StyleKeys.Font);
+            var fontSize = Style.Get(StyleKeys.FontSize).Point;
             // render additional dots/lines/whatever
             const double size = 9;
             var lastContentLine = Content.Measurement.Subs[^1];
             var position = Content.Measurement.Position + lastContentLine.Position;
-            position.X += lastContentLine.Size.Width + FontSize / 3;
+            position.X += lastContentLine.Size.Width + fontSize / 3;
             var referencePagePosition = referenceParagraph.Measurement.Position;
-            referencePagePosition.X -= FontSize / 5;
+            referencePagePosition.X -= fontSize / 5;
             referencePagePosition.X -= referencePagePosition.X % size;
             var delta = referencePagePosition.X - position.X;
             var count = (int)(delta / size);
             referencePagePosition.Y = position.Y;
 
-            var typeface = new Text.Typeface(Font!, FontSize, FontWeight, FontStyle);
+            var typeface = new Text.Typeface(font!, fontSize, FontWeight, FontStyle);
             for (int i = 0; i < count; i++)
             {
                 referencePagePosition.X -= size;

@@ -13,7 +13,6 @@ namespace Scriber.Engine.Commands
         public static Paragraph Caption(Paragraph paragraph)
         {
             paragraph.Tag = "caption";
-            paragraph.Margin = new Thickness(16, 0, 0, 0);
             return paragraph;
         }
 

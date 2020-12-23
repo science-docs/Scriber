@@ -1,6 +1,7 @@
 ﻿using Scriber.Drawing;
 using Scriber.Drawing.Shapes;
 using Scriber.Layout.Document;
+using Scriber.Layout.Styling;
 using Scriber.Text;
 using System;
 
@@ -26,7 +27,7 @@ namespace Scriber.Layout.Shapes
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            return new Measurement(this, Path.Size, Margin);
+            return new Measurement(this, Path.Size, Style.Get(StyleKeys.Margin));
         }
 
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)

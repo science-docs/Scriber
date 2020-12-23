@@ -1,4 +1,6 @@
-﻿namespace Scriber.Layout.Document
+﻿using Scriber.Layout.Styling;
+
+namespace Scriber.Layout.Document
 {
     public class PageReference : Leaf, ITextLeaf
     {
@@ -35,13 +37,14 @@
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (Font == null)
+            var font = Style.Get(StyleKeys.Font);
+            if (font == null)
             {
                 throw new LayoutException("Font property of the element was not set");
             }
 
-            var height = FontSize;
-            var width = Font.GetWidth(PageNumber, FontSize, FontWeight);
+            var height = Style.Get(StyleKeys.FontSize).Point;
+            var width = font.GetWidth(PageNumber, height, FontWeight);
             return new Size(width, height);
         }
 

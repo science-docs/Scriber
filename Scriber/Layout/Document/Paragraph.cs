@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Scriber.Drawing;
+using Scriber.Layout.Styling;
 using Scriber.Text;
 using Scriber.Variables;
 
@@ -18,6 +19,7 @@ namespace Scriber.Layout.Document
 
         public Paragraph()
         {
+            Tag = "p";
             Leaves = new ElementCollection<Leaf>(this);
         }
 
@@ -59,11 +61,12 @@ namespace Scriber.Layout.Document
                         height = Math.Max(lineNodes[item.Index].Element?.DesiredSize.Height ?? 0, height);
                     }
 
-                    var stretch = ParagraphVariables.BaselineStretch[doc];
+                    var skip = Style.Get(StyleKeys.BaselineSkip) ?? Unit.FromPoint(height);
+                    var stretch = Style.Get(StyleKeys.BaselineStretch);
 
                     if (!last)
                     {
-                        height *= stretch;
+                        height = skip.Point * stretch;
                     }
                     var size = new Size(width, height);
                     var measurement = new Measurement(this, size, Thickness.Zero)
@@ -89,7 +92,7 @@ namespace Scriber.Layout.Document
             
             if (ms.Subs.Count > 0)
             {
-                ms.Margin = new Thickness(Margin.Top, 0, Margin.Bottom, 0);
+                ms.Margin = Style.Get(StyleKeys.Margin);
             }
 
             return ms;
@@ -226,7 +229,7 @@ namespace Scriber.Layout.Document
 
                         if (node.Link != null)
                         {
-                            var rect = new Rectangle(offset, new Size(node.Width, node.Element.FontSize));
+                            var rect = new Rectangle(offset, new Size(node.Width, node.Element.Style.Get(StyleKeys.FontSize).Point));
                             drawingContext.AddLink(rect, node.Link.Value);
                         }
                     }
@@ -241,12 +244,14 @@ namespace Scriber.Layout.Document
                 throw new NullReferenceException("The Element property of a LineNode was null");
             }
 
-            if (node.Element.Font == null)
+            var font = node.Element.Style.Get(StyleKeys.Font);
+            if (font == null)
             {
                 throw new NullReferenceException("The Font property of a LineNode was null");
             }
+            var fontSize = node.Element.Style.Get(StyleKeys.FontSize).Point;
 
-            return new TextRun(node.Text ?? string.Empty, new Text.Typeface(node.Element.Font, node.Element.FontSize, node.Element.FontWeight, node.Element.FontStyle));
+            return new TextRun(node.Text ?? string.Empty, new Text.Typeface(font, fontSize, node.Element.FontWeight, node.Element.FontStyle));
         }
 
 

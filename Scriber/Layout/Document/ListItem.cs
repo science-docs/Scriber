@@ -1,4 +1,5 @@
 ﻿using Scriber.Drawing;
+using Scriber.Layout.Styling;
 using System;
 
 namespace Scriber.Layout.Document
@@ -22,10 +23,11 @@ namespace Scriber.Layout.Document
         private const double Buffer = 24;
 
         public int Index { get; set; }
-        public ListStyle Style { get; set; }
+        public ListStyle ListStyle { get; set; }
 
         public ListItem(Paragraph content)
         {
+            Tag = "li";
             Leaves.AddRange(content.Leaves);
         }
 
@@ -43,8 +45,10 @@ namespace Scriber.Layout.Document
 
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
+            var font = Style.Get(StyleKeys.Font);
+            var fontSize = Style.Get(StyleKeys.FontSize).Point;
             drawingContext.Offset = new Position(10, 0);
-            drawingContext.DrawText(new TextRun(GetPreamble(), new Text.Typeface(Font!, FontSize, FontWeight, FontStyle)), Foreground);
+            drawingContext.DrawText(new TextRun(GetPreamble(), new Text.Typeface(font!, fontSize, FontWeight, FontStyle)), Foreground);
 
             drawingContext.PushTransform(new TranslateTransform(new Position(Buffer, 0)));
 
@@ -55,7 +59,7 @@ namespace Scriber.Layout.Document
 
         public string GetPreamble()
         {
-            return Style switch
+            return ListStyle switch
             {
                 ListStyle.Disc => "•",
                 ListStyle.Circle => "○",

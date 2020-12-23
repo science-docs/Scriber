@@ -1,4 +1,5 @@
-﻿using Scriber.Text;
+﻿using Scriber.Layout.Styling;
+using Scriber.Text;
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
@@ -53,13 +54,14 @@ namespace Scriber.Layout.Document
             {
                 throw new LayoutException("Content property is null");
             }
-            if (Font == null)
+            var font = Style.Get(StyleKeys.Font);
+            if (font == null)
             {
                 throw new LayoutException("Font property is null");
             }
 
-            var height = FontSize;
-            var width = Font.GetWidth(Content, FontSize, FontWeight);
+            var height = Style.Get(StyleKeys.FontSize).Point;
+            var width = font.GetWidth(Content, height, FontWeight);
             return new Size(width, height);
         }
     }

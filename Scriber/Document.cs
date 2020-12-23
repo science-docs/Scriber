@@ -13,6 +13,7 @@ using Scriber.Variables;
 using System.Threading.Tasks;
 using System.Linq;
 using Scriber.Text;
+using Scriber.Layout.Styling;
 
 namespace Scriber
 {
@@ -38,6 +39,8 @@ namespace Scriber
 
         public Citations? Citations { get; set; }
 
+        public StyleCollection Styles { get; }
+
         public string? Title { get; set; }
         public string? Author { get; set; }
 
@@ -48,10 +51,15 @@ namespace Scriber
             //Locale = new Locale(Culture);
             Elements = new ElementCollection<DocumentElement>(this);
             PageItems = new ElementCollection<DocumentElement>(this);
+            Styles = new StyleCollection();
             Measurements = new Measurements();
+            Document = this;
 
-            Font = Text.Font.Default;
-            FontSize = 12;
+            var pStyle = new StyleContainer(StyleOrigin.Engine, "p, li");
+            pStyle.Set(StyleKeys.MarginBottom, 8.0);
+            Styles.Add(pStyle);
+            //Font = Font.Default;
+            //FontSize = 12;
         }
 
         public T Variable<T>(DocumentLocal<T> local)

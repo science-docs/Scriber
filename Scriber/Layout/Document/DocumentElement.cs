@@ -1,5 +1,6 @@
 ﻿using System;
 using Scriber.Drawing;
+using Scriber.Layout.Styling;
 
 namespace Scriber.Layout.Document
 {
@@ -21,7 +22,8 @@ namespace Scriber.Layout.Document
                 return Measurement = new Measurement(this);
             }
 
-            var marginSize = new Size(Margin.Width, Margin.Height);
+            var margin = Style.Get(StyleKeys.Margin);
+            var marginSize = new Size(margin.Width, margin.Height);
             return Measurement = MeasureOverride(availableSize - marginSize);
         }
 

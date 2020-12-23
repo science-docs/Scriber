@@ -1,4 +1,5 @@
 ﻿using Scriber.Layout.Document;
+using Scriber.Layout.Styling;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -156,7 +157,7 @@ namespace Scriber.Layout
             }
 
             ms.Size = new Size(columnWidths.Sum(), rowHeight);
-            ms.Margin = Margin;
+            ms.Margin = Style.Get(StyleKeys.Margin);
 
             return ms;
         }
@@ -290,7 +291,7 @@ namespace Scriber.Layout
                     y = Math.Max(0, y);
 
                     Measurement = element.Measure(new Size(x, y));
-                    Measurement.Margin = element.Margin;
+                    Measurement.Margin = element.Style.Get(StyleKeys.Margin);
                     Size = Measurement.TotalSize;
 
                     if (rowUnit == GridUnit.Point)

@@ -1,4 +1,5 @@
-﻿using Scriber.Text;
+﻿using Scriber.Layout.Styling;
+using Scriber.Text;
 using System;
 using System.Collections.Generic;
 
@@ -41,13 +42,15 @@ namespace Scriber.Layout.Document
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (Font == null)
+            var font = Style.Get(StyleKeys.Font);
+
+            if (font == null)
             {
-                throw new LayoutException("Font property is null");
+                throw new InvalidOperationException();
             }
 
-            var height = FontSize;
-            var width = Font.GetWidth(Content, FontSize, FontWeight);
+            var height = Style.Get(StyleKeys.FontSize).Point;
+            var width = font.GetWidth(Content, height, FontWeight);
             return new Size(width, height);
         }
     }

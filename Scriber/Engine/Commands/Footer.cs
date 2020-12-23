@@ -13,11 +13,13 @@ namespace Scriber.Engine.Commands
             var footnote = new FootnoteLeaf(name, content);
             content.Parent = footnote;
             content.HorizontalAlignment = Layout.HorizontalAlignment.Justify;
+            content.Classes.Add("footnote");
             var footnoteSize = state.Document.Variable(FontVariables.FootnoteSize);
-            if (footnoteSize != null)
-            {
-                content.FontSize = footnoteSize.Value;
-            }
+            // TODO: Footnote 
+            //if (footnoteSize != null)
+            //{
+            //    content.FontSize = footnoteSize.Value;
+            //}
             
             return footnote;
         }

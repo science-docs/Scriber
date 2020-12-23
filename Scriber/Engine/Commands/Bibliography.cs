@@ -88,10 +88,7 @@ namespace Scriber.Engine.Commands
             var list = new List<Paragraph>();
             foreach (var bibEntry in bibliography)
             {
-                var paragraph = new Paragraph
-                {
-                    Margin = new Layout.Thickness(4, 0)
-                };
+                var paragraph = new Paragraph();
 
                 var leaves = ToLeaves(bibEntry);
 
@@ -112,23 +109,36 @@ namespace Scriber.Engine.Commands
 
         private static Leaf ToLeaf(TextRun run)
         {
-            var textLeaf = new TextLeaf(run.Text);
-
-            if (run.FontStyle == Scriber.Bibliography.Styling.Formatting.FontStyle.Italic)
+            var textLeaf = new TextLeaf(run.Text)
             {
-                textLeaf.FontWeight = Text.FontWeight.Italic;
-            }
+                Tag = string.Empty
+            };
+
             if (run.FontWeight == Scriber.Bibliography.Styling.Formatting.FontWeight.Bold)
             {
-                textLeaf.FontWeight = Text.FontWeight.Bold;
+                textLeaf.Tag += "b";
+            }
+            if (run.FontStyle == Scriber.Bibliography.Styling.Formatting.FontStyle.Italic)
+            {
+                textLeaf.Tag += "i";
             }
 
-            textLeaf.FontStyle = run.VerticalAlign switch
+            if (string.IsNullOrEmpty(textLeaf.Tag))
             {
-                Scriber.Bibliography.Styling.Formatting.VerticalAlign.Subscript => Text.FontStyle.Subscript,
-                Scriber.Bibliography.Styling.Formatting.VerticalAlign.Superscript => Text.FontStyle.Superscript,
-                _ => Text.FontStyle.Normal
+                textLeaf.Tag = "span";
+            }
+
+            string? classEntry = run.VerticalAlign switch
+            {
+                Scriber.Bibliography.Styling.Formatting.VerticalAlign.Subscript => "sub",
+                Scriber.Bibliography.Styling.Formatting.VerticalAlign.Superscript => "super",
+                _ => null
             };
+
+            if (classEntry != null)
+            {
+                textLeaf.Classes.Add(classEntry);
+            }
 
             return textLeaf;
         }
