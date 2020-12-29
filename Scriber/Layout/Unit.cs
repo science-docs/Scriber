@@ -346,6 +346,20 @@ namespace Scriber.Layout
             return !(value1 == value2);
         }
 
+        public static Unit operator +(Unit value1, Unit value2)
+        {
+            var unit = FromPoint(value1.Point + value2.Point);
+            unit.ConvertType(value1.Type);
+            return unit;
+        }
+
+        public static Unit operator -(Unit value1, Unit value2)
+        {
+            var unit = FromPoint(value1.Point - value2.Point);
+            unit.ConvertType(value1.Type);
+            return unit;
+        }
+
         /// <summary>
         /// Calls base class Equals.
         /// </summary>

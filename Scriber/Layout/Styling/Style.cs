@@ -1,5 +1,4 @@
 ﻿using Scriber.Layout.Document;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Scriber.Layout.Styling
@@ -8,7 +7,7 @@ namespace Scriber.Layout.Styling
     {
         public AbstractElement Element { get; }
 
-        private readonly Dictionary<StyleKey, object> fields = new Dictionary<StyleKey, object>();
+        private readonly StyleContainer container = new StyleContainer(StyleOrigin.Author);
 
         public Style(AbstractElement element)
         {
@@ -30,9 +29,9 @@ namespace Scriber.Layout.Styling
         [return: MaybeNull]
         public T Get<T>(StyleKey key)
         {
-            if (fields.TryGetValue(key, out var field) && field is T result)
+            if (container.TryGet<T>(key, out var field))
             {
-                return result;
+                return field;
             }
             else if (Element.Document!.Styles.TryGetValue(Element, key, out T computedResult))
             {
@@ -54,7 +53,12 @@ namespace Scriber.Layout.Styling
 
         public void Set(StyleKey key, object field)
         {
-            fields[key] = field;
+            container.Set(key, field);
+        }
+
+        public void Set<T>(StyleKey<T> key, [DisallowNull] T field)
+        {
+            container.Set(key, field);
         }
     }
 }

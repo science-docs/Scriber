@@ -1,10 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Scriber.Util
 {
     public static class StringUtility
     {
+        public static string ToFirstUpper(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            var c = value[0];
+            return char.ToUpperInvariant(c) + value.Substring(1);
+        }
+
+        /// <summary>
+        /// Transforms css property names into Scriber style keys e.g. <c>margin-bottom</c> into <c>MarginBottom</c>.
+        /// Does nothing if the property name is already in a Scriber style key.
+        /// </summary>
+        /// <param name="styleProperty"></param>
+        /// <returns></returns>
+        public static string TransformStyleProperty(this string styleProperty)
+        {
+            var splits = styleProperty.Split('-', StringSplitOptions.RemoveEmptyEntries);
+            return string.Join("", splits.Select(e => e.ToFirstUpper()));
+        }
+
         public static string[] Split(this string value, Func<char, bool> predicate)
         {
             return value.Split(predicate, StringSplitOptions.None);
@@ -26,6 +50,12 @@ namespace Scriber.Util
                         splits.Add(split);
                     }
                 }
+            }
+
+            var lastSplit = value[last..];
+            if (splitOptions != StringSplitOptions.RemoveEmptyEntries || !string.IsNullOrEmpty(lastSplit))
+            {
+                splits.Add(lastSplit);
             }
 
             return splits.ToArray();
@@ -53,18 +83,6 @@ namespace Scriber.Util
                 }
             }
             return true;
-        }
-
-        public static string Trim(this string value, out int advance)
-        {
-            return TrimStart(value, out advance).TrimEnd();
-        }
-
-        public static string TrimStart(this string value, out int advance)
-        {
-            var trimmed = value.TrimStart();
-            advance = value.Length - trimmed.Length;
-            return trimmed;
         }
 
         public static string Pluralify(this int count, string single, string plural)

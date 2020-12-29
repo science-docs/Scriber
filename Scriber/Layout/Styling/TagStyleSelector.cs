@@ -1,4 +1,5 @@
 ﻿using Scriber.Layout.Document;
+using System;
 
 namespace Scriber.Layout.Styling
 {
@@ -8,12 +9,12 @@ namespace Scriber.Layout.Styling
 
         public TagStyleSelector(string tag)
         {
-            Tag = tag;
+            Tag = tag ?? throw new ArgumentNullException(nameof(tag));
         }
 
         public override bool Matches(AbstractElement element)
         {
-            return element.Tag == Tag;
+            return Tag.Equals(element.Tag, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

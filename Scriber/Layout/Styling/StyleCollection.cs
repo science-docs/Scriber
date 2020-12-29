@@ -1,7 +1,7 @@
 ﻿using Scriber.Layout.Document;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Scriber.Layout.Styling
 {
@@ -16,13 +16,12 @@ namespace Scriber.Layout.Styling
 
         public bool TryGetValue<T>(AbstractElement element, StyleKey key, [MaybeNull] out T value)
         {
-            foreach (var container in styles)
+            var container = styles.AsParallel().FirstOrDefault(e => e.ContainsKey(key) && e.Matches(element));
+
+            if (container != null)
             {
-                if (container.ContainsKey(key) && container.Matches(element))
-                {
-                    value = container.Get<T>(key);
-                    return true;
-                }
+                value = container.Get<T>(key);
+                return true;
             }
 
             value = default;

@@ -7,17 +7,17 @@ namespace Scriber.Layout.Styling
         public static StyleKey<Font> Font { get; } = new StyleKey<Font>(nameof(Font), true, Text.Font.Default);
         public static StyleKey<Unit> FontSize { get; } = new StyleKey<Unit>(nameof(FontSize), true, Unit.FromPoint(12));
 
-        public static StyleKey<double> MarginTop { get; } = new StyleKey<double>(nameof(MarginTop), 0);
-        public static StyleKey<double> MarginRight { get; } = new StyleKey<double>(nameof(MarginRight), 0);
-        public static StyleKey<double> MarginBottom { get; } = new StyleKey<double>(nameof(MarginBottom), 0);
-        public static StyleKey<double> MarginLeft { get; } = new StyleKey<double>(nameof(MarginLeft), 0);
+        public static StyleKey<Unit> MarginTop { get; } = new StyleKey<Unit>(nameof(MarginTop), Unit.Zero);
+        public static StyleKey<Unit> MarginRight { get; } = new StyleKey<Unit>(nameof(MarginRight), Unit.Zero);
+        public static StyleKey<Unit> MarginBottom { get; } = new StyleKey<Unit>(nameof(MarginBottom), Unit.Zero);
+        public static StyleKey<Unit> MarginLeft { get; } = new StyleKey<Unit>(nameof(MarginLeft), Unit.Zero);
 
         public static ComputedStyleKey<Thickness> Margin { get; } = new ComputedStyleKey<Thickness>(nameof(Margin), style =>
         {
-            var top = style.Get(MarginTop);
-            var right = style.Get(MarginRight);
-            var bottom = style.Get(MarginBottom);
-            var left = style.Get(MarginLeft);
+            var top = style.Get(MarginTop).Point;
+            var right = style.Get(MarginRight).Point;
+            var bottom = style.Get(MarginBottom).Point;
+            var left = style.Get(MarginLeft).Point;
             return new Thickness(top, left, bottom, right);
         });
 

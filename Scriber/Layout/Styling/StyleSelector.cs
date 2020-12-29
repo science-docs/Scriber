@@ -18,6 +18,10 @@ namespace Scriber.Layout.Styling
                 {
                     yield return new AllStyleSelector();
                 }
+                else if (split.StartsWith("."))
+                {
+                    yield return new ClassStyleSelector(split.Substring(1));
+                }
                 else
                 {
                     yield return new TagStyleSelector(split);

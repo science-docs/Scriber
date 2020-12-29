@@ -1,7 +1,7 @@
 ﻿using Scriber.Layout.Document;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Scriber.Layout.Styling
 {
@@ -21,7 +21,8 @@ namespace Scriber.Layout.Styling
 
         public StyleContainer(StyleOrigin origin, string selectorText)
         {
-
+            Origin = origin;
+            Selectors = StyleSelector.FromString(selectorText).ToArray();
         }
 
         public StyleContainer(StyleOrigin origin, params StyleSelector[] selectors)
@@ -45,6 +46,20 @@ namespace Scriber.Layout.Styling
         public bool ContainsKey(StyleKey key)
         {
             return fields.ContainsKey(key);
+        }
+
+        public bool TryGet<T>(StyleKey key, [MaybeNullWhen(false)] out T t)
+        {
+            if (fields.TryGetValue(key, out var result) && result is T generic)
+            {
+                t = generic;
+                return true;
+            }
+            else
+            {
+                t = default;
+                return false;
+            }
         }
 
         [return: MaybeNull]
