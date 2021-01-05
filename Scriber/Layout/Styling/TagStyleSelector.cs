@@ -5,6 +5,8 @@ namespace Scriber.Layout.Styling
 {
     public class TagStyleSelector : StyleSelector
     {
+        public override int Specificity => 1;
+
         public string Tag { get; set; }
 
         public TagStyleSelector(string tag)

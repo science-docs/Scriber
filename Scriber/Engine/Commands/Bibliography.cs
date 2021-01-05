@@ -20,8 +20,7 @@ namespace Scriber.Engine.Commands
             try
             {
                 var bytes = state.Context.ResourceSet.RelativeResource(style.Value).GetContent();
-                using var sourceStream = new System.IO.MemoryStream(bytes);
-                var styleFile = File.Load<StyleFile>(sourceStream);
+                var styleFile = File.Load<StyleFile>(bytes);
                 state.Document.Citations = new Citations(new Processor(styleFile, LocaleFile.Defaults), state.Document.Locale.File);
             }
             catch (Exception ex)

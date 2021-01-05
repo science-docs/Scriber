@@ -37,7 +37,7 @@ namespace Scriber.Layout.Styling
             {
                 return computedResult;
             }
-            else if (Element.Parent != null)
+            else if (key.Inherited && Element.Parent != null)
             {
                 return Element.Parent.Style.Get<T>(key);
             }

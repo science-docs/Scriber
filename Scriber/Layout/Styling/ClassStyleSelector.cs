@@ -5,6 +5,8 @@ namespace Scriber.Layout.Styling
 {
     public class ClassStyleSelector : StyleSelector
     {
+        public override int Specificity => 2;
+
         public string Class { get; }
 
         public ClassStyleSelector(string className)

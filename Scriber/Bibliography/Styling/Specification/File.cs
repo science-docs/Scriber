@@ -97,6 +97,16 @@ namespace Scriber.Bibliography.Styling.Specification
             return Load(fs);
         }
         /// <summary>
+        /// Loads a file from the given path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static File Load(byte[] bytes)
+        {
+            using var ms = new MemoryStream(bytes);
+            return Load(ms);
+        }
+        /// <summary>
         /// Loads a file from the given stream.
         /// </summary>
         /// <param name="stream"></param>
@@ -239,6 +249,11 @@ namespace Scriber.Bibliography.Styling.Specification
             where T : File
         {
             return (T)Load(stream);
+        }
+        public static T Load<T>(byte[] bytes)
+            where T : File
+        {
+            return (T)Load(bytes);
         }
         /// <summary>
         /// Loads a file from the given text reader.

@@ -23,6 +23,11 @@ namespace Scriber.Layout.Document
             Leaves = new ElementCollection<Leaf>(this);
         }
 
+        public override IEnumerable<AbstractElement> ChildElements()
+        {
+            return Leaves;
+        }
+
         protected override Measurement MeasureOverride(Size availableSize)
         {
             var doc = Document ?? throw new LayoutException("Document was not set");

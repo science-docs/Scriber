@@ -18,6 +18,11 @@ namespace Scriber.Layout
             Elements = new ElementCollection<DocumentElement>(this);
         }
 
+        public override IEnumerable<AbstractElement> ChildElements()
+        {
+            return Elements;
+        }
+
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             foreach (var sub in measurement.Subs)

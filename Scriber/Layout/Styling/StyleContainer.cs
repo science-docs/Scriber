@@ -31,18 +31,6 @@ namespace Scriber.Layout.Styling
             Selectors = selectors;
         }
 
-        public bool Matches(AbstractElement element)
-        {
-            for (int i = 0; i < Selectors.Count; i++)
-            {
-                if (Selectors[i].Matches(element))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         public bool ContainsKey(StyleKey key)
         {
             return fields.ContainsKey(key);
@@ -84,6 +72,5 @@ namespace Scriber.Layout.Styling
         {
             fields[key] = value;
         }
-
     }
 }

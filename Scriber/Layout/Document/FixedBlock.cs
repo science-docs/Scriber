@@ -48,6 +48,11 @@ namespace Scriber.Layout.Document
             Child.Parent = this;
         }
 
+        public override IEnumerable<AbstractElement> ChildElements()
+        {
+            yield return Child;
+        }
+
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             foreach (var sub in measurement.Subs)

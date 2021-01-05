@@ -29,6 +29,11 @@ namespace Scriber.Layout.Document
             }
         }
 
+        public override IEnumerable<AbstractElement> ChildElements()
+        {
+            yield return Element;
+        }
+
         public override LineNode[] GetNodes()
         {
             Element.Parent = Parent;

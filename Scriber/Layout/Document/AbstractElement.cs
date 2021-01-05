@@ -84,6 +84,11 @@ namespace Scriber.Layout.Document
             return clone;
         }
 
+        public virtual IEnumerable<AbstractElement> ChildElements()
+        {
+            yield break;
+        }
+
         protected abstract AbstractElement CloneInternal();
 
         public virtual void Interlude()
