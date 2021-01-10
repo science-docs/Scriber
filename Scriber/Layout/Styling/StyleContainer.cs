@@ -1,4 +1,4 @@
-﻿using Scriber.Layout.Document;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace Scriber.Layout.Styling
         Author
     }
 
-    public class StyleContainer
+    public class StyleContainer : IEnumerable<KeyValuePair<StyleKey, object>>
     {
         private readonly Dictionary<StyleKey, object> fields = new Dictionary<StyleKey, object>();
 
@@ -71,6 +71,16 @@ namespace Scriber.Layout.Styling
         public void Set(StyleKey key, object value)
         {
             fields[key] = value;
+        }
+
+        public IEnumerator<KeyValuePair<StyleKey, object>> GetEnumerator()
+        {
+            return fields.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

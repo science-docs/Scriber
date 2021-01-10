@@ -8,6 +8,7 @@ namespace Scriber.Layout.Styling
         public AbstractElement Element { get; }
 
         private readonly StyleContainer container = new StyleContainer(StyleOrigin.Author);
+        private StyleContainer? computed;
 
         public Style(AbstractElement element)
         {
@@ -33,9 +34,15 @@ namespace Scriber.Layout.Styling
             {
                 return field;
             }
-            else if (Element.Document!.Styles.TryGetValue(Element, key, out T computedResult))
+
+            if (computed == null)
             {
-                return computedResult;
+                computed = Element.Document!.Styles.Compute(Element);
+            }
+
+            if (computed.TryGet(key, out field))
+            {
+                return field;
             }
             else if (key.Inherited && Element.Parent != null)
             {
