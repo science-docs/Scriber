@@ -8,5 +8,10 @@ namespace Scriber.Layout.Styling.Classes
         {
             return element is Scriber.Document;
         }
+
+        public override string ToString()
+        {
+            return "root";
+        }
     }
 }

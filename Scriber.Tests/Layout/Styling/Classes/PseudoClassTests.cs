@@ -16,6 +16,7 @@ namespace Scriber.Layout.Styling.Classes.Tests
         {
             var parsedPseudoClass = PseudoClass.FromString(input);
             Assert.IsType(targetType, parsedPseudoClass);
+            Assert.Equal(input, parsedPseudoClass.ToString());
         }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using Scriber.Layout.Document;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Scriber.Layout.Styling
 {
-    public class StyleCollection
+    public class StyleCollection : IEnumerable<StyleContainer>
     {
         private readonly Dictionary<StyleSelector, StyleContainer> styles = new Dictionary<StyleSelector, StyleContainer>();
         private readonly Dictionary<int, List<StyleSelector>> selectorsBuckets = new Dictionary<int, List<StyleSelector>>();
@@ -25,6 +26,16 @@ namespace Scriber.Layout.Styling
                 styles[selector] = styleContainer;
                 selectorsBuckets[selector.Specificity].Add(selector);
             }
+        }
+
+        public IEnumerator<StyleContainer> GetEnumerator()
+        {
+            return styles.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public bool TryGetValue<T>(AbstractElement element, StyleKey key, [MaybeNullWhen(false)] out T value)
@@ -50,5 +61,7 @@ namespace Scriber.Layout.Styling
             value = default;
             return false;
         }
+
+        
     }
 }

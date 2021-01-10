@@ -185,11 +185,12 @@ namespace Scriber.Layout
                 var pos = ms.Position;
                 if (msSize != size)
                 {
-                    if (el.VerticalAlignment == VerticalAlignment.Center)
+                    var vertAlignment = el.Style.Get(StyleKeys.VerticalAlignment);
+                    if (vertAlignment == VerticalAlignment.Center)
                     {
                         pos.Y += (size.Height - msSize.Height) / 2;
                     }
-                    else if (el.VerticalAlignment == VerticalAlignment.Bottom)
+                    else if (vertAlignment == VerticalAlignment.Bottom)
                     {
                         pos.Y += size.Height - msSize.Height;
                     }

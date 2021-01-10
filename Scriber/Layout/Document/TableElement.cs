@@ -26,7 +26,7 @@ namespace Scriber.Layout.Document
             {
                 preambleParagraph = Paragraph.FromText(Preamble);
                 preambleParagraph.Parent = this;
-                preambleParagraph.Style.Set(StyleKeys.MarginLeft, CalculateLeft(level - 1));
+                preambleParagraph.Style.Set(StyleKeys.MarginLeft, Unit.FromPoint(CalculateLeft(level - 1)));
                 //preambleParagraph.Margin = new Thickness(0, , 0, 0);
                 Set(preambleParagraph, 0, 0);
             }
@@ -38,7 +38,7 @@ namespace Scriber.Layout.Document
             Reference = new PageReference(original);
             referenceParagraph = Paragraph.FromLeaves(Reference);
             referenceParagraph.Parent = this;
-            referenceParagraph.VerticalAlignment = VerticalAlignment.Bottom;
+            referenceParagraph.Style.Set(StyleKeys.VerticalAlignment, VerticalAlignment.Bottom);
 
             
             Set(Content, 0, 1);
@@ -62,7 +62,7 @@ namespace Scriber.Layout.Document
             var count = (int)(delta / size);
             referencePagePosition.Y = position.Y;
 
-            var typeface = new Text.Typeface(font!, fontSize, FontWeight, FontStyle);
+            var typeface = new Text.Typeface(font!, fontSize, Style.Get(StyleKeys.FontWeight), Style.Get(StyleKeys.FontStyle));
             for (int i = 0; i < count; i++)
             {
                 referencePagePosition.X -= size;

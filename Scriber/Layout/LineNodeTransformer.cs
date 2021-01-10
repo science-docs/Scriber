@@ -40,7 +40,7 @@ namespace Scriber.Layout
 
             double GetWidth(string value)
             {
-                return font.GetWidth(value, size, element.FontWeight);
+                return font.GetWidth(value, size, element.Style.Get(StyleKeys.FontWeight));
             }
         }
 
@@ -55,7 +55,7 @@ namespace Scriber.Layout
                 return new List<LineNode>();
 
             var font = leaf.Style.Get(StyleKeys.Font) ?? throw new ArgumentException("Specified element missing font", nameof(leaf));
-            var size = FontStyler.ScaleSize(leaf.FontStyle, leaf.Style.Get(StyleKeys.FontSize).Point);
+            var size = FontStyler.ScaleSize(leaf.Style.Get(StyleKeys.FontStyle), leaf.Style.Get(StyleKeys.FontSize).Point);
             var spaceWidth = GetWidth(" ");
             var hyphenWidth = GetWidth("-");
             var stretch = Math.Max(0, spaceWidth / 2);
@@ -117,7 +117,7 @@ namespace Scriber.Layout
 
             double GetWidth(string value)
             {
-                return font.GetWidth(value, size, leaf.FontWeight);
+                return font.GetWidth(value, size, leaf.Style.Get(StyleKeys.FontWeight));
             }
         }
 

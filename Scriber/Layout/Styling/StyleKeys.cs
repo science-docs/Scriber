@@ -7,6 +7,13 @@ namespace Scriber.Layout.Styling
         public static StyleKey<Font> Font { get; } = new StyleKey<Font>(nameof(Font), true, Text.Font.Default);
         public static StyleKey<Unit> FontSize { get; } = new StyleKey<Unit>(nameof(FontSize), true, Unit.FromPoint(12));
 
+        public static StyleKey<FontWeight> FontWeight { get; } = new StyleKey<FontWeight>(nameof(FontWeight), true, Text.FontWeight.Normal);
+        public static StyleKey<FontStyle> FontStyle { get; } = new StyleKey<FontStyle>(nameof(FontStyle), true, Text.FontStyle.Normal);
+
+        public static StyleKey<HorizontalAlignment> HorizontalAlignment { get; } = new StyleKey<HorizontalAlignment>(nameof(HorizontalAlignment), true, Layout.HorizontalAlignment.Justify);
+        public static StyleKey<VerticalAlignment> VerticalAlignment { get; } = new StyleKey<VerticalAlignment>(nameof(VerticalAlignment), true, Layout.VerticalAlignment.Top);
+
+
         public static StyleKey<Unit> MarginTop { get; } = new StyleKey<Unit>(nameof(MarginTop), Unit.Zero);
         public static StyleKey<Unit> MarginRight { get; } = new StyleKey<Unit>(nameof(MarginRight), Unit.Zero);
         public static StyleKey<Unit> MarginBottom { get; } = new StyleKey<Unit>(nameof(MarginBottom), Unit.Zero);

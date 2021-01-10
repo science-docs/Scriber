@@ -18,34 +18,10 @@ namespace Scriber.Layout.Document
             }
         }
 
-        public FontWeight FontWeight
-        {
-            get => fontWeight ?? Parent?.FontWeight ?? FontWeight.Normal;
-            set => fontWeight = value;
-        }
-
-        public FontStyle FontStyle
-        {
-            get => fontStyle ?? Parent?.FontStyle ?? FontStyle.Normal;
-            set => fontStyle = value;
-        }
-
         public Color Foreground
         {
             get => foreground ?? Parent?.Foreground ?? Colors.Black;
             set => foreground = value;
-        }
-
-        public HorizontalAlignment HorizontalAlignment
-        {
-            get => horizontalAlignment ?? Parent?.HorizontalAlignment ?? 0;
-            set => horizontalAlignment = value;
-        }
-
-        public VerticalAlignment VerticalAlignment
-        {
-            get => verticalAlignment ?? Parent?.VerticalAlignment ?? 0;
-            set => verticalAlignment = value;
         }
 
         public DocumentPage? Page
@@ -64,14 +40,8 @@ namespace Scriber.Layout.Document
 
         public string Tag { get; set; } = string.Empty;
         public List<string> Classes { get; } = new List<string>();
-        
-        //public Thickness Margin { get; set; }
 
-        private FontStyle? fontStyle;
         private Color? foreground;
-        private FontWeight? fontWeight;
-        private HorizontalAlignment? horizontalAlignment;
-        private VerticalAlignment? verticalAlignment;
         private DocumentPage? page;
         private Scriber.Document? document;
         private Style? style;

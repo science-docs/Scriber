@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Util;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -6,35 +7,40 @@ namespace Scriber.Layout.Styling
 {
     public class StyleKey<T> : StyleKey
     {
-        public StyleKey(string name, T defaultValue) : base(name, defaultValue)
+        public StyleKey(string name, T defaultValue) : base(name, typeof(T), defaultValue)
         {
         }
 
-        public StyleKey(string name, bool inherited, T defaultValue) : base(name, inherited, defaultValue)
+        public StyleKey(string name, bool inherited, T defaultValue) : base(name, typeof(T), inherited, defaultValue)
         {
         }
     }
 
     public class StyleKey : IEquatable<StyleKey>
     {
-        public static IReadOnlyList<StyleKey> Keys => keys;
+        public static bool TryGetStyleKey(string name, [MaybeNullWhen(false)] out StyleKey styleKey)
+        {
+            return keys.TryGetValue(name, out styleKey);
+        }
 
-        private static readonly List<StyleKey> keys = new List<StyleKey>();
+        private static readonly Dictionary<string, StyleKey> keys = new Dictionary<string, StyleKey>();
 
         public string Name { get; }
         public bool Inherited { get; } = false;
         public object? Default { get; }
+        public Type Type { get; }
 
-        public StyleKey(string name, object? defaultValue) : this(name, false, defaultValue)
+        public StyleKey(string name, Type type, object? defaultValue) : this(name, type, false, defaultValue)
         {
         }
 
-        public StyleKey(string name, bool inherited, object? defaultValue)
+        public StyleKey(string name, Type type, bool inherited, object? defaultValue)
         {
             Name = name;
+            Type = type;
             Default = defaultValue;
             Inherited = inherited;
-            keys.Add(this);
+            keys.Add(name, this);
         }
 
         public bool Equals([AllowNull] StyleKey other)
@@ -62,6 +68,11 @@ namespace Scriber.Layout.Styling
         public override int GetHashCode()
         {
             return HashCode.Combine(Name);
+        }
+
+        public override string ToString()
+        {
+            return $"{Name}<{Type.FormattedName()}>";
         }
     }
 }

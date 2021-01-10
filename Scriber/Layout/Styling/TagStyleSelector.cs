@@ -18,5 +18,10 @@ namespace Scriber.Layout.Styling
         {
             return Tag.Equals(element.Tag, StringComparison.InvariantCultureIgnoreCase);
         }
+
+        public override string ToString()
+        {
+            return Tag;
+        }
     }
 }

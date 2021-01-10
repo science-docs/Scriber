@@ -1,4 +1,5 @@
 ﻿using Scriber.Layout.Document;
+using Scriber.Layout.Styling;
 using System;
 using System.Collections.Generic;
 
@@ -10,19 +11,19 @@ namespace Scriber.Engine.Commands
         [Command("Bold")]
         public static IEnumerable<Leaf> Bold(IEnumerable<Leaf> leaves)
         {
-            return leaves.Apply(e => e.FontWeight = Text.FontWeight.Bold);
+            return leaves.Apply(e => e.Style.Set(StyleKeys.FontWeight, Text.FontWeight.Bold));
         }
 
         [Command("Italic")]
         public static IEnumerable<Leaf> Italic(IEnumerable<Leaf> leaves)
         {
-            return leaves.Apply(e => e.FontWeight = Text.FontWeight.Italic);
+            return leaves.Apply(e => e.Style.Set(StyleKeys.FontWeight, Text.FontWeight.Italic));
         }
 
         [Command("BoldItalic")]
         public static IEnumerable<Leaf> BoldItalic(IEnumerable<Leaf> leaves)
         {
-            return leaves.Apply(e => e.FontWeight = Text.FontWeight.BoldItalic);
+            return leaves.Apply(e => e.Style.Set(StyleKeys.FontWeight, Text.FontWeight.BoldItalic));
         }
 
         private static IEnumerable<Leaf> Apply(this IEnumerable<Leaf> leaves, Action<Leaf> action)

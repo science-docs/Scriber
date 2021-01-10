@@ -23,5 +23,10 @@ namespace Scriber.Layout.Styling.Classes
             }
             return result == element;
         }
+
+        public override string ToString()
+        {
+            return "only-child";
+        }
     }
 }

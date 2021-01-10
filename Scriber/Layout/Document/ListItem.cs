@@ -48,7 +48,7 @@ namespace Scriber.Layout.Document
             var font = Style.Get(StyleKeys.Font);
             var fontSize = Style.Get(StyleKeys.FontSize).Point;
             drawingContext.Offset = new Position(10, 0);
-            drawingContext.DrawText(new TextRun(GetPreamble(), new Text.Typeface(font!, fontSize, FontWeight, FontStyle)), Foreground);
+            drawingContext.DrawText(new TextRun(GetPreamble(), new Text.Typeface(font!, fontSize, Style.Get(StyleKeys.FontWeight), Style.Get(StyleKeys.FontStyle))), Foreground);
 
             drawingContext.PushTransform(new TranslateTransform(new Position(Buffer, 0)));
 

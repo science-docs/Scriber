@@ -256,7 +256,7 @@ namespace Scriber.Layout.Document
             }
             var fontSize = node.Element.Style.Get(StyleKeys.FontSize).Point;
 
-            return new TextRun(node.Text ?? string.Empty, new Text.Typeface(font, fontSize, node.Element.FontWeight, node.Element.FontStyle));
+            return new TextRun(node.Text ?? string.Empty, new Typeface(font, fontSize, node.Element.Style.Get(StyleKeys.FontWeight), node.Element.Style.Get(StyleKeys.FontStyle)));
         }
 
 

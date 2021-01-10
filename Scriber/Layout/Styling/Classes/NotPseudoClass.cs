@@ -16,5 +16,10 @@ namespace Scriber.Layout.Styling.Classes
         {
             return !Selector.Matches(element);
         }
+
+        public override string ToString()
+        {
+            return $"not({Selector})";
+        }
     }
 }

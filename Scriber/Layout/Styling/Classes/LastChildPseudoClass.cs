@@ -14,5 +14,10 @@ namespace Scriber.Layout.Styling.Classes
             var parentNodes = parent.ChildElements();
             return parentNodes.LastOrDefault() == element;
         }
+
+        public override string ToString()
+        {
+            return "last-child";
+        }
     }
 }

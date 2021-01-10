@@ -5,6 +5,7 @@ using Scriber.Bibliography.Styling;
 using Scriber.Bibliography.Styling.Formatting;
 using Scriber.Bibliography.Styling.Specification;
 using Scriber.Layout.Document;
+using Scriber.Layout.Styling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,34 +111,29 @@ namespace Scriber.Engine.Commands
         {
             var textLeaf = new TextLeaf(run.Text)
             {
-                Tag = string.Empty
+                Tag = "span"
             };
 
+            var fontWeight = Text.FontWeight.Normal;
             if (run.FontWeight == Scriber.Bibliography.Styling.Formatting.FontWeight.Bold)
             {
-                textLeaf.Tag += "b";
+                fontWeight |= Text.FontWeight.Bold;
             }
             if (run.FontStyle == Scriber.Bibliography.Styling.Formatting.FontStyle.Italic)
             {
-                textLeaf.Tag += "i";
+                fontWeight |= Text.FontWeight.Italic;
             }
 
-            if (string.IsNullOrEmpty(textLeaf.Tag))
-            {
-                textLeaf.Tag = "span";
-            }
+            textLeaf.Style.Set(StyleKeys.FontWeight, fontWeight);
 
-            string? classEntry = run.VerticalAlign switch
+            var fontStyle = run.VerticalAlign switch
             {
-                Scriber.Bibliography.Styling.Formatting.VerticalAlign.Subscript => "sub",
-                Scriber.Bibliography.Styling.Formatting.VerticalAlign.Superscript => "super",
-                _ => null
+                Scriber.Bibliography.Styling.Formatting.VerticalAlign.Subscript => Text.FontStyle.Subscript,
+                Scriber.Bibliography.Styling.Formatting.VerticalAlign.Superscript => Text.FontStyle.Superscript,
+                _ => Text.FontStyle.Normal
             };
 
-            if (classEntry != null)
-            {
-                textLeaf.Classes.Add(classEntry);
-            }
+            textLeaf.Style.Set(StyleKeys.FontStyle, fontStyle);
 
             return textLeaf;
         }

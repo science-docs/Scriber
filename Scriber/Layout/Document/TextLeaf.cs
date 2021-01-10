@@ -61,7 +61,7 @@ namespace Scriber.Layout.Document
             }
 
             var height = Style.Get(StyleKeys.FontSize).Point;
-            var width = font.GetWidth(Content, height, FontWeight);
+            var width = font.GetWidth(Content, height, Style.Get(StyleKeys.FontWeight));
             return new Size(width, height);
         }
     }

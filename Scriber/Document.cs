@@ -48,18 +48,16 @@ namespace Scriber
 
         public Document()
         {
-            //Locale = new Locale(Culture);
             Elements = new ElementCollection<DocumentElement>(this);
             PageItems = new ElementCollection<DocumentElement>(this);
             Styles = new StyleCollection();
             Measurements = new Measurements();
             Document = this;
 
-            var pStyle = new StyleContainer(StyleOrigin.Engine, "p, li");
-            pStyle.Set(StyleKeys.MarginBottom, 8.0);
-            Styles.Add(pStyle);
-            //Font = Font.Default;
-            //FontSize = 12;
+            foreach (var style in StyleReader.GetDefaultStyles())
+            {
+                Styles.Add(style);
+            }
         }
 
         public T Variable<T>(DocumentLocal<T> local)

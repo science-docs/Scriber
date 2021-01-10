@@ -1,5 +1,6 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
+using Scriber.Layout.Styling;
 using Scriber.Variables;
 using System.Globalization;
 
@@ -31,7 +32,7 @@ namespace Scriber.Engine.Commands
                 {
                     for (int i = 0; i < panel.Elements.Count; i++)
                     {
-                        panel.Elements[i].HorizontalAlignment = HorizontalAlignment.Center;
+                        panel.Elements[i].Style.Set(StyleKeys.HorizontalAlignment, HorizontalAlignment.Center);
                     }
                 }
             }

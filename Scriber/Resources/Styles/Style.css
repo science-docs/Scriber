@@ -1,0 +1,35 @@
+﻿p, li {
+	margin-bottom: 8pt;
+}
+
+h1 {
+	margin-top: 12pt;
+	margin-bottom: 8pt;
+	font-size: 18pt;
+}
+
+h2 {
+	margin-top: 12pt;
+	margin-bottom: 8pt;
+	font-size: 16pt;
+}
+
+h3 {
+	margin-top: 12pt;
+	margin-bottom: 8pt;
+	font-size: 14pt;
+}
+
+img {
+	margin-top: 8pt;
+	margin-bottom: 8pt;
+}
+
+caption {
+	margin-top: 4pt;
+	margin-bottom: 16pt;
+}
+
+.footnote-reference {
+	font-style: superscript;
+}

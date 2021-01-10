@@ -35,7 +35,7 @@ namespace Scriber.Layout.Styling
 
         public override string ToString()
         {
-            return $"{Class}:{PseudoClassText}";
+            return $"{Class}:{PseudoClass}";
         }
     }
 }

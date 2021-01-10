@@ -10,5 +10,10 @@ namespace Scriber.Layout.Styling
         {
             return true;
         }
+
+        public override string ToString()
+        {
+            return "*";
+        }
     }
 }

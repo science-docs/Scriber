@@ -88,5 +88,24 @@ namespace Scriber.Layout.Styling.Classes
                 return (position - Offset) % Step == 0;
             }
         }
+
+        public override string ToString()
+        {
+            string formula;
+            if (Step == 0)
+            {
+                formula = Offset.ToString();
+            }
+            else if (Offset == 0)
+            {
+                formula = $"{Step}n";
+            }
+            else
+            {
+                formula = $"{Step}n+{Offset}";
+            }
+
+            return $"nth-child({formula})";
+        }
     }
 }

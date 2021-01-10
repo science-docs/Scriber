@@ -59,7 +59,7 @@ namespace Scriber.Layout
             if (Orientation == Orientation.Vertical)
             {
                 y = value;
-                var align = measurement.Element.HorizontalAlignment;
+                var align = measurement.Element.Style.Get(StyleKeys.HorizontalAlignment);
                 if (align == HorizontalAlignment.Right)
                 {
                     x = availableSize.Width - total.Width;
@@ -72,7 +72,7 @@ namespace Scriber.Layout
             else
             {
                 x = value;
-                var align = measurement.Element.VerticalAlignment;
+                var align = measurement.Element.Style.Get(StyleKeys.VerticalAlignment);
                 if (align == VerticalAlignment.Bottom)
                 {
                     y = availableSize.Height - total.Height;

@@ -18,14 +18,18 @@ namespace Scriber.Layout.Document
 
         private FootnoteLeaf(string content, Paragraph value, bool addPrefix)
         {
-            FontStyle = FontStyle.Superscript;
+            Tag = "span";
+            Classes.Add("footnote-reference");
+            //FontStyle = FontStyle.Superscript;
             Content = content;
             Element = value ?? throw new ArgumentNullException(nameof(value));
-            value.VerticalAlignment = VerticalAlignment.Bottom;
+            //value.VerticalAlignment = VerticalAlignment.Bottom;
 
             if (addPrefix)
             {
-                value.Leaves.Insert(0, new TextLeaf(content) { FontStyle = FontStyle.Superscript });
+                var prefix = new TextLeaf(content) { Tag = Tag };
+                prefix.Classes.Add("footnote-reference");
+                value.Leaves.Insert(0, prefix);
             }
         }
 
@@ -55,7 +59,7 @@ namespace Scriber.Layout.Document
             }
 
             var height = Style.Get(StyleKeys.FontSize).Point;
-            var width = font.GetWidth(Content, height, FontWeight);
+            var width = font.GetWidth(Content, height, Style.Get(StyleKeys.FontWeight));
             return new Size(width, height);
         }
     }

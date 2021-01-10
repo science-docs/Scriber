@@ -25,5 +25,10 @@ namespace Scriber.Layout.Styling
             }
             return false;
         }
+
+        public override string ToString()
+        {
+            return "." + Class;
+        }
     }
 }
