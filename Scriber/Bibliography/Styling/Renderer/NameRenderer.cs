@@ -277,7 +277,11 @@ namespace Scriber.Bibliography.Styling.Renderer
                                     interpreter.Push("& ", formatting);
                                     break;
                                 case And.Text:
-                                    interpreter.Push(interpreter.Locale.GetTerm(TermName.And, TermFormat.Long, false), formatting);
+                                    var andTerm = interpreter.Locale.GetTerm(TermName.And, TermFormat.Long, false);
+                                    if (andTerm != null)
+                                    {
+                                        interpreter.Push(andTerm + " ", formatting);
+                                    }
                                     break;
                             }
                         }
