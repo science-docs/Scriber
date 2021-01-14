@@ -1,6 +1,4 @@
-﻿using Scriber.Layout.Styling;
-
-namespace Scriber.Layout.Document
+﻿namespace Scriber.Layout.Document
 {
     public class PageReference : Leaf, ITextLeaf
     {
@@ -33,19 +31,7 @@ namespace Scriber.Layout.Document
             }
 
             PageNumber = ReferencedElement.Page.Number ?? throw new LayoutException("Pagenumber was not set");
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            var font = Style.Get(StyleKeys.Font);
-            if (font == null)
-            {
-                throw new LayoutException("Font property of the element was not set");
-            }
-
-            var height = Style.Get(StyleKeys.FontSize).Point;
-            var width = font.GetWidth(PageNumber, height, Style.Get(StyleKeys.FontWeight));
-            return new Size(width, height);
+            Invalidate();
         }
 
         protected override AbstractElement CloneInternal()

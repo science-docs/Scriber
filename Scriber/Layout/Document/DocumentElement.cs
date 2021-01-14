@@ -17,6 +17,12 @@ namespace Scriber.Layout.Document
 
         public Measurement Measure(Size availableSize)
         {
+            if (IsValid)
+            {
+                return Measurement;
+            }
+
+            IsValid = true;
             if (!IsVisible)
             {
                 return Measurement = new Measurement(this);
@@ -69,6 +75,10 @@ namespace Scriber.Layout.Document
             if (next.Subs.Count == 0)
             {
                 next = null;
+            }
+            else
+            {
+                Invalidate();
             }
 
             return new SplitResult(source, measurement, next);

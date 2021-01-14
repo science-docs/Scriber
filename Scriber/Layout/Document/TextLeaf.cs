@@ -1,5 +1,4 @@
-﻿using Scriber.Layout.Styling;
-using Scriber.Text;
+﻿using Scriber.Text;
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
@@ -46,23 +45,6 @@ namespace Scriber.Layout.Document
             }
 
             return LineNodeTransformer.Create(this).ToArray();
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            if (Content == null)
-            {
-                throw new LayoutException("Content property is null");
-            }
-            var font = Style.Get(StyleKeys.Font);
-            if (font == null)
-            {
-                throw new LayoutException("Font property is null");
-            }
-
-            var height = Style.Get(StyleKeys.FontSize).Point;
-            var width = font.GetWidth(Content, height, Style.Get(StyleKeys.FontWeight));
-            return new Size(width, height);
         }
     }
 }

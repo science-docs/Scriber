@@ -3,13 +3,11 @@ using Scriber.Drawing;
 
 namespace Scriber.Layout.Document
 {
-    public delegate DocumentElement BlockCallback();
-
     public class CallbackBlock : DocumentElement
     {
-        public BlockCallback Callback { get; }
+        public Func<DocumentElement> Callback { get; }
 
-        public CallbackBlock(BlockCallback callback)
+        public CallbackBlock(Func<DocumentElement> callback)
         {
             Callback = callback;
         }

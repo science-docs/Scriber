@@ -1,5 +1,4 @@
-﻿using Scriber.Layout.Styling;
-using Scriber.Text;
+﻿using Scriber.Text;
 using System;
 using System.Collections.Generic;
 
@@ -47,20 +46,6 @@ namespace Scriber.Layout.Document
         protected override AbstractElement CloneInternal()
         {
             return new FootnoteLeaf(Content, Element.Clone(), false);
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            var font = Style.Get(StyleKeys.Font);
-
-            if (font == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var height = Style.Get(StyleKeys.FontSize).Point;
-            var width = font.GetWidth(Content, height, Style.Get(StyleKeys.FontWeight));
-            return new Size(width, height);
         }
     }
 }

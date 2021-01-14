@@ -1,6 +1,4 @@
-﻿using Scriber.Layout.Styling;
-
-namespace Scriber.Layout.Document
+﻿namespace Scriber.Layout.Document
 {
     public class ReferenceLeaf : Leaf, ITextLeaf
     {
@@ -27,19 +25,6 @@ namespace Scriber.Layout.Document
             }
             
             return items.ToArray();
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            var font = Style.Get(StyleKeys.Font);
-            if (font == null)
-            {
-                throw new LayoutException("Font property of the element was not set");
-            }
-
-            var height = Style.Get(StyleKeys.FontSize).Point;
-            var width = font.GetWidth(Preamble, height, Style.Get(StyleKeys.FontWeight));
-            return new Size(width, height);
         }
 
         protected override AbstractElement CloneInternal()

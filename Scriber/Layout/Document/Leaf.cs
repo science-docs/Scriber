@@ -1,19 +1,29 @@
-﻿using System;
+﻿using Scriber.Layout.Styling;
+using System;
 
 namespace Scriber.Layout.Document
 {
     public abstract class Leaf : AbstractElement
     {
-        public Size DesiredSize { get; private set; }
+        public double DesiredHeight { get; private set; }
 
         public abstract LineNode[] GetNodes();
 
-        public Size Measure(Size availableSize)
+        public double Measure(Size availableSize)
         {
-            return DesiredSize = MeasureOverride(availableSize);
+            if (IsValid)
+            {
+                return DesiredHeight;
+            }
+
+            IsValid = true;
+            return DesiredHeight = MeasureOverride(availableSize);
         }
 
-        protected abstract Size MeasureOverride(Size availableSize);
+        protected virtual double MeasureOverride(Size availableSize)
+        {
+            return Style.Get(StyleKeys.FontSize).Point;
+        }
 
         public new Leaf Clone()
         {

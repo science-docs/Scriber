@@ -26,6 +26,11 @@ namespace Scriber.Layout.Document
                 Manipulate(Document);
             }
         }
+
+        public override void Interlude()
+        {
+            Invalidate();
+        }
     }
 
     public abstract class MeasuringBlock : DocumentElement
@@ -44,6 +49,11 @@ namespace Scriber.Layout.Document
                 Manipulate(Document);
             }
             return new Measurement(this);
+        }
+
+        public override void Interlude()
+        {
+            Invalidate();
         }
     }
 }

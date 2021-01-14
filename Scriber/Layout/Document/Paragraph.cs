@@ -30,7 +30,7 @@ namespace Scriber.Layout.Document
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            var doc = Document ?? throw new LayoutException("Document was not set");
+            //var doc = Document ?? throw new LayoutException("Document was not set");
 
             var ms = new Measurement(this);
             lineNodes = new List<LineNode>();
@@ -63,7 +63,7 @@ namespace Scriber.Layout.Document
                     width += lastNode.Width;
                     foreach (var item in line)
                     {
-                        height = Math.Max(lineNodes[item.Index].Element?.DesiredSize.Height ?? 0, height);
+                        height = Math.Max(lineNodes[item.Index].Element?.DesiredHeight ?? 0, height);
                     }
 
                     var skip = Style.Get(StyleKeys.BaselineSkip) ?? Unit.FromPoint(height);
@@ -179,6 +179,10 @@ namespace Scriber.Layout.Document
             if (next.Subs.Count == 0)
             {
                 next = null;
+            }
+            else
+            {
+                Invalidate();
             }
 
             return new SplitResult(source, measurement, next);

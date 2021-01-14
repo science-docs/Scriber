@@ -36,6 +36,8 @@ namespace Scriber.Layout.Document
             set => document = value;
         }
 
+        public bool IsValid { get; protected set; } = false;
+
         public virtual IEnumerable<Symbol> Symbols => Array.Empty<Symbol>();
 
         public string Tag { get; set; } = string.Empty;
@@ -64,6 +66,12 @@ namespace Scriber.Layout.Document
         public virtual void Interlude()
         {
 
+        }
+
+        public void Invalidate()
+        {
+            IsValid = false;
+            Parent?.Invalidate();
         }
     }
 }
