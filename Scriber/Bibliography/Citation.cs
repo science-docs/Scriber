@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Scriber.Bibliography
 {
@@ -35,6 +37,11 @@ namespace Scriber.Bibliography
             {
                 variables[variable.Key] = variable.Value;
             }
+        }
+
+        public static Citation FromJson(JsonElement json)
+        {
+            return CitationJsonParser.Parse(json);
         }
     }
 }

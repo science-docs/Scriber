@@ -1,0 +1,3 @@
+[submodule "Scriber.Tests/Resources/Csl"]
+	path = Scriber.Tests/Resources/Csl
+	url = https://github.com/citation-style-language/test-suite.git

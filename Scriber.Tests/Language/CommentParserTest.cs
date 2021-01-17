@@ -1,9 +1,6 @@
 ﻿using Scriber.Language;
 using Scriber.Language.Syntax;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Scriber.Tests.Language

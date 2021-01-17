@@ -99,7 +99,7 @@ namespace Scriber.Bibliography.Styling.Specification
 
         public override void EvaluateOverride(Interpreter interpreter)
         {
-            if (Variable == null || !EnumUtility.TryParseEnum<TermName>(Variable, out var term))
+            if (Variable == null || !EnumUtility.TryParseEnum<TermName>(Variable.ToPascalCase(), out var term))
             {
                 throw new Exception();
             }

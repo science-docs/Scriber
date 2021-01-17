@@ -14,16 +14,6 @@ namespace Scriber.Bibliography.Styling.Specification
     /// </summary>
     public abstract class File : Element, ICloneable
     {
-        [ThreadStatic]
-        private static XmlReader? _Current;
-        internal static IXmlLineInfo? Current
-        {
-            get
-            {
-                return _Current as IXmlLineInfo;
-            }
-        }
-
         /// <summary>
         /// Public Citation Style Language namespace.
         /// </summary>
@@ -136,71 +126,35 @@ namespace Scriber.Bibliography.Styling.Specification
             // init
             File? result = null;
 
-            // locked?
-            if (_Current != null)
+            // read to first element
+            while (reader.NodeType != XmlNodeType.Element && !reader.EOF)
             {
-                throw new NotSupportedException();
+                reader.Read();
             }
 
-            // lock
-            _Current = reader;
-
-            // try/catch
-            try
+            // element present?
+            if (reader.NodeType == XmlNodeType.Element)
             {
-                // read to first element
-                while (reader.NodeType != XmlNodeType.Element && !reader.EOF)
+                // namespace valid?
+                if (reader.NamespaceURI != NAMESPACE_URI)
                 {
-                    reader.Read();
+                    throw new XmlException(string.Format("Unexpected namespace '{0}' encountered.", reader.NamespaceURI));
                 }
 
-                // element present?
-                if (reader.NodeType == XmlNodeType.Element)
+                Type? type = null;
+
+                type = reader.LocalName switch
                 {
-                    // namespace valid?
-                    if (reader.NamespaceURI != NAMESPACE_URI)
-                    {
-                        throw new XmlException(string.Format("Unexpected namespace '{0}' encountered.", reader.NamespaceURI));
-                    }
+                    "style" => typeof(StyleFile),
+                    "locale" => typeof(LocaleFile),
+                    _ => throw new XmlException(string.Format("Unexpected element '{0}' of encountered.", reader.LocalName)),
+                };
 
-                    // version
-                    var version = reader.GetAttribute("version");
-                    Type? type = null;
-                    switch (version)
-                    {
-                        case "1.0":
-                            // type
-                            switch (reader.LocalName)
-                            {
-                                case "style":
-                                    type = typeof(StyleFile);
-                                    break;
-                                case "locale":
-                                    type = typeof(LocaleFile);
-                                    break;
-                            }
-                            break;
-                        default:
-                            throw new XmlException(string.Format("Version '{0}' is not supported.", version));
-                    }
-
-                    // type found?
-                    if (type == null)
-                    {
-                        throw new XmlException(string.Format("Unexpected element '{0}' of version '{1}' encountered.", reader.LocalName, version));
-                    }
-
-                    // deserialize
-                    var xs = new XmlSerializer(type);
-                    xs.UnknownNode += XmlSerializer_UnknownNode;
-                    xs.UnknownAttribute += XS_UnknownAttribute;
-                    result = (File)xs.Deserialize(reader);
-                }
-            }
-            finally
-            {
-                // unlock
-                _Current = null;
+                // deserialize
+                var xs = new XmlSerializer(type);
+                xs.UnknownNode += XmlSerializer_UnknownNode;
+                xs.UnknownAttribute += XS_UnknownAttribute;
+                result = (File)xs.Deserialize(reader);
             }
 
             // done
@@ -211,8 +165,8 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             // unknown attribute encountered
             throw new XmlException(string.Format("Unexpected attribute '{0}' encountered.", e.Attr.LocalName), null, e.LineNumber, e.LinePosition - 2 - e.Attr.Name.Length);
-
         }
+
         static void XmlSerializer_UnknownNode(object sender, XmlNodeEventArgs e)
         {
             if (e.NodeType != XmlNodeType.Attribute)

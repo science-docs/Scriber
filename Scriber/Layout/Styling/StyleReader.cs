@@ -51,7 +51,7 @@ namespace Scriber.Layout.Styling
 
             foreach (var property in rule.Style)
             {
-                var propName = StringUtility.TransformStyleProperty(property.Name);
+                var propName = StringUtility.ToPascalCase(property.Name);
                 if (StyleKey.TryGetStyleKey(propName, out var styleKey) && context.Converters.TryConvert(property.Value, styleKey.Type, out var propertyValue))
                 {
                     container.Set(styleKey, propertyValue);

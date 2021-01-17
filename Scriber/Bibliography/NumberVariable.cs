@@ -30,7 +30,7 @@ namespace Scriber.Bibliography
 
             return TrySplitNumber(value, ",", out variable) 
                 || TrySplitNumber(value, "&", out variable) 
-                || TrySplitNumber(value, "--", out variable);
+                || TrySplitNumber(value, "-", out variable);
         }
 
         public static bool TryParseOrdinal(string value, out NumberVariable variable)

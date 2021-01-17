@@ -49,9 +49,19 @@ namespace Scriber.Util.Tests
         [InlineData("image", "Image")]
         [InlineData("", "")]
         [InlineData("MarginBottom", "MarginBottom")]
-        public void TransformCssProperty(string input, string output)
+        public void TestToPascalCase(string input, string output)
         {
-            Assert.Equal(output, input.TransformStyleProperty());
+            Assert.Equal(output, input.ToPascalCase());
+        }
+
+        [Theory]
+        [InlineData("margin-bottom", "margin-bottom")]
+        [InlineData("image", "image")]
+        [InlineData("", "")]
+        [InlineData("MarginBottom", "margin-bottom")]
+        public void TestToKebapCase(string input, string output)
+        {
+            Assert.Equal(output, input.ToKebapCase());
         }
 
         [Theory]
