@@ -11,7 +11,6 @@ namespace Scriber
         public Logger Logger { get; } = new Logger();
         public ConverterCollection Converters { get; } = new ConverterCollection();
         public CommandCollection Commands { get; } = new CommandCollection();
-        public VariableCollection Variables { get; } = new VariableCollection();
         public bool FailOnError { get; set; }
 
         public Context() : this(null)

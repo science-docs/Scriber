@@ -1,5 +1,6 @@
 ﻿using Scriber.Bibliography.Styling.Specification;
 using Scriber.Localization;
+using System.Collections.Generic;
 
 namespace Scriber.Bibliography.Styling.Tests
 {
@@ -12,10 +13,8 @@ namespace Scriber.Bibliography.Styling.Tests
     public class CslTestSuite
     {
         public CslTestMode Mode { get; set; }
-        public Citation[] Input { get; set; }
-#pragma warning disable CA1819 // Properties should not return arrays
-        public Citation[][] Citations { get; set; }
-#pragma warning restore CA1819 // Properties should not return arrays
+        public IReadOnlyList<Citation> Input { get; set; }
+        public IReadOnlyList<Citation[]> Citations { get; set; }
         public string Result { get; set; }
         public StyleFile Csl { get; set; }
         public string Version { get; set; }

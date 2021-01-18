@@ -12,14 +12,7 @@ namespace Scriber.Engine.Commands
             name ??= LabelVariables.FootnoteCounter.Increment(state.Document).ToString();
             var footnote = new FootnoteLeaf(name, content);
             content.Parent = footnote;
-            //content.HorizontalAlignment = Layout.HorizontalAlignment.Justify;
             content.Classes.Add("footnote");
-            var footnoteSize = state.Document.Variable(FontVariables.FootnoteSize);
-            // TODO: Footnote 
-            //if (footnoteSize != null)
-            //{
-            //    content.FontSize = footnoteSize.Value;
-            //}
             
             return footnote;
         }

@@ -87,7 +87,7 @@ namespace Scriber.Layout.Document
                         var item = lineNodes[node.Index];
                         if (item.Element is FootnoteLeaf footnote)
                         {
-                            var footMS = footnote.Element.Measure(Document.Variable(PageVariables.BoxSize));
+                            var footMS = footnote.Element.Measure(Document!.Variable(PageVariables.BoxSize));
                             measurement.Extra.Subs.Add(footMS);
                         }
                     }
