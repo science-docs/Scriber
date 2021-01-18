@@ -128,19 +128,39 @@ namespace Scriber.Bibliography
             var names = new List<IName>();
             foreach (var nameElement in json.EnumerateArray())
             {
-                if (nameElement.TryGetProperty("given", out var givenName))
+                var hasGivenName = nameElement.TryGetProperty("given", out var givenName);
+                var hasFamilyName = nameElement.TryGetProperty("family", out var familyName);
+
+                if (hasGivenName || hasFamilyName)
                 {
-                    var familyName = string.Empty;
-                    if (nameElement.TryGetProperty("family", out var familyNameElement))
+                    var family = string.Empty;
+                    var given = string.Empty;
+                    string? suffix = null;
+                    string? droppingParticles = null;
+                    string? nonDroppingParticles = null;
+                    if (hasFamilyName)
                     {
-                        familyName = familyNameElement.GetString();
+                        family = familyName.GetString();
                     }
-                    names.Add(new PersonalName(familyName, givenName.GetString()));
-                }
-                else if (nameElement.TryGetProperty("family", out var familyNameElement))
-                {
-                    var familyName = familyNameElement.GetString();
-                    names.Add(new PersonalName(familyName, string.Empty));
+                    if (hasGivenName)
+                    {
+                        given = givenName.GetString();
+                    }
+                    if (nameElement.TryGetProperty("suffix", out var suffixElement))
+                    {
+                        suffix = suffixElement.GetString();
+                    }
+                    if (nameElement.TryGetProperty("dropping-particle", out var droppingParticlesElement))
+                    {
+                        droppingParticles = droppingParticlesElement.GetString();
+                    }
+                    if (nameElement.TryGetProperty("non-dropping-particle", out var nonDropingParticlesElement))
+                    {
+                        nonDroppingParticles = nonDropingParticlesElement.GetString();
+                    }
+                    var name = new PersonalName(family, given, suffix, false, droppingParticles, nonDroppingParticles);
+
+                    names.Add(name);
                 }
                 else if (nameElement.TryGetProperty("literal", out var literalName))
                 {

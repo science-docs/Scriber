@@ -1,7 +1,10 @@
 ﻿using Scriber.Bibliography.Styling.Specification;
 using Scriber.Util;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+
+using Match = System.Text.RegularExpressions.Match;
 
 namespace Scriber.Bibliography.Styling.Tests
 {
@@ -14,7 +17,7 @@ namespace Scriber.Bibliography.Styling.Tests
             var matches = ParserRegex.Matches(input);
             var suite = new CslTestSuite();
 
-            foreach (System.Text.RegularExpressions.Match match in matches)
+            foreach (Match match in matches)
             {
                 var names = match.Groups["name"].Captures;
                 var contents = match.Groups["content"].Captures;
@@ -31,9 +34,12 @@ namespace Scriber.Bibliography.Styling.Tests
                             break;
                         case "INPUT":
                             var array = JsonDocument.Parse(content).RootElement.EnumerateArray();
-                            array.MoveNext();
-                            var json = array.Current;
-                            suite.Input = Citation.FromJson(json);
+                            var inputs = new List<Citation>();
+                            while (array.MoveNext())
+                            {
+                                inputs.Add(Citation.FromJson(array.Current));
+                            }
+                            suite.Input = inputs.ToArray();
                             break;
                         case "RESULT":
                             suite.Result = content;

@@ -168,7 +168,7 @@ namespace Scriber.Bibliography.Styling.Renderer
                                 inverted = false;
                                 break;
                             case NameSortOptions.First:
-                                inverted = (index == 0);
+                                inverted = index == 0;
                                 break;
                             case NameSortOptions.All:
                                 inverted = true;
@@ -356,7 +356,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             var nonDroppingParticles = interpreter.Create(name.NonDroppingParticles, familyPart);
             var given = interpreter.Create(InitializeGivenNames(interpreter, name, nameElement.Initialize && (interpreter.DisambiguationContext.AddGivenNameLevel != DisambiguateAddGivenNameLevel.LongAndUninitialized), nameElement.InitializeWith), givenPart);
             var droppingParticles = interpreter.Create(name.DroppingParticles, givenPart);
-            var suffix = interpreter.Create(name.PrecedeSuffixByComma && !string.IsNullOrWhiteSpace(name.Suffix) ? string.Format(",{0}", name.Suffix) : name.Suffix, suffixPart);
+            var suffix = interpreter.Create(name.PrecedeSuffixByComma && !string.IsNullOrWhiteSpace(name.Suffix) ? $",{name.Suffix}" : name.Suffix, suffixPart);
 
             // space delimiter
             var space = interpreter.Create(" ", nameElement)!;

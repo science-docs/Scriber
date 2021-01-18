@@ -12,7 +12,7 @@ namespace Scriber.Bibliography.Styling.Tests
     public class CslTestSuite
     {
         public CslTestMode Mode { get; set; }
-        public Citation Input { get; set; }
+        public Citation[] Input { get; set; }
 #pragma warning disable CA1819 // Properties should not return arrays
         public Citation[][] Citations { get; set; }
 #pragma warning restore CA1819 // Properties should not return arrays
@@ -23,7 +23,7 @@ namespace Scriber.Bibliography.Styling.Tests
         public string Evaluate(Culture culture = null)
         {
             var processor = new Processor(Csl, LocaleFile.Defaults);
-            var run = processor.Cite(culture ?? Culture.Invariant, new Citation[] { Input });
+            var run = processor.Cite(culture ?? Culture.Invariant, Input);
             return run.ToPlainText();
         }
     }
