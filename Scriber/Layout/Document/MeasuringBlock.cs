@@ -2,10 +2,7 @@
 
 namespace Scriber.Layout.Document
 {
-    /// <summary>
-    /// Base class for block element that manipulate the document during the measuring phase.
-    /// </summary>
-    public abstract class ArrangingBlock : DocumentElement
+    public abstract class MeasuringBlock : DocumentElement
     {
         public abstract void Manipulate(Scriber.Document document);
 
@@ -15,15 +12,11 @@ namespace Scriber.Layout.Document
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            return new Measurement(this);
-        }
-
-        protected override void ArrangeOverride(Measurement finalMeasurement)
-        {
             if (Document != null)
             {
                 Manipulate(Document);
             }
+            return new Measurement(this);
         }
 
         public override void Interlude()

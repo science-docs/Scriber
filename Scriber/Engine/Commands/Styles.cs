@@ -10,7 +10,6 @@ namespace Scriber.Engine.Commands
         [Command("SetStyle")]
         public static void SetStyle(string selector, DynamicDictionary style)
         {
-
         }
     }
 }

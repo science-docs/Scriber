@@ -21,7 +21,5 @@ namespace Scriber.Layout.Styling
             Inherited = inherited;
             Compute = compute;
         }
-
-        
     }
 }

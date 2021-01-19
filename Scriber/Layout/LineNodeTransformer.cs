@@ -4,6 +4,7 @@ using System.Linq;
 using Scriber.Layout.Document;
 using Scriber.Layout.Styling;
 using Scriber.Text;
+using Scriber.Util;
 
 namespace Scriber.Layout
 {
@@ -104,8 +105,6 @@ namespace Scriber.Layout
                     box.Element = leaf;
                     nodes.Add(box);
                 }
-
-                
             }
 
             if (end)
@@ -137,30 +136,8 @@ namespace Scriber.Layout
 
         private static IEnumerable<string> Chunkenize(string fullText)
         {
-            if (string.IsNullOrWhiteSpace(fullText))
-            {
-                yield break;
-            }
-
             fullText = fullText.Trim();
-
-
-            int last = 0;
-
-            for (int i = 1; i < fullText.Length - 1; i++)
-            {
-                var c = fullText[i];
-                if (char.IsWhiteSpace(c))
-                {
-                    if (i > last - 1)
-                    {
-                        yield return fullText[last..i];
-                    }
-                    last = i + 1;
-                }
-            }
-
-            yield return fullText.Substring(last);
+            return fullText.Split(c => char.IsWhiteSpace(c), StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

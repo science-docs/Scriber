@@ -54,8 +54,6 @@ namespace Scriber.Bibliography.Styling.Tests
                             break;
                     }
                 }
-
-                
             }
 
             return suite;

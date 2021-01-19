@@ -94,7 +94,6 @@ namespace Scriber.Layout.Document
                 }
             }
 
-            
             if (ms.Subs.Count > 0)
             {
                 ms.Margin = Style.Get(StyleKeys.Margin);
@@ -255,7 +254,6 @@ namespace Scriber.Layout.Document
             var typeface = node.Element.Style.Get(StyleKeys.Typeface);
             return new TextRun(node.Text ?? string.Empty, typeface);
         }
-
 
         public override void Interlude()
         {

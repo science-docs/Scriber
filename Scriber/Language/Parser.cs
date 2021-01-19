@@ -199,8 +199,6 @@ namespace Scriber.Language
                 command.Arguments = new ListSyntax<ArgumentSyntax>();
             }
 
-            
-
             if (context.Tokens.SkipSearchFor(e => e.Type == TokenType.Whitespace || e.Type == TokenType.Newline, e => e.Type == TokenType.CurlyOpen))
             {
                 command.Environment = ParseExplicitBlock(context);
@@ -317,7 +315,6 @@ namespace Scriber.Language
             }
 
             CleanText(argument.Content);
-
 
             argument.Span = span.WithEnd(token.Span.End);
 
@@ -599,78 +596,90 @@ namespace Scriber.Language
             var token = context.Tokens.Peek();
             var span = token!.Span;
             var list = new ListSyntax();
+            bool continueParsing = true;
+            SyntaxNode? outNode = null;
 
-            while (token.Type != TokenType.None)
+            while (continueParsing && token.Type != TokenType.None)
             {
-                switch (token.Type)
+                continueParsing = ParseElement(context, stop, out outNode);
+                if (outNode != null)
                 {
-                    case TokenType.Whitespace:
-                    case TokenType.Text:
-                        list.Add(ParseText(context, stop));
-                        break;
-                    case TokenType.Percent:
-                        list.Add(ParsePercent(context));
-                        break;
-                    case TokenType.DoubleSlash:
-                        list.Add(ParseSinglelineComment(context));
-                        break;
-                    case TokenType.SlashAsterisk:
-                        list.Add(ParseMultilineComment(context));
-                        break;
-                    case TokenType.At:
-                        list.Add(ParseCommand(context));
-                        break;
-                    case TokenType.QuotedRaw:
-                        list.Add(ParseStringLiteral(context));
-                        break;
-                    case TokenType.Quotation:
-                        list.Add(ParseQuotation(context));
-                        break;
-                    case TokenType.CurlyOpen:
-                        if (stop.Contains(TokenType.Semicolon))
-                        {
-                            list.Add(ParseObject(context));
-                        }
-                        else
-                        {
-                            list.Add(ParseText(context, stop));
-                        }
-                        break;
-                    case TokenType.BracketOpen:
-                        if (stop.Contains(TokenType.Semicolon))
-                        {
-                            list.Add(ParseArray(context));
-                        }
-                        else
-                        {
-                            list.Add(ParseText(context, stop));
-                        }
-                        break;
-                    case TokenType.Newline:
-                        SkipWhitespaceTokens(context);
-                        goto end;
-                    default:
-                        if (!stop.Contains(token.Type))
-                        {
-                            list.Add(ParseText(context, stop));
-                            break;
-                        }
-                        else
-                        {
-                            goto end;
-                        }
+                    list.Add(outNode);
                 }
                 token = context.Tokens.Peek();
             }
-
-            
-            end:
 
             token = context.Tokens.Peek();
             list.Span = span.WithEnd(token.Span.End);
             context.Tokens.SkipWhile(e => e.Type == TokenType.Newline);
 
             return list;
+        }
+
+        private static bool ParseElement(ParserContext context, TokenType[] stop, out SyntaxNode? node)
+        {
+            node = null;
+            var token = context.Tokens.Peek();
+            switch (token.Type)
+            {
+                case TokenType.Whitespace:
+                case TokenType.Text:
+                    node = ParseText(context, stop);
+                    break;
+                case TokenType.Percent:
+                    node = ParsePercent(context);
+                    break;
+                case TokenType.DoubleSlash:
+                    node = ParseSinglelineComment(context);
+                    break;
+                case TokenType.SlashAsterisk:
+                    node = ParseMultilineComment(context);
+                    break;
+                case TokenType.At:
+                    node = ParseCommand(context);
+                    break;
+                case TokenType.QuotedRaw:
+                    node = ParseStringLiteral(context);
+                    break;
+                case TokenType.Quotation:
+                    node = ParseQuotation(context);
+                    break;
+                case TokenType.CurlyOpen:
+                    if (stop.Contains(TokenType.Semicolon))
+                    {
+                        node = ParseObject(context);
+                    }
+                    else
+                    {
+                        node = ParseText(context, stop);
+                    }
+                    break;
+                case TokenType.BracketOpen:
+                    if (stop.Contains(TokenType.Semicolon))
+                    {
+                        node = ParseArray(context);
+                    }
+                    else
+                    {
+                        node = ParseText(context, stop);
+                    }
+                    break;
+                case TokenType.Newline:
+                    SkipWhitespaceTokens(context);
+                    return false;
+                default:
+                    if (!stop.Contains(token.Type))
+                    {
+                        node = ParseText(context, stop);
+                        break;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+            }
+
+            return true;
         }
 
         private static void IssuesChanged(Logger logger, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -683,5 +692,7 @@ namespace Scriber.Language
                 }
             }
         }
+
+        
     }
 }

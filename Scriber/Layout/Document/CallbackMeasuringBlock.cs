@@ -2,11 +2,11 @@
 
 namespace Scriber.Layout.Document
 {
-    public class CallbackArrangingBlock : ArrangingBlock
+    public class CallbackMeasuringBlock : MeasuringBlock
     {
         public Action<DocumentElement> Callback { get; }
 
-        public CallbackArrangingBlock(Action<DocumentElement> callback)
+        public CallbackMeasuringBlock(Action<DocumentElement> callback)
         {
             Callback = callback;
         }

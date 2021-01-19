@@ -5,17 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Scriber.Layout.Styling
 {
-    public class StyleKey<T> : StyleKey
-    {
-        public StyleKey(string name, T defaultValue) : base(name, typeof(T), defaultValue)
-        {
-        }
-
-        public StyleKey(string name, bool inherited, T defaultValue) : base(name, typeof(T), inherited, defaultValue)
-        {
-        }
-    }
-
     public class StyleKey : IEquatable<StyleKey>
     {
         public static bool TryGetStyleKey(string name, [MaybeNullWhen(false)] out StyleKey styleKey)

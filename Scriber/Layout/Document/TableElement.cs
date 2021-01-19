@@ -40,7 +40,6 @@ namespace Scriber.Layout.Document
             referenceParagraph.Parent = this;
             referenceParagraph.Style.Set(StyleKeys.VerticalAlignment, VerticalAlignment.Bottom);
 
-            
             Set(Content, 0, 1);
             Set(referenceParagraph, 0, 2);
         }
@@ -54,7 +53,7 @@ namespace Scriber.Layout.Document
             const double size = 9;
             var lastContentLine = Content.Measurement.Subs[^1];
             var position = Content.Measurement.Position + lastContentLine.Position;
-            position.X += lastContentLine.Size.Width + fontSize / 3;
+            position.X += lastContentLine.Size.Width + (fontSize / 3);
             var referencePagePosition = referenceParagraph.Measurement.Position;
             referencePagePosition.X -= fontSize / 5;
             referencePagePosition.X -= referencePagePosition.X % size;

@@ -8,8 +8,8 @@ namespace Scriber.Layout.Styling
     public class StyleCache
     {
         private readonly ConcurrentDictionary<BitArray, StyleContainer> computedStyles = new ConcurrentDictionary<BitArray, StyleContainer>();
+        private readonly StyleCollection styles;
         private int selectorCount = -1;
-        private StyleCollection styles;
 
         public StyleCache(StyleCollection styles)
         {
@@ -36,7 +36,6 @@ namespace Scriber.Layout.Styling
                 array = new BitArray(selectorCount);
             }
             
-
             int index = 0;
             foreach (var container in styles)
             {

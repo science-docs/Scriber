@@ -69,7 +69,8 @@ namespace Scriber.Util
             int hash = 0;
             for (int i = 0; i < bytes.Length; i++)
             {
-                hash ^= bytes[i] << (i % 4 * 8);
+                int byteIndex = i % sizeof(int);
+                hash ^= bytes[i] << (byteIndex * 8);
             }
             return hash;
         }

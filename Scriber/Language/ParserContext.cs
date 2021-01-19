@@ -12,7 +12,5 @@ namespace Scriber.Language
         public TokenQueue Tokens { get; set; } = new TokenQueue(Array.Empty<Token>());
 
         private List<(SyntaxNode node, IEnumerable<TokenType>)> stopTokens = new List<(SyntaxNode node, IEnumerable<TokenType>)>();
-
-
     }
 }

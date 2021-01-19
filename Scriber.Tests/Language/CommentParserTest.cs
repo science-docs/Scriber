@@ -11,9 +11,7 @@ namespace Scriber.Tests.Language
         public void TestWithoutSpace()
         {
             var element = ParseAsSyntax<CommentSyntax>("/*test*/ end");
-
         }
-
 
         private T ParseAsSyntax<T>(string input) where T : SyntaxNode
         {
