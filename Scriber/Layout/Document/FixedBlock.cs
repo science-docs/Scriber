@@ -44,6 +44,7 @@ namespace Scriber.Layout.Document
 
         public FixedBlock(DocumentElement child)
         {
+            Tag = "div";
             Child = child;
             Child.Parent = this;
         }

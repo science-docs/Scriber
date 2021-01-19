@@ -10,6 +10,15 @@ namespace Scriber.Layout.Styling
         public static StyleKey<FontWeight> FontWeight { get; } = new StyleKey<FontWeight>(nameof(FontWeight), true, Text.FontWeight.Normal);
         public static StyleKey<FontStyle> FontStyle { get; } = new StyleKey<FontStyle>(nameof(FontStyle), true, Text.FontStyle.Normal);
 
+        public static ComputedStyleKey<Typeface> Typeface { get; } = new ComputedStyleKey<Typeface>(nameof(Typeface), style =>
+        {
+            var font = style.Get(Font)!;
+            var size = style.Get(FontSize).Point;
+            var weight = style.Get(FontWeight);
+            var fontStyle = style.Get(FontStyle);
+            return new Typeface(font, size, weight, fontStyle);
+        });
+
         public static StyleKey<HorizontalAlignment> HorizontalAlignment { get; } = new StyleKey<HorizontalAlignment>(nameof(HorizontalAlignment), true, Layout.HorizontalAlignment.Justify);
         public static StyleKey<VerticalAlignment> VerticalAlignment { get; } = new StyleKey<VerticalAlignment>(nameof(VerticalAlignment), true, Layout.VerticalAlignment.Top);
 

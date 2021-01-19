@@ -60,6 +60,15 @@ namespace Scriber.Engine.Commands
                 Position = position
             };
 
+            if (position.HasFlag(FixedPosition.Bottom))
+            {
+                block.Classes.Add("footer");
+            }
+            else if (position.HasFlag(FixedPosition.Top))
+            {
+                block.Classes.Add("header");
+            }
+
             for (int i = 0; i < state.Document.PageItems.Count; i++)
             {
                 var item = state.Document.PageItems[i];

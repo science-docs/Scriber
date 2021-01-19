@@ -252,15 +252,8 @@ namespace Scriber.Layout.Document
             {
                 throw new NullReferenceException("The Element property of a LineNode was null");
             }
-
-            var font = node.Element.Style.Get(StyleKeys.Font);
-            if (font == null)
-            {
-                throw new NullReferenceException("The Font property of a LineNode was null");
-            }
-            var fontSize = node.Element.Style.Get(StyleKeys.FontSize).Point;
-
-            return new TextRun(node.Text ?? string.Empty, new Typeface(font, fontSize, node.Element.Style.Get(StyleKeys.FontWeight), node.Element.Style.Get(StyleKeys.FontStyle)));
+            var typeface = node.Element.Style.Get(StyleKeys.Typeface);
+            return new TextRun(node.Text ?? string.Empty, typeface);
         }
 
 
