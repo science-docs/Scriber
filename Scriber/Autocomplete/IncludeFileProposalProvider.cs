@@ -4,7 +4,6 @@
     {
         public IncludeFileProposalProvider() : base(BuildFilter("sc"))
         {
-
         }
     }
 }

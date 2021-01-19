@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Scriber.Drawing;
+using Scriber.Layout.Styling;
+using Scriber.Text;
 using Scriber.Variables;
 
 namespace Scriber.Layout.Document
@@ -13,14 +15,22 @@ namespace Scriber.Layout.Document
         private List<LineNode>? lineNodes;
         private PositionedItem[][]? lines;
 
+        public override IEnumerable<Symbol> Symbols => Leaves.SelectMany(e => e.Symbols);
+
         public Paragraph()
         {
+            Tag = "p";
             Leaves = new ElementCollection<Leaf>(this);
+        }
+
+        public override IEnumerable<AbstractElement> ChildElements()
+        {
+            return Leaves;
         }
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            var doc = Document ?? throw new LayoutException("Document was not set");
+            //var doc = Document ?? throw new LayoutException("Document was not set");
 
             var ms = new Measurement(this);
             lineNodes = new List<LineNode>();
@@ -53,14 +63,15 @@ namespace Scriber.Layout.Document
                     width += lastNode.Width;
                     foreach (var item in line)
                     {
-                        height = Math.Max(lineNodes[item.Index].Element?.DesiredSize.Height ?? 0, height);
+                        height = Math.Max(lineNodes[item.Index].Element?.DesiredHeight ?? 0, height);
                     }
 
-                    var stretch = ParagraphVariables.BaselineStretch[doc];
+                    var skip = Style.Get(StyleKeys.BaselineSkip) ?? Unit.FromPoint(height);
+                    var stretch = Style.Get(StyleKeys.BaselineStretch);
 
                     if (!last)
                     {
-                        height *= stretch;
+                        height = skip.Point * stretch;
                     }
                     var size = new Size(width, height);
                     var measurement = new Measurement(this, size, Thickness.Zero)
@@ -76,17 +87,16 @@ namespace Scriber.Layout.Document
                         var item = lineNodes[node.Index];
                         if (item.Element is FootnoteLeaf footnote)
                         {
-                            var footMS = footnote.Element.Measure(Document.Variable(PageVariables.BoxSize));
+                            var footMS = footnote.Element.Measure(Document!.Variable(PageVariables.BoxSize));
                             measurement.Extra.Subs.Add(footMS);
                         }
                     }
                 }
             }
 
-            
             if (ms.Subs.Count > 0)
             {
-                ms.Margin = new Thickness(Margin.Top, 0, Margin.Bottom, 0);
+                ms.Margin = Style.Get(StyleKeys.Margin);
             }
 
             return ms;
@@ -169,6 +179,10 @@ namespace Scriber.Layout.Document
             {
                 next = null;
             }
+            else
+            {
+                Invalidate();
+            }
 
             return new SplitResult(source, measurement, next);
         }
@@ -223,7 +237,7 @@ namespace Scriber.Layout.Document
 
                         if (node.Link != null)
                         {
-                            var rect = new Rectangle(offset, new Size(node.Width, node.Element.FontSize));
+                            var rect = new Rectangle(offset, new Size(node.Width, node.Element.Style.Get(StyleKeys.FontSize).Point));
                             drawingContext.AddLink(rect, node.Link.Value);
                         }
                     }
@@ -237,15 +251,9 @@ namespace Scriber.Layout.Document
             {
                 throw new NullReferenceException("The Element property of a LineNode was null");
             }
-
-            if (node.Element.Font == null)
-            {
-                throw new NullReferenceException("The Font property of a LineNode was null");
-            }
-
-            return new TextRun(node.Text ?? string.Empty, new Text.Typeface(node.Element.Font, node.Element.FontSize, node.Element.FontWeight, node.Element.FontStyle));
+            var typeface = node.Element.Style.Get(StyleKeys.Typeface);
+            return new TextRun(node.Text ?? string.Empty, typeface);
         }
-
 
         public override void Interlude()
         {

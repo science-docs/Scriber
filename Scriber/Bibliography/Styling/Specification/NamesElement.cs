@@ -94,9 +94,13 @@ namespace Scriber.Bibliography.Styling.Specification
 
         public override void EvaluateOverride(Interpreter interpreter)
         {
-            if (Name == null)
+            if (Name is null && Substitute is null)
             {
                 throw new ArgumentNullException(nameof(Name));
+            }
+            else if (Name is null)
+            {
+                throw new NotImplementedException("Substitute rendering");
             }
 
             var variables = Utility.Split(Variable, ' ');

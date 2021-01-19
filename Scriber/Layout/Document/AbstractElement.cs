@@ -1,4 +1,7 @@
-﻿using Scriber.Text;
+﻿using Scriber.Layout.Styling;
+using Scriber.Text;
+using System;
+using System.Collections.Generic;
 
 namespace Scriber.Layout.Document
 {
@@ -6,44 +9,19 @@ namespace Scriber.Layout.Document
     {
         public AbstractElement? Parent { get; set; }
 
-        public Font? Font
+        public Style Style
         {
-            get => font ?? Parent?.Font;
-            set => font = value;
-        }
-        public double FontSize
-        {
-            get => fontSize ?? Parent?.FontSize ?? 0;
-            set => fontSize = value;
-        }
-        public FontWeight FontWeight
-        {
-            get => fontWeight ?? Parent?.FontWeight ?? FontWeight.Normal;
-            set => fontWeight = value;
-        }
-
-        public FontStyle FontStyle
-        {
-            get => fontStyle ?? Parent?.FontStyle ?? FontStyle.Normal;
-            set => fontStyle = value;
+            get
+            {
+                style ??= new Style(this);
+                return style;
+            }
         }
 
         public Color Foreground
         {
             get => foreground ?? Parent?.Foreground ?? Colors.Black;
             set => foreground = value;
-        }
-
-        public HorizontalAlignment HorizontalAlignment
-        {
-            get => horizontalAlignment ?? Parent?.HorizontalAlignment ?? 0;
-            set => horizontalAlignment = value;
-        }
-
-        public VerticalAlignment VerticalAlignment
-        {
-            get => verticalAlignment ?? Parent?.VerticalAlignment ?? 0;
-            set => verticalAlignment = value;
         }
 
         public DocumentPage? Page
@@ -58,32 +36,29 @@ namespace Scriber.Layout.Document
             set => document = value;
         }
 
-        public object? Tag { get; set; }
+        public bool IsValid { get; protected set; } = false;
 
-        public Thickness Margin { get; set; } = Thickness.Zero;
-        
-        private Font? font;
-        private double? fontSize;
-        private FontStyle? fontStyle;
+        public virtual IEnumerable<Symbol> Symbols => Array.Empty<Symbol>();
+
+        public string Tag { get; set; } = string.Empty;
+        public List<string> Classes { get; } = new List<string>();
+
         private Color? foreground;
-        private FontWeight? fontWeight;
-        private HorizontalAlignment? horizontalAlignment;
-        private VerticalAlignment? verticalAlignment;
         private DocumentPage? page;
         private Scriber.Document? document;
+        private Style? style;
 
         public AbstractElement Clone()
         {
             var clone = CloneInternal();
-            clone.Margin = Margin;
-            clone.font = font;
-            clone.fontSize = fontSize;
-            clone.foreground = foreground;
-            clone.fontWeight = fontWeight;
-            clone.fontStyle = fontStyle;
-            clone.document = document;
-            clone.horizontalAlignment = horizontalAlignment;
+            clone.Tag = Tag;
+            clone.Classes.AddRange(Classes);
             return clone;
+        }
+
+        public virtual IEnumerable<AbstractElement> ChildElements()
+        {
+            yield break;
         }
 
         protected abstract AbstractElement CloneInternal();
@@ -91,6 +66,12 @@ namespace Scriber.Layout.Document
         public virtual void Interlude()
         {
 
+        }
+
+        public void Invalidate()
+        {
+            IsValid = false;
+            Parent?.Invalidate();
         }
     }
 }

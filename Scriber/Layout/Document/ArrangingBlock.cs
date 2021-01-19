@@ -7,13 +7,10 @@ namespace Scriber.Layout.Document
     /// </summary>
     public abstract class ArrangingBlock : DocumentElement
     {
-        public override bool IsVisible => false;
-
         public abstract void Manipulate(Scriber.Document document);
 
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
-
         }
 
         protected override Measurement MeasureOverride(Size availableSize)
@@ -27,6 +24,11 @@ namespace Scriber.Layout.Document
             {
                 Manipulate(Document);
             }
+        }
+
+        public override void Interlude()
+        {
+            Invalidate();
         }
     }
 }

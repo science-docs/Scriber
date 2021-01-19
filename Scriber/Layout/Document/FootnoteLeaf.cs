@@ -1,25 +1,40 @@
-﻿namespace Scriber.Layout.Document
+﻿using Scriber.Text;
+using System;
+using System.Collections.Generic;
+
+namespace Scriber.Layout.Document
 {
     public class FootnoteLeaf : Leaf, ITextLeaf
     {
-        public string? Content { get; }
+        public string Content { get; }
         public Paragraph Element { get; }
 
-        public FootnoteLeaf(string? content, Paragraph value) : this(content, value, true)
+        public override IEnumerable<Symbol> Symbols => Element.Symbols;
+
+        public FootnoteLeaf(string content, Paragraph value) : this(content, value, true)
         {
         }
 
-        private FootnoteLeaf(string? content, Paragraph value, bool addPrefix)
+        private FootnoteLeaf(string content, Paragraph value, bool addPrefix)
         {
-            FontStyle = Text.FontStyle.Superscript;
+            Tag = "span";
+            Classes.Add("footnote-reference");
+            //FontStyle = FontStyle.Superscript;
             Content = content;
-            Element = value;
-            value.VerticalAlignment = VerticalAlignment.Bottom;
+            Element = value ?? throw new ArgumentNullException(nameof(value));
+            //value.VerticalAlignment = VerticalAlignment.Bottom;
 
             if (addPrefix)
             {
-                value.Leaves.Insert(0, new TextLeaf(content) { FontStyle = Text.FontStyle.Superscript });
+                var prefix = new TextLeaf(content) { Tag = Tag };
+                prefix.Classes.Add("footnote-reference");
+                value.Leaves.Insert(0, prefix);
             }
+        }
+
+        public override IEnumerable<AbstractElement> ChildElements()
+        {
+            yield return Element;
         }
 
         public override LineNode[] GetNodes()
@@ -31,22 +46,6 @@
         protected override AbstractElement CloneInternal()
         {
             return new FootnoteLeaf(Content, Element.Clone(), false);
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            if (Content == null)
-            {
-                throw new LayoutException("Content property is null");
-            }
-            if (Font == null)
-            {
-                throw new LayoutException("Font property is null");
-            }
-
-            var height = FontSize;
-            var width = Font.GetWidth(Content, FontSize, FontWeight);
-            return new Size(width, height);
         }
     }
 }

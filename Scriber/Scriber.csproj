@@ -163,6 +163,11 @@
     <None Remove="Resources\Locales\locales-zh-TW.xml" />
     <None Remove="Resources\Messages\exceptions.properties" />
     <None Remove="Resources\Messages\logging.properties" />
+    <None Remove="Resources\Styles\Style.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Styles\Style.css" />
   </ItemGroup>
 
   <ItemGroup>
@@ -326,6 +331,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ExCSS" Version="4.1.0" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.13" />
     <PackageReference Include="NHyphenator" Version="2.0.0" />
     <PackageReference Include="PdfSharpCore" Version="1.2.6" />

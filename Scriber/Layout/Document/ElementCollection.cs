@@ -13,7 +13,7 @@ namespace Scriber.Layout.Document
             get => list[index]; 
             set
             {
-                if (index >= Count)
+                if (index < 0 || index >= Count)
                 {
                     throw new IndexOutOfRangeException();
                 }
@@ -22,6 +22,12 @@ namespace Scriber.Layout.Document
                 list[index] = value ?? throw new ArgumentNullException(nameof(value));
                 value.Parent = Parent;
             }
+        }
+
+        public T this[Index index]
+        {
+            get => this[index.GetOffset(Count)];
+            set => this[index.GetOffset(Count)] = value;
         }
 
         public int Count => list.Count;

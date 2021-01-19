@@ -7,10 +7,14 @@ namespace Scriber.Bibliography
     {
         private readonly Citation citation;
 
-        public CitationBuilder(string key, CitationType type)
+        public CitationBuilder(string key, string type)
         {
             citation = new Citation(key);
-            citation[nameof(type)] = new TextVariable(TransformType(type));
+            citation[nameof(type)] = new TextVariable(type);
+        }
+
+        public CitationBuilder(string key, CitationType type) : this(key, TransformType(type))
+        {
         }
 
         private static string TransformType(CitationType type)
@@ -52,12 +56,12 @@ namespace Scriber.Bibliography
 
         public void ArchiveLocation(ITextVariable archiveLocation)
         {
-            Set(archiveLocation, "archive_location");
+            Set(archiveLocation);
         }
 
         public void ArchivePlace(ITextVariable archivePlace)
         {
-            Set(archivePlace, "archive-place");
+            Set(archivePlace);
         }
 
         public void Authority(ITextVariable authority)
@@ -67,32 +71,32 @@ namespace Scriber.Bibliography
 
         public void CallNumber(ITextVariable callNumber)
         {
-            Set(callNumber, "call-number");
+            Set(callNumber);
         }
 
         public void CitationLabel(ITextVariable citationLabel)
         {
-            Set(citationLabel, "citation-label");
+            Set(citationLabel);
         }
 
         public void CitationNumber(ITextVariable citationNumber)
         {
-            Set(citationNumber, "citation-number");
+            Set(citationNumber);
         }
 
         public void ContainerTitle(ITextVariable containerTitle)
         {
-            Set(containerTitle, "container-title");
+            Set(containerTitle);
         }
 
         public void CollectionTitle(ITextVariable collectionTitle)
         {
-            Set(collectionTitle, "collection-title");
+            Set(collectionTitle);
         }
 
         public void CollectionTitleShort(ITextVariable collectionTitleShort)
         {
-            Set(collectionTitleShort, "collection-title-short");
+            Set(collectionTitleShort);
         }
 
         public void Dimensions(ITextVariable dimensions)
@@ -112,12 +116,12 @@ namespace Scriber.Bibliography
 
         public void EventPlace(ITextVariable eventPlace)
         {
-            Set(eventPlace, "event-place");
+            Set(eventPlace);
         }
 
         public void FirstReferenceNoteNumber(ITextVariable firstReferenceNoteNumber)
         {
-            Set(firstReferenceNoteNumber, "first-reference-note-number");
+            Set(firstReferenceNoteNumber);
         }
 
         public void Genre(ITextVariable genre)
@@ -162,17 +166,17 @@ namespace Scriber.Bibliography
 
         public void OriginalPublisher(ITextVariable originalPublisher)
         {
-            Set(originalPublisher, "original-publisher");
+            Set(originalPublisher);
         }
 
         public void OriginalPublisherPlace(ITextVariable originalPublisherPlace)
         {
-            Set(originalPublisherPlace, "original-publisher-place");
+            Set(originalPublisherPlace);
         }
 
         public void OriginalTitle(ITextVariable originalTitle)
         {
-            Set(originalTitle, "original-title");
+            Set(originalTitle);
         }
 
         public void Page(ITextVariable page)
@@ -187,12 +191,12 @@ namespace Scriber.Bibliography
 
         public void PageFirst(ITextVariable pageFirst)
         {
-            Set(pageFirst, "page-first");
+            Set(pageFirst);
         }
 
         public void PageFirst(INumberVariable pageFirst)
         {
-            Set(pageFirst, "page-first");
+            Set(pageFirst);
         }
 
         public void Pmcid(ITextVariable pmcid)
@@ -212,7 +216,7 @@ namespace Scriber.Bibliography
 
         public void PublisherPlace(ITextVariable publisherPlace)
         {
-            Set(publisherPlace, "publisher-place");
+            Set(publisherPlace);
         }
 
         public void References(ITextVariable references)
@@ -222,7 +226,7 @@ namespace Scriber.Bibliography
 
         public void ReviewedTitle(ITextVariable reviewedTitle)
         {
-            Set(reviewedTitle, "reviewed-title");
+            Set(reviewedTitle);
         }
 
         public void Scale(ITextVariable scale)
@@ -252,7 +256,7 @@ namespace Scriber.Bibliography
 
         public void TitleShort(ITextVariable titleShort)
         {
-            Set(titleShort, "title-short");
+            Set(titleShort);
         }
 
         public void Url(ITextVariable url)
@@ -267,7 +271,7 @@ namespace Scriber.Bibliography
 
         public void YearSuffix(ITextVariable yearSuffix)
         {
-            Set(yearSuffix, "year-suffix");
+            Set(yearSuffix);
         }
 
         #endregion
@@ -276,12 +280,12 @@ namespace Scriber.Bibliography
 
         public void ChapterNumber(INumberVariable chapterNumber)
         {
-            Set(chapterNumber, "chapter-number");
+            Set(chapterNumber);
         }
 
         public void CollectionNumber(INumberVariable collectionNumber)
         {
-            Set(collectionNumber, "collection-number");
+            Set(collectionNumber);
         }
 
         public void Edition(INumberVariable edition)
@@ -301,12 +305,12 @@ namespace Scriber.Bibliography
 
         public void NumberOfPages(INumberVariable numberOfPages)
         {
-            Set(numberOfPages, "number-of-pages");
+            Set(numberOfPages);
         }
 
         public void NumberOfVolumes(INumberVariable numberOfVolumes)
         {
-            Set(numberOfVolumes, "number-of-volumes");
+            Set(numberOfVolumes);
         }
 
         public void Volume(INumberVariable volume)
@@ -330,7 +334,7 @@ namespace Scriber.Bibliography
 
         public void EventDate(IDateVariable eventDate)
         {
-            Set(eventDate, "event-date");
+            Set(eventDate);
         }
 
         public void Issued(IDateVariable issued)
@@ -340,7 +344,7 @@ namespace Scriber.Bibliography
 
         public void OriginalDate(IDateVariable originalDate)
         {
-            Set(originalDate, "original-date");
+            Set(originalDate);
         }
 
         public void Submitted(IDateVariable submitted)
@@ -359,7 +363,7 @@ namespace Scriber.Bibliography
 
         public void CollectionAuthor(INamesVariable collectionAuthor)
         {
-            Set(collectionAuthor, "collection-author");
+            Set(collectionAuthor);
         }
 
         public void Composer(INamesVariable composer)
@@ -369,7 +373,7 @@ namespace Scriber.Bibliography
 
         public void ContainerAuthor(INamesVariable containerAuthor)
         {
-            Set(containerAuthor, "container-author");
+            Set(containerAuthor);
         }
 
         public void Director(INamesVariable directory)
@@ -384,7 +388,7 @@ namespace Scriber.Bibliography
 
         public void EditorialDirector(INamesVariable editorialDirector)
         {
-            Set(editorialDirector, "editorial-director");
+            Set(editorialDirector);
         }
 
         public void Illustrator(INamesVariable illustrator)
@@ -399,7 +403,7 @@ namespace Scriber.Bibliography
 
         public void OriginalAuthor(INamesVariable originalAuthor)
         {
-            Set(originalAuthor, "original-author");
+            Set(originalAuthor);
         }
 
         public void Recipient(INamesVariable recipient)
@@ -409,7 +413,7 @@ namespace Scriber.Bibliography
 
         public void ReviewedAuthor(INamesVariable reviewedAuthor)
         {
-            Set(reviewedAuthor, "reviewed-author");
+            Set(reviewedAuthor);
         }
 
         public void Translator(INamesVariable translator)
@@ -419,11 +423,11 @@ namespace Scriber.Bibliography
 
         #endregion
 
-        private void Set(IVariable variable, [CallerMemberName] string? name = null)
+        internal void Set(IVariable variable, [CallerMemberName] string? name = null)
         {
             if (name != null)
             {
-                citation[name] = variable;
+                citation[name.ToKebapCase()] = variable;
             }
         }
 

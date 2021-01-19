@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scriber.Util;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -19,17 +20,17 @@ namespace Scriber
             local[document] = --value;
             return value;
         }
-
-        public static DocumentLocal<T> Create<T>() where T : new()
-        {
-            return new DocumentLocal<T>(() => new T());
-        }
     }
 
     public class DocumentLocal<T>
     {
-        private readonly ConditionalWeakTable<Document, ObjectBox<T>> table = new ConditionalWeakTable<Document, ObjectBox<T>>();
+        private readonly ConditionalWeakTable<Document, ObjectBox> table = new ConditionalWeakTable<Document, ObjectBox>();
         private readonly Func<T> consumer;
+
+        public DocumentLocal()
+        {
+            consumer = Activator.CreateInstance<T>;
+        }
 
         public DocumentLocal([AllowNull] T defaultValue)
         {
@@ -64,11 +65,6 @@ namespace Scriber
             this.consumer = consumer;
         }
 
-        protected DocumentLocal()
-        {
-            consumer = CreateDefault;
-        }
-
         public T this[Document document]
         {
             get => Get(document);
@@ -91,7 +87,7 @@ namespace Scriber
 
         public virtual void Set(Document document, [AllowNull] T value)
         {
-            table.AddOrUpdate(document, new ObjectBox<T>(value));
+            table.AddOrUpdate(document, new ObjectBox(value));
         }
 
         [return: MaybeNull]
@@ -100,12 +96,12 @@ namespace Scriber
             return default;
         }
 
-        private class ObjectBox<TElement>
+        private class ObjectBox
         {
             [AllowNull]
-            public TElement Element { get; set; }
+            public T Element { get; set; }
 
-            public ObjectBox([AllowNull] TElement element)
+            public ObjectBox([AllowNull] T element)
             {
                 Element = element;
             }

@@ -31,7 +31,7 @@ namespace Scriber.Engine.Commands
 
                 if (value is Paragraph paragraph)
                 {
-                    list.Add((key, paragraph));
+                    list[key] = paragraph;
 
                     var grid = new Grid();
                     grid.Rows.Add(new GridLength(GridUnit.Auto, 0));
@@ -53,15 +53,15 @@ namespace Scriber.Engine.Commands
         {
             var list = AcronymVariables.Acronyms.Get(state.Document);
             var usedAcronyms = AcronymVariables.UsedAcronyms.Get(state.Document);
-            var pair = list.FirstOrDefault(e => e.name.ToLowerInvariant() == name.ToLowerInvariant());
+            var pair = list.FirstOrDefault(e => e.Key.ToLowerInvariant() == name.ToLowerInvariant());
 
-            if (pair != default((string, Paragraph)))
+            if (!string.IsNullOrEmpty(pair.Key))
             {
-                var paragraph = Paragraph.FromLeaves(new ReferenceLeaf(pair.full, pair.name));
+                var paragraph = Paragraph.FromLeaves(new ReferenceLeaf(pair.Value, pair.Key));
 
-                if (usedAcronyms.Add(pair.name))
+                if (usedAcronyms.Add(pair.Key))
                 {
-                    paragraph = pair.full;
+                    paragraph = pair.Value;
                 }
 
                 return paragraph.Leaves;

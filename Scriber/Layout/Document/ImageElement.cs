@@ -1,5 +1,5 @@
 ﻿using Scriber.Drawing;
-
+using Scriber.Layout.Styling;
 using Img = SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>;
 
 namespace Scriber.Layout.Document
@@ -40,6 +40,7 @@ namespace Scriber.Layout.Document
 
         private ImageElement(Img? image, byte[] imageData, string fileName)
         {
+            Tag = "img";
             FileName = fileName;
             this.imageData = imageData;
             Image = image ?? SixLabors.ImageSharp.Image.Load(imageData);
@@ -76,7 +77,7 @@ namespace Scriber.Layout.Document
                 if (width != null)
                 {
                     var aspectRatio = OriginalWidth.Presentation / OriginalHeight.Presentation;
-                    height = new Unit(width.Value.Presentation * aspectRatio, UnitType.Presentation);
+                    height = new Unit(width.Value.Presentation / aspectRatio, UnitType.Presentation);
                 }
                 else if (height != null)
                 {
@@ -86,13 +87,14 @@ namespace Scriber.Layout.Document
             }
 
             var size = new Size(Width.Point * Scale, Height.Point * Scale);
+            var margin = Style.Get(StyleKeys.Margin);
             if (size.Width > availableSize.Width)
             {
-                var ratio = size.Width / (availableSize.Width - Margin.Width - 2);
+                var ratio = size.Width / (availableSize.Width - margin.Width - 2);
                 size.Width /= ratio;
                 size.Height /= ratio;
             }
-            return new Measurement(this, size, Margin);
+            return new Measurement(this, size, margin);
         }
 
         public override SplitResult Split(Measurement source, double height)

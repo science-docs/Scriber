@@ -1,6 +1,5 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
-using Scriber.Variables;
 
 namespace Scriber.Engine.Commands
 {
@@ -8,20 +7,18 @@ namespace Scriber.Engine.Commands
     public static class Lists
     {
         [Command("ListItem")]
-        public static Paragraph Item(CompilerState state, Paragraph content)
+        public static Paragraph Item(Paragraph content)
         {
-            var listItem = new ListItem(content);
-            var margin = new Thickness(0, 0, state.Document.Variable(ParagraphVariables.Skip), 0);
-            listItem.Margin = margin;
-            return listItem;
+            return new ListItem(content);
         }
 
         [Command("List")]
-        public static StackPanel List(CompilerState state, ListStyle style, Argument[] contents)
+        public static StackPanel List(ListStyle style, Argument[] contents)
         {
             var panel = new StackPanel
             {
-                Orientation = Orientation.Vertical
+                Orientation = Orientation.Vertical,
+                Tag = "list"
             };
 
             int index = 1;
@@ -30,7 +27,7 @@ namespace Scriber.Engine.Commands
                 if (content.Value is ListItem item)
                 {
                     item.Index = index++;
-                    item.Style = style;
+                    item.ListStyle = style;
                     panel.Elements.Add(item);
                 }
             }

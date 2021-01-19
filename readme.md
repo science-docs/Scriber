@@ -11,6 +11,10 @@
 	<a href="https://codecov.io/gh/science-docs/Scriber">
 		<img alt="code-coverage" src="https://img.shields.io/codecov/c/github/science-docs/Scriber/master?style=flat-square&logo=codecov">
 	</a>
+	<a href="https://www.codefactor.io/repository/github/science-docs/scriber">
+		<img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/science-docs/Scriber?style=flat-square">
+	</a>
+	
 </div>
 
 

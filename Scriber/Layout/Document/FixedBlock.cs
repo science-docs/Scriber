@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Scriber.Drawing;
+using Scriber.Text;
 using Scriber.Variables;
 
 namespace Scriber.Layout.Document
@@ -27,10 +29,29 @@ namespace Scriber.Layout.Document
         public DocumentElement Child { get; }
         public FixedPosition Position { get; set; } = FixedPosition.TopLeft;
 
+        public override IEnumerable<Symbol> Symbols
+        {
+            get
+            {
+                var childSymbols = Child.Symbols;
+                foreach (var symbol in childSymbols)
+                {
+                    symbol.Type = SymbolType.Header;
+                }
+                return childSymbols;
+            }
+        }
+
         public FixedBlock(DocumentElement child)
         {
+            Tag = "div";
             Child = child;
             Child.Parent = this;
+        }
+
+        public override IEnumerable<AbstractElement> ChildElements()
+        {
+            yield return Child;
         }
 
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)

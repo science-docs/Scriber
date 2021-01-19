@@ -4,7 +4,6 @@
     {
         public ImageFileProposalProvider() : base(BuildFilter("png", "jpeg", "jpg", "bmp", "gif"))
         {
-
         }
     }
 }

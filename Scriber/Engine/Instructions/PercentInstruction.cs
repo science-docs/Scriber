@@ -8,8 +8,10 @@ namespace Scriber.Engine.Instructions
     {
         public override object? Evaluate(CompilerState state, PercentSyntax node)
         {
-            var width = state.Document.Variable(PageVariables.BoxSize).Width.ToString(CultureInfo.InvariantCulture);
-            return $"*{width}pt";
+            var width = state.Document.Variable(PageVariables.BoxSize).Width;
+            width /= 100.0;
+            var widthText = width.ToString(CultureInfo.InvariantCulture);
+            return $"*{widthText}pt";
         }
     }
 }

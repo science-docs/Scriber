@@ -4,15 +4,12 @@ namespace Scriber.Language
 {
     public enum TokenType
     {
-        Text = 0,
+        None = 0,
+        Text,
         /// <summary>
         /// The @ character. Usually initiates a command.
         /// </summary>
         At,
-        /// <summary>
-        /// Special backslash character used for escaping and hyphenation
-        /// </summary>
-        Backslash,
         /// <summary>
         /// Double forward slash indicates a single-line comment
         /// </summary>
@@ -26,6 +23,7 @@ namespace Scriber.Language
         /// </summary>
         AsteriskSlash,
         Quotation,
+        QuotedRaw,
         Newline,
         /// <summary>
         /// Whitespace character. Accounts for every whitespace character like tabulator.
@@ -39,6 +37,8 @@ namespace Scriber.Language
         Underscore,
         ParenthesesOpen,
         ParenthesesClose,
+        DoubleCurlyOpen,
+        DoubleCurlyClose,
         CurlyOpen,
         CurlyClose,
         BracketOpen,
@@ -65,20 +65,12 @@ namespace Scriber.Language
         public int Length => Content.Length;
         public int Line { get; set; }
 
-        public Token(string content, int index, int line)
+        public Token(int index, int line)
         {
-            Content = content;
+            Content = string.Empty;
             Index = index;
             Line = line;
             Type = TokenType.Text;
-        }
-
-        public Token(TokenType type, int index, int line)
-        {
-            Type = type;
-            Index = index;
-            Line = line;
-            Content = null ?? string.Empty;
         }
 
         public Token(TokenType type, int index, int line, string content)

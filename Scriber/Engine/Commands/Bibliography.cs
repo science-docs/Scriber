@@ -5,6 +5,7 @@ using Scriber.Bibliography.Styling;
 using Scriber.Bibliography.Styling.Formatting;
 using Scriber.Bibliography.Styling.Specification;
 using Scriber.Layout.Document;
+using Scriber.Layout.Styling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,7 @@ namespace Scriber.Engine.Commands
             try
             {
                 var bytes = state.Context.ResourceSet.RelativeResource(style.Value).GetContent();
-                using var sourceStream = new System.IO.MemoryStream(bytes);
-                var styleFile = File.Load<StyleFile>(sourceStream);
+                var styleFile = File.Load<StyleFile>(bytes);
                 state.Document.Citations = new Citations(new Processor(styleFile, LocaleFile.Defaults), state.Document.Locale.File);
             }
             catch (Exception ex)
@@ -88,10 +88,7 @@ namespace Scriber.Engine.Commands
             var list = new List<Paragraph>();
             foreach (var bibEntry in bibliography)
             {
-                var paragraph = new Paragraph
-                {
-                    Margin = new Layout.Thickness(4, 0)
-                };
+                var paragraph = new Paragraph();
 
                 var leaves = ToLeaves(bibEntry);
 
@@ -112,23 +109,31 @@ namespace Scriber.Engine.Commands
 
         private static Leaf ToLeaf(TextRun run)
         {
-            var textLeaf = new TextLeaf(run.Text);
-
-            if (run.FontStyle == Scriber.Bibliography.Styling.Formatting.FontStyle.Italic)
+            var textLeaf = new TextLeaf(run.Text)
             {
-                textLeaf.FontWeight = Text.FontWeight.Italic;
-            }
+                Tag = "span"
+            };
+
+            var fontWeight = Text.FontWeight.Normal;
             if (run.FontWeight == Scriber.Bibliography.Styling.Formatting.FontWeight.Bold)
             {
-                textLeaf.FontWeight = Text.FontWeight.Bold;
+                fontWeight |= Text.FontWeight.Bold;
+            }
+            if (run.FontStyle == Scriber.Bibliography.Styling.Formatting.FontStyle.Italic)
+            {
+                fontWeight |= Text.FontWeight.Italic;
             }
 
-            textLeaf.FontStyle = run.VerticalAlign switch
+            textLeaf.Style.Set(StyleKeys.FontWeight, fontWeight);
+
+            var fontStyle = run.VerticalAlign switch
             {
                 Scriber.Bibliography.Styling.Formatting.VerticalAlign.Subscript => Text.FontStyle.Subscript,
                 Scriber.Bibliography.Styling.Formatting.VerticalAlign.Superscript => Text.FontStyle.Superscript,
                 _ => Text.FontStyle.Normal
             };
+
+            textLeaf.Style.Set(StyleKeys.FontStyle, fontStyle);
 
             return textLeaf;
         }

@@ -86,7 +86,7 @@ namespace Scriber.Engine.Commands
         [Command("Heading")]
         public static Paragraph Heading(CompilerState state, Argument<int> level, Argument<Paragraph> content)
         {
-            var pretext = AddTableOfContentInternal(state, level, content);
+            var pretext = AddTableOfContentInternal(state, true, level, content);
             return CreateHeading(state, level, content, pretext);
         }
 
@@ -97,20 +97,26 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("AddTableOfContent")]
-        public static void AddTableOfContent(CompilerState state, Argument<int> level, Argument<Paragraph> content)
+        public static Paragraph AddTableOfContent(CompilerState state, Argument<int> level, Argument<Paragraph> content)
         {
-            AddTableOfContentInternal(state, level, content);
+            AddTableOfContentInternal(state, false, level, content);
+            content.Value.IsVisible = false;
+            return content.Value;
         }
 
-        public static string AddTableOfContentInternal(CompilerState state, Argument<int> level, Argument<Paragraph> content)
+        private static string AddTableOfContentInternal(CompilerState state, bool withNumbering, Argument<int> level, Argument<Paragraph> content)
         {
             var lvl = level.Value;
-            ResetNumbering(state.Document, lvl);
-            var pretext = CreatePretext(state.Document, lvl);
+            string preamble = string.Empty;
+            if (withNumbering)
+            {
+                ResetNumbering(state.Document, lvl);
+                preamble = CreatePretext(state.Document, lvl);
+            }
             var paragraph = content.Value;
-            var entry = new TableElement(pretext, lvl, paragraph.Clone(), paragraph);
+            var entry = new TableElement(preamble, lvl, paragraph.Clone(), paragraph);
             state.Document.Variable(TableVariables.TableOfContent).Add(entry);
-            return pretext;
+            return preamble;
         }
 
         private static Paragraph CreateHeading(CompilerState state, Argument<int> level, Argument<Paragraph> content, string? preamble = null)
@@ -122,14 +128,15 @@ namespace Scriber.Engine.Commands
                 lvl = Math.Clamp(lvl, 1, MaxLevel);
             }
             var paragraph = content.Value;
-            paragraph.FontSize = lvl switch
-            {
-                1 => 18,
-                2 => 16,
-                3 => 14,
-                _ => 12
-            };
-            paragraph.Margin = new Thickness(14 - lvl * 2, 0);
+            paragraph.Tag = "h" + lvl;
+            //paragraph.FontSize = lvl switch
+            //{
+            //    1 => 18,
+            //    2 => 16,
+            //    3 => 14,
+            //    _ => 12
+            //};
+            //paragraph.Margin = new Thickness(14 - lvl * 2, 0);
             AddOutline(state, lvl, paragraph);
 
             if (preamble != null)

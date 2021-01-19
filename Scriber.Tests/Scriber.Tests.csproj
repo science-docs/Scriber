@@ -32,4 +32,10 @@
     <ProjectReference Include="..\Scriber\Scriber.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Resources\Csl\processor-tests\humans\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

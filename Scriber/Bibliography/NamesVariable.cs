@@ -7,9 +7,9 @@ namespace Scriber.Bibliography
 {
     public class NamesVariable : INamesVariable
     {
-        private readonly List<Name> items;
+        private readonly List<IName> items;
 
-        public NamesVariable(IEnumerable<Name> names)
+        public NamesVariable(IEnumerable<IName> names)
         {
             // init
             items = names.ToList();
@@ -22,7 +22,7 @@ namespace Scriber.Bibliography
                 return items.Count;
             }
         }
-        public Name this[int index]
+        public IName this[int index]
         {
             get
             {
@@ -30,7 +30,7 @@ namespace Scriber.Bibliography
             }
         }
 
-        public IEnumerator<Name> GetEnumerator()
+        public IEnumerator<IName> GetEnumerator()
         {
             return items.GetEnumerator();
         }
@@ -47,7 +47,7 @@ namespace Scriber.Bibliography
 
         public static NamesVariable Parse(string value, string outerSplitter, string innerSplitter)
         {
-            var names = new List<Name>();
+            var names = new List<IName>();
             outerSplitter = " " + outerSplitter.Trim() + " ";
             var outerSplits = value.Split(outerSplitter, StringSplitOptions.RemoveEmptyEntries);
 

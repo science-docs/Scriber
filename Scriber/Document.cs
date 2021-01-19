@@ -3,7 +3,6 @@ using PdfSharpCore.Pdf;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Scriber.Drawing;
 using Scriber.Layout;
 using Scriber.Layout.Document;
@@ -11,6 +10,10 @@ using Scriber.Logging;
 using Scriber.Bibliography;
 using Scriber.Localization;
 using Scriber.Variables;
+using System.Threading.Tasks;
+using System.Linq;
+using Scriber.Text;
+using Scriber.Layout.Styling;
 
 namespace Scriber
 {
@@ -36,18 +39,25 @@ namespace Scriber
 
         public Citations? Citations { get; set; }
 
+        public StyleCollection Styles { get; }
+
         public string? Title { get; set; }
         public string? Author { get; set; }
 
+        public override IEnumerable<Symbol> Symbols => Elements.SelectMany(e => e.Symbols);
+
         public Document()
         {
-            //Locale = new Locale(Culture);
             Elements = new ElementCollection<DocumentElement>(this);
             PageItems = new ElementCollection<DocumentElement>(this);
+            Styles = new StyleCollection();
             Measurements = new Measurements();
-            
-            Font = Text.Font.Default;
-            FontSize = 12;
+            Document = this;
+
+            foreach (var style in StyleReader.GetDefaultStyles())
+            {
+                Styles.Add(style);
+            }
         }
 
         public T Variable<T>(DocumentLocal<T> local)
@@ -76,7 +86,7 @@ namespace Scriber
 
         public override void Interlude()
         {
-            foreach (var element in Elements.AsParallel())
+            foreach (var element in Elements)
             {
                 element.Interlude();
             }
@@ -90,11 +100,17 @@ namespace Scriber
         {
             var boxSize = Variable(PageVariables.BoxSize);
 
-            foreach (var element in Elements.AsParallel())
+            // In order to add the measurements in the correct order
+            // we save them temporarily in an array
+            Measurement[] measurements = new Measurement[Elements.Count];
+
+            Parallel.ForEach(Elements, (e, _, i) =>
             {
-                element.Document = this;
-                Measurements.Add(element.Measure(boxSize));
-            }
+                e.Document = this;
+                measurements[i] = e.Measure(boxSize);
+            });
+
+            Measurements.AddRange(measurements);
 
             foreach (var element in PageItems)
             {

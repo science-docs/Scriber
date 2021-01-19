@@ -1,4 +1,4 @@
-﻿using Scriber.Localization;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 
@@ -13,7 +13,7 @@ namespace Scriber.Text
 
         private static readonly Dictionary<string, Hyphenator> hyphenators = new Dictionary<string, Hyphenator>();
 
-        private readonly Dictionary<string, string[]> cache = new Dictionary<string, string[]>();
+        private readonly ConcurrentDictionary<string, string[]> cache = new ConcurrentDictionary<string, string[]>();
 
         private Hyphenator(string culture)
         {

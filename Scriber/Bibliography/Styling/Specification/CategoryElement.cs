@@ -23,6 +23,7 @@ namespace Scriber.Bibliography.Styling.Specification
             get;
             set;
         }
+
         /// <summary>
         /// Indicates whether the citation format is specified. Required bij the System.Xml.XmlSerializer.
         /// </summary>

@@ -7,8 +7,6 @@ namespace Scriber.Layout.Document
 {
     public class Pagebreak : DocumentElement
     {
-        public override bool IsVisible => false;
-
         protected override AbstractElement CloneInternal()
         {
             return new Pagebreak();

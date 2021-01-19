@@ -13,29 +13,17 @@ namespace Scriber.Bibliography.Styling.Specification
         /// Represents the first, 'if', conditional branch.
         /// </summary>
         [XmlElement("if")]
-        public IfElement? If
-        {
-            get;
-            set;
-        }
+        public IfElement? If { get; set; }
         /// <summary>
         /// Represents the subsequent, 'else if' conditional branches.
         /// </summary>
         [XmlElement("else-if")]
-        public List<IfElement> ElseIf
-        {
-            get;
-            set;
-        } = new List<IfElement>();
+        public List<IfElement> ElseIf { get; set; } = new List<IfElement>();
         /// <summary>
         /// Represents the last, 'else' conditional branch.
         /// </summary>
         [XmlElement("else")]
-        public ElseElement? Else
-        {
-            get;
-            set;
-        }
+        public ElseElement? Else { get; set; }
 
         public override void EvaluateOverride(Interpreter interpreter)
         {

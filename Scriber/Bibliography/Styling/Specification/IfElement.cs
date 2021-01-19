@@ -113,27 +113,39 @@ namespace Scriber.Bibliography.Styling.Specification
 
             var variableMatch = Matches(interpreter, Variable, (cit, split) => cit.Variable(split) != null);
             if (variableMatch != null)
+            {
                 return variableMatch.Value;
+            }
 
             var numericMatch = Matches(interpreter, IsNumeric, (cit, split) => cit.Variable(split) is INumberVariable);
             if (numericMatch != null)
+            {
                 return numericMatch.Value;
+            }
 
             var typeMatch = Matches(interpreter, Type, (cit, split) => cit.Variable("type") is ITextVariable text && text.Value == split);
             if (typeMatch != null)
+            {
                 return typeMatch.Value;
+            }
 
             var uncertainDateMatch = Matches(interpreter, IsUncertainDate, (cit, split) => cit.Variable(split) is IDateVariable date && date.IsApproximate);
             if (uncertainDateMatch != null)
+            {
                 return uncertainDateMatch.Value;
+            }
 
             var locatorMatch = Matches(interpreter, Locator, (cit, split) => cit.Variable("locator") is ITextVariable text && text.Value == split);
             if (locatorMatch != null)
+            {
                 return locatorMatch.Value;
+            }
 
             var positionMatch = Matches(interpreter, Position, (cit, split) => throw new NotImplementedException());
             if (positionMatch != null)
+            {
                 return positionMatch.Value;
+            }
 
             return false;
         }

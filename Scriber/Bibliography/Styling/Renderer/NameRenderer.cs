@@ -65,7 +65,7 @@ namespace Scriber.Bibliography.Styling.Renderer
 
             var editors = groups.SingleOrDefault(x => x.Term.HasValue && x.Term.Value == TermName.Editor);
             var translators = groups.SingleOrDefault(x => x.Term.HasValue && x.Term.Value == TermName.Translator);
-            if (editors?.Names != null && translators?.Names != null)
+            if (editors != null && translators != null)
             {
                 // identical?
                 if (editors.Names.Select(x => x.ToString()).SequenceEqual(translators.Names.Select(x => x.ToString())))
@@ -82,7 +82,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             {
                 // count
                 var count = groups
-                    .Select(x => x.Names!.Count >= name.EtAlMin ? Math.Max(name.EtAlUseFirst, interpreter.DisambiguationContext.MinAddNames) : x.Names.Count)
+                    .Select(x => x.Names.Count >= name.EtAlMin ? Math.Max(name.EtAlUseFirst, interpreter.DisambiguationContext.MinAddNames) : x.Names.Count)
                     .Sum();
 
                 interpreter.Push(count > 0 ? count.ToString() : string.Empty, formatting);
@@ -140,7 +140,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             // complete subsequent author substitution?
             var isComplete = subsequentAuthorSubstituteRule.HasValue &&
                 previousGroup?.Names != null &&
-                group.Names!.Count == previousGroup.Names.Count &&
+                group.Names.Count == previousGroup.Names.Count &&
                 Enumerable.Range(0, group.Names.Count).All(i => NameGroup.AreNamesEqual(group.Names[i], previousGroup.Names[i]));
             if (isComplete && subsequentAuthorSubstituteRule!.Value == SubsequentAuthorSubstituteRules.CompleteAll)
             {
@@ -151,7 +151,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             else
             {
                 // render names list
-                var etAlActive = group.Names!.Count >= name.EtAlMin;
+                var etAlActive = group.Names.Count >= name.EtAlMin;
                 var count = etAlActive ? Math.Max(name.EtAlUseFirst, interpreter.DisambiguationContext.MinAddNames) + 1 : group.Names.Count;
                 var delta = etAlActive ? 1 : 0;
 
@@ -168,7 +168,7 @@ namespace Scriber.Bibliography.Styling.Renderer
                                 inverted = false;
                                 break;
                             case NameSortOptions.First:
-                                inverted = (index == 0);
+                                inverted = index == 0;
                                 break;
                             case NameSortOptions.All:
                                 inverted = true;
@@ -277,7 +277,11 @@ namespace Scriber.Bibliography.Styling.Renderer
                                     interpreter.Push("& ", formatting);
                                     break;
                                 case And.Text:
-                                    interpreter.Push(interpreter.Locale.GetTerm(TermName.And, TermFormat.Long, false), formatting);
+                                    var andTerm = interpreter.Locale.GetTerm(TermName.And, TermFormat.Long, false);
+                                    if (andTerm != null)
+                                    {
+                                        interpreter.Push(andTerm + " ", formatting);
+                                    }
                                     break;
                             }
                         }
@@ -352,7 +356,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             var nonDroppingParticles = interpreter.Create(name.NonDroppingParticles, familyPart);
             var given = interpreter.Create(InitializeGivenNames(interpreter, name, nameElement.Initialize && (interpreter.DisambiguationContext.AddGivenNameLevel != DisambiguateAddGivenNameLevel.LongAndUninitialized), nameElement.InitializeWith), givenPart);
             var droppingParticles = interpreter.Create(name.DroppingParticles, givenPart);
-            var suffix = interpreter.Create(name.PrecedeSuffixByComma && !string.IsNullOrWhiteSpace(name.Suffix) ? string.Format(",{0}", name.Suffix) : name.Suffix, suffixPart);
+            var suffix = interpreter.Create(name.PrecedeSuffixByComma && !string.IsNullOrWhiteSpace(name.Suffix) ? $",{name.Suffix}" : name.Suffix, suffixPart);
 
             // space delimiter
             var space = interpreter.Create(" ", nameElement)!;

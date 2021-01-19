@@ -39,7 +39,7 @@ namespace Scriber.Engine.Instructions
                 {
                     if (currentParagraph == null)
                     {
-                        currentParagraph = CreateNewParagraph(state);
+                        currentParagraph = new Paragraph();
                         results.Add(new Argument(element.Source, currentParagraph));
                     }
 
@@ -49,13 +49,13 @@ namespace Scriber.Engine.Instructions
                 {
                     if (currentParagraph == null)
                     {
-                        currentParagraph = CreateNewParagraph(state);
+                        currentParagraph = new Paragraph();
                         results.Add(new Argument(element.Source, currentParagraph));
                     }
 
                     currentParagraph.Leaves.Add(new TextLeaf(str));
                 }
-                else
+                else if (element.Value != null)
                 {
                     currentParagraph = null;
                     results.Add(element);
@@ -63,21 +63,6 @@ namespace Scriber.Engine.Instructions
             }
 
             return results.ToArray();
-        }
-
-        private Paragraph CreateNewParagraph(CompilerState state)
-        {
-            var currentParagraph = new Paragraph();
-            var margin = currentParagraph.Margin;
-            margin.Bottom = state.Document.Variable(ParagraphVariables.Skip);
-            currentParagraph.FontSize = state.Document.Variable(FontVariables.FontSize);
-            currentParagraph.Margin = margin;
-            return currentParagraph;
-        }
-
-        private static string LeafString(int count)
-        {
-            return count == 1 ? "leaf" : "leaves";
         }
     }
 }

@@ -97,7 +97,6 @@ namespace Scriber.Bibliography.Styling.Specification
         [XmlEnum("volume")]
         Volume,
 
-
         // ----------------------------------------------
         // -- Months                                   --
         // ----------------------------------------------
@@ -163,7 +162,6 @@ namespace Scriber.Bibliography.Styling.Specification
         [XmlEnum("month-12")]
         Month12,
 
-
         // ----------------------------------------------
         // -- Ordinals                                 --
         // ----------------------------------------------
@@ -223,7 +221,6 @@ namespace Scriber.Bibliography.Styling.Specification
         /// </summary>
         [XmlEnum("long-ordinal-10")]
         LongOrdinal10,
-
 
         // ----------------------------------------------
         // -- Ordinals 00-99                           --
@@ -730,7 +727,6 @@ namespace Scriber.Bibliography.Styling.Specification
         [XmlEnum("ordinal-99")]
         Ordinal99,
 
-
         // ----------------------------------------------
         // -- Quotation marks                          --
         // ----------------------------------------------
@@ -755,7 +751,6 @@ namespace Scriber.Bibliography.Styling.Specification
         /// </summary>
         [XmlEnum("close-inner-quote")]
         CloseInnerQuote,
-
 
         // ----------------------------------------------
         // -- Roles                                    --
@@ -832,7 +827,6 @@ namespace Scriber.Bibliography.Styling.Specification
         [XmlEnum("translator")]
         Translator,
 
-
         // ----------------------------------------------
         // -- Seasons                                  --
         // ----------------------------------------------
@@ -857,7 +851,6 @@ namespace Scriber.Bibliography.Styling.Specification
         /// </summary>
         [XmlEnum("season-04")]
         Season04,
-
 
         // ----------------------------------------------
         // -- Miscellaneous                            --

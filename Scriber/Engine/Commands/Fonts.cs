@@ -22,23 +22,23 @@ namespace Scriber.Engine.Commands
         [Command("FontSize")]
         public static void FontSize(CompilerState state, Unit size)
         {
-            FontVariables.FontSize.Set(state.Document, size.Point);
+            //FontVariables.FontSize.Set(state.Document, size.Point);
         }
 
         [Command("FontSize")]
         public static DocumentElement[] FontSize(Unit size, Argument<DocumentElement>[] children)
         {
-            foreach (var child in children)
-            {
-                child.Value.FontSize = size.Point;
-            }
+            //foreach (var child in children)
+            //{
+            //    child.Value.FontSize = size.Point;
+            //}
             return children.Select(e => e.Value).ToArray();
         }
 
         [Command("FootnoteSize")]
         public static void FootnoteSize(CompilerState state, Unit size)
         {
-            FontVariables.FootnoteSize.Set(state.Document, size.Point);
+            //FontVariables.FootnoteSize.Set(state.Document, size.Point);
         }
     }
 }

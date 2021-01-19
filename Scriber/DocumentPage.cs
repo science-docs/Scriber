@@ -11,7 +11,7 @@ namespace Scriber
         public string? Number { get; set; }
         public int Index { get; set; }
 
-        public DocumentPage(Document document)
+        protected DocumentPage(Document document)
         {
             Document = document;
         }

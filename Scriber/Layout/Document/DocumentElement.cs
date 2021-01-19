@@ -1,5 +1,6 @@
 ﻿using System;
 using Scriber.Drawing;
+using Scriber.Layout.Styling;
 
 namespace Scriber.Layout.Document
 {
@@ -7,7 +8,7 @@ namespace Scriber.Layout.Document
     {
         public Measurement Measurement { get; private set; }
         public Transform? Transform { get; set; }
-        public virtual bool IsVisible => true;
+        public bool IsVisible { get; set; } = true;
 
         protected DocumentElement()
         {
@@ -16,7 +17,19 @@ namespace Scriber.Layout.Document
 
         public Measurement Measure(Size availableSize)
         {
-            var marginSize = new Size(Margin.Width, Margin.Height);
+            if (IsValid)
+            {
+                return Measurement;
+            }
+
+            IsValid = true;
+            if (!IsVisible)
+            {
+                return Measurement = new Measurement(this);
+            }
+
+            var margin = Style.Get(StyleKeys.Margin);
+            var marginSize = new Size(margin.Width, margin.Height);
             return Measurement = MeasureOverride(availableSize - marginSize);
         }
 
@@ -63,12 +76,21 @@ namespace Scriber.Layout.Document
             {
                 next = null;
             }
+            else
+            {
+                Invalidate();
+            }
 
             return new SplitResult(source, measurement, next);
         }
 
         public void Render(IDrawingContext drawingContext, Measurement measurement)
         {
+            if (!IsVisible)
+            {
+                return;
+            }
+
             var pos = measurement.Position;
             pos.X += measurement.Margin.Left;
             pos.Y += measurement.Margin.Top;

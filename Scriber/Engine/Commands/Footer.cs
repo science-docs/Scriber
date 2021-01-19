@@ -12,12 +12,7 @@ namespace Scriber.Engine.Commands
             name ??= LabelVariables.FootnoteCounter.Increment(state.Document).ToString();
             var footnote = new FootnoteLeaf(name, content);
             content.Parent = footnote;
-            content.HorizontalAlignment = Layout.HorizontalAlignment.Justify;
-            var footnoteSize = state.Document.Variable(FontVariables.FootnoteSize);
-            if (footnoteSize != null)
-            {
-                content.FontSize = footnoteSize.Value;
-            }
+            content.Classes.Add("footnote");
             
             return footnote;
         }
@@ -64,6 +59,15 @@ namespace Scriber.Engine.Commands
             {
                 Position = position
             };
+
+            if (position.HasFlag(FixedPosition.Bottom))
+            {
+                block.Classes.Add("footer");
+            }
+            else if (position.HasFlag(FixedPosition.Top))
+            {
+                block.Classes.Add("header");
+            }
 
             for (int i = 0; i < state.Document.PageItems.Count; i++)
             {

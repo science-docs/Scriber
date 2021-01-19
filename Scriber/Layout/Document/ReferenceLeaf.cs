@@ -27,18 +27,6 @@
             return items.ToArray();
         }
 
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            if (Font == null)
-            {
-                throw new LayoutException("Font property of the element was not set");
-            }
-
-            var height = FontSize;
-            var width = Font.GetWidth(Preamble, FontSize, FontWeight);
-            return new Size(width, height);
-        }
-
         protected override AbstractElement CloneInternal()
         {
             return new ReferenceLeaf(Referenced, Preamble);

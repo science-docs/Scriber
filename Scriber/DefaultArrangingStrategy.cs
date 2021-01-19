@@ -4,6 +4,7 @@ using Scriber.Drawing.Shapes;
 using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Layout.Shapes;
+using Scriber.Layout.Styling;
 using Scriber.Text;
 using Scriber.Variables;
 
@@ -120,7 +121,7 @@ namespace Scriber
                     var size = measurement.TotalSize;
 
                     measurement.Position = currentOffset;
-                    Realign(measurement, boxSize, pageSize, measurement.Element.HorizontalAlignment);
+                    Realign(measurement, boxSize, pageSize, measurement.Element.Style.Get(StyleKeys.HorizontalAlignment));
                     measurement.Element.Arrange(measurement);
 
                     currentOffset.Y += size.Height;
@@ -150,7 +151,7 @@ namespace Scriber
                     var size = extra.TotalSize;
 
                     extra.Position = extraOffset;
-                    Realign(extra, boxSize, pageSize, extra.Element.HorizontalAlignment);
+                    Realign(extra, boxSize, pageSize, extra.Element.Style.Get(StyleKeys.HorizontalAlignment));
                     extra.Element.Arrange(extra);
 
                     extraOffset.Y += size.Height;

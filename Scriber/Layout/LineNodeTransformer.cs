@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Scriber.Layout.Document;
+using Scriber.Layout.Styling;
 using Scriber.Text;
+using Scriber.Util;
 
 namespace Scriber.Layout
 {
@@ -29,8 +31,8 @@ namespace Scriber.Layout
 
         public static LineNode GetDefaultGlue(AbstractElement element)
         {
-            var font = element.Font ?? throw new ArgumentException("Specified element missing font", nameof(element));
-            var size = element.FontSize;
+            var font = element.Style.Get(StyleKeys.Font) ?? throw new ArgumentException("Specified element missing font", nameof(element));
+            var size = element.Style.Get(StyleKeys.FontSize).Point;
             var spaceWidth = GetWidth(" ");
             var stretch = Math.Max(0, spaceWidth / 2);
             var shrink = Math.Max(0, spaceWidth / 3);
@@ -39,7 +41,7 @@ namespace Scriber.Layout
 
             double GetWidth(string value)
             {
-                return font.GetWidth(value, size, element.FontWeight);
+                return font.GetWidth(value, size, element.Style.Get(StyleKeys.FontWeight));
             }
         }
 
@@ -53,8 +55,8 @@ namespace Scriber.Layout
             if (text == null)
                 return new List<LineNode>();
 
-            var font = leaf.Font ?? throw new ArgumentException("Specified element missing font", nameof(leaf));
-            var size = FontStyler.ScaleSize(leaf.FontStyle, leaf.FontSize);
+            var font = leaf.Style.Get(StyleKeys.Font) ?? throw new ArgumentException("Specified element missing font", nameof(leaf));
+            var size = FontStyler.ScaleSize(leaf.Style.Get(StyleKeys.FontStyle), leaf.Style.Get(StyleKeys.FontSize).Point);
             var spaceWidth = GetWidth(" ");
             var hyphenWidth = GetWidth("-");
             var stretch = Math.Max(0, spaceWidth / 2);
@@ -103,8 +105,6 @@ namespace Scriber.Layout
                     box.Element = leaf;
                     nodes.Add(box);
                 }
-
-                
             }
 
             if (end)
@@ -116,7 +116,7 @@ namespace Scriber.Layout
 
             double GetWidth(string value)
             {
-                return font.GetWidth(value, size, leaf.FontWeight);
+                return font.GetWidth(value, size, leaf.Style.Get(StyleKeys.FontWeight));
             }
         }
 
@@ -136,30 +136,8 @@ namespace Scriber.Layout
 
         private static IEnumerable<string> Chunkenize(string fullText)
         {
-            if (string.IsNullOrWhiteSpace(fullText))
-            {
-                yield break;
-            }
-
             fullText = fullText.Trim();
-
-
-            int last = 0;
-
-            for (int i = 1; i < fullText.Length - 1; i++)
-            {
-                var c = fullText[i];
-                if (char.IsWhiteSpace(c))
-                {
-                    if (i > last - 1)
-                    {
-                        yield return fullText[last..i];
-                    }
-                    last = i + 1;
-                }
-            }
-
-            yield return fullText.Substring(last);
+            return fullText.Split(c => char.IsWhiteSpace(c), StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

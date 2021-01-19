@@ -16,59 +16,38 @@ namespace Scriber.Bibliography.Styling.Specification
         /// If set to “true” (“false” is the default), bibliographic entries are rendered with hanging-indents.
         /// </summary>
         [XmlAttribute("hanging-indent")]
-        public bool HangingIndent
-        {
-            get;
-            set;
-        }
+        public bool HangingIndent { get; set; }
+
         /// <summary>
         /// Indicates whether the 'hanging-indent' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
         [XmlIgnore]
-        public bool HangingIndentSpecified
-        {
-            get;
-            set;
-        }
+        public bool HangingIndentSpecified { get; set; }
 
         /// <summary>
         /// If set, subsequent lines of bibliographic entries are aligned along the second field.
         /// </summary>
         [XmlAttribute("second-field-align")]
-        public SecondFieldAlign SecondFieldAlign
-        {
-            get;
-            set;
-        }
+        public SecondFieldAlign SecondFieldAlign { get; set; }
+
         /// <summary>
         /// Indicates whether the 'hanging-indent' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
         [XmlIgnore]
-        public bool SecondFieldAlignSpecified
-        {
-            get;
-            set;
-        }
+        public bool SecondFieldAlignSpecified { get; set; }
 
         /// <summary>
         /// Specifies vertical line distance. Defaults to “1” (single-spacing), and can be set to any positive integer
         /// to specify a multiple of the standard unit of line height (e.g. “2” for double-spacing).
         /// </summary>
         [XmlAttribute("line-spacing")]
-        public int LineSpacing
-        {
-            get;
-            set;
-        }
+        public int LineSpacing { get; set; }
+
         /// <summary>
         /// Indicates whether the 'line-spacing' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
         [XmlIgnore]
-        public bool LineSpacingSpecified
-        {
-            get;
-            set;
-        }
+        public bool LineSpacingSpecified { get; set; }
 
         /// <summary>
         /// Specifies vertical distance between bibliographic entries. By default (with a value of “1”), entries are separated
@@ -76,20 +55,13 @@ namespace Scriber.Bibliography.Styling.Specification
         /// to specify a multiple of this amount.
         /// </summary>
         [XmlAttribute("entry-spacing")]
-        public int EntrySpacing
-        {
-            get;
-            set;
-        }
+        public int EntrySpacing { get; set; }
+
         /// <summary>
         /// Indicates whether the 'entry-spacing' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
         [XmlIgnore]
-        public bool EntrySpacingSpecified
-        {
-            get;
-            set;
-        }
+        public bool EntrySpacingSpecified { get; set; }
 
         /// <summary>
         /// If set, the value of this attribute replaces names in a bibliographic entry that also occur in the preceding entry.
@@ -97,41 +69,25 @@ namespace Scriber.Bibliography.Styling.Specification
         /// is limited to the names of the first cs:names element rendered.
         /// </summary>
         [XmlAttribute("subsequent-author-substitute")]
-        public string? SubsequentAuthorSubstitute
-        {
-            get;
-            set;
-        }
+        public string? SubsequentAuthorSubstitute { get; set; }
+
         /// <summary>
         /// Indicates whether the 'subsequent-author-substitute' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
         [XmlIgnore]
-        public bool SubsequentAuthorSubstituteSpecified
-        {
-            get;
-            set;
-        }
+        public bool SubsequentAuthorSubstituteSpecified { get; set; }
 
         /// <summary>
         /// Specifies when and how names are substituted as a result of the subsequent-author-substitute attribute.
         /// </summary>
         [XmlAttribute("subsequent-author-substitute-rule")]
-        public SubsequentAuthorSubstituteRules SubsequentAuthorSubstituteRule
-        {
-            get;
-            set;
-        }
+        public SubsequentAuthorSubstituteRules SubsequentAuthorSubstituteRule { get; set; }
+
         /// <summary>
         /// Indicates whether the 'subsequent-author-substitute-rule' attribute is specified. Required by System.Xml.XmlSerializer.
         /// </summary>
         [XmlIgnore]
-        public bool SubsequentAuthorSubstituteRuleSpecified
-        {
-            get;
-            set;
-        }
-
-
+        public bool SubsequentAuthorSubstituteRuleSpecified { get; set; }
 
         ///// <summary>
         ///// Compiles the sort part of the bibliography element.

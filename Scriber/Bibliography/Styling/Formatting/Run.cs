@@ -56,6 +56,7 @@ namespace Scriber.Bibliography.Styling.Formatting
                 output.Append(text.Text);
             }
         }
+
         public string ToPlainText()
         {
             // init

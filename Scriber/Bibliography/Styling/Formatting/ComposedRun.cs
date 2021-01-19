@@ -9,9 +9,9 @@ namespace Scriber.Bibliography.Styling.Formatting
             : base(children.All(x => x.IsEmpty))
         {
             // init
-            this.Tag = tag;
+            Tag = tag;
             Children = new List<Run>(children);
-            this.ByVariable = byVariable;
+            ByVariable = byVariable;
         }
 
         public override bool IsEmpty => Children.All(x => x.IsEmpty);
@@ -31,13 +31,8 @@ namespace Scriber.Bibliography.Styling.Formatting
 
         internal override IEnumerable<TextRun> GetTextRuns()
         {
-            return this.Children
+            return Children
                 .SelectMany(x => x.GetTextRuns());
-        }
-        internal IEnumerable<ComposedRun> GetComposedRuns()
-        {
-            // done
-            return new ComposedRun[] { this }.Concat(this.Children.OfType<ComposedRun>().SelectMany(x => x.GetComposedRuns()));
         }
     }
 }
