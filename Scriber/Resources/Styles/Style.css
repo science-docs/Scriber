@@ -33,3 +33,10 @@ caption {
 .footnote-reference {
 	font-style: superscript;
 }
+
+td {
+	margin-left: 4pt;
+	margin-right: 4pt;
+	margin-top: 4pt;
+	margin-bottom: 4pt;
+}

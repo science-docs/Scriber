@@ -18,7 +18,7 @@ namespace Scriber.Layout
         public object? Tag { get; set; }
         public Position Position { get; internal set; }
 
-        public Measurements Subs { get; }
+        public List<Measurement> Subs { get; }
         /// <summary>
         /// Extra measurements are used for elements outside the actual element. These are e.g. footnotes.
         /// </summary>
@@ -44,7 +44,7 @@ namespace Scriber.Layout
 
         public Measurement(DocumentElement element, Size? size, Thickness margin)
         {
-            Subs = new Measurements();
+            Subs = new List<Measurement>();
             Element = element;
             this.size = size;
             Margin = margin;

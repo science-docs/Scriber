@@ -74,39 +74,50 @@ namespace Scriber.Layout
                 }
             }
             // See https://github.com/dotnet/wpf/blob/master/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Controls/Grid.cs#L459-L607
-            cells.Sort((a, b) => a.Order.CompareTo(b.Order));
 
             var ms = new Measurement(this);
 
             // measure order 1
-            for (int i = 0; i < cells.Count; i++)
+            foreach (var cell in cells.Where(e => e.Order == 1))
             {
-                var cell = cells[i];
-                if (cell.Order != 1)
+                var height = availableSize.Height;
+                var width = availableSize.Width;
+
+                if (Rows[cell.RowIndex].Unit == GridUnit.Point)
                 {
-                    break;
+                    height = Rows[cell.RowIndex].Value;
+                }
+                if (Columns[cell.ColumnIndex].Unit == GridUnit.Point)
+                {
+                    width = Columns[cell.ColumnIndex].Value;
                 }
 
-                MeasureCell(ms, cell, availableSize);
-                
+                MeasureCell(ms, cell, new Size(width, height));
             }
 
-            // TODO: measure other orders here
             var currentWidth = cells.Sum(e => e.Size.Width);
             var currentHeight = cells.Sum(e => e.Size.Height);
             var restSize = availableSize;
             restSize.Width -= currentWidth;
             restSize.Height -= currentHeight;
 
-            for (int i = 0; i < cells.Count; i++)
+            var starSize = new Size
             {
-                var cell = cells[i];
-                if (cell.Order == 1)
-                {
-                    continue;
-                }
+                Height = Rows.Where(e => e.Unit == GridUnit.Star).Sum(e => e.Value),
+                Width = Columns.Where(e => e.Unit == GridUnit.Star).Sum(e => e.Value)
+            };
 
-                MeasureCell(ms, cell, restSize);
+            // measure order 2
+            foreach (var cell in cells.Where(e => e.Order == 2))
+            {
+                var height = restSize.Height;
+                var width = restSize.Width;
+
+                var columnStarValue = Columns[cell.ColumnIndex].Value;
+
+                width *= columnStarValue / starSize.Width;
+
+                MeasureCell(ms, cell, new Size(width, height));
             }
 
             // arrange here
@@ -148,11 +159,8 @@ namespace Scriber.Layout
                         cell.Measurement.Position = new Position(columnWidth, rowHeight);
                         AlignCell(cell);
                     }
-
                     columnWidth += columnWidths[j];
-                    
                 }
-
                 rowHeight += rowHeights[i];
             }
 
@@ -355,9 +363,8 @@ namespace Scriber.Layout
 
             private static readonly Dictionary<(GridUnit row, GridUnit column), int> orders = new Dictionary<(GridUnit, GridUnit), int>
             {
-                { (GridUnit.Point, GridUnit.Point), 1 }, { (GridUnit.Point, GridUnit.Auto), 1 }, { (GridUnit.Point, GridUnit.Star), 3 },
-                { (GridUnit.Auto, GridUnit.Point), 1 }, { (GridUnit.Auto, GridUnit.Auto), 1 }, { (GridUnit.Auto, GridUnit.Star), 3 },
-                { (GridUnit.Star, GridUnit.Point), 4 }, { (GridUnit.Star, GridUnit.Auto), 2 }, { (GridUnit.Star, GridUnit.Star), 4 }
+                { (GridUnit.Point, GridUnit.Point), 1 }, { (GridUnit.Point, GridUnit.Auto), 1 }, { (GridUnit.Point, GridUnit.Star), 2 },
+                { (GridUnit.Auto, GridUnit.Point), 1 }, { (GridUnit.Auto, GridUnit.Auto), 1 }, { (GridUnit.Auto, GridUnit.Star), 2 }
             };
         }
     }

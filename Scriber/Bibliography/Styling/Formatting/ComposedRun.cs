@@ -31,8 +31,7 @@ namespace Scriber.Bibliography.Styling.Formatting
 
         internal override IEnumerable<TextRun> GetTextRuns()
         {
-            return Children
-                .SelectMany(x => x.GetTextRuns());
+            return Children.SelectMany(x => x.GetTextRuns());
         }
     }
 }

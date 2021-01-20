@@ -28,6 +28,7 @@ namespace Scriber.Engine.Commands
             if (caption != null)
             {
                 var copiedCaption = caption.Clone();
+                copiedCaption.Tag = "p";
 
                 var figureCount = FigureVariables.FigureCaptionCounter.Increment(state.Document);
 
@@ -52,8 +53,7 @@ namespace Scriber.Engine.Commands
             {
                 var panel = new StackPanel
                 {
-                    Orientation = Orientation.Vertical,
-                    Tag = "div"
+                    Orientation = Orientation.Vertical
                 };
 
                 var figures = TableVariables.TableOfFigures.Get(state.Document);
