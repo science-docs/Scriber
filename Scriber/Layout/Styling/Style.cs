@@ -17,52 +17,21 @@ namespace Scriber.Layout.Styling
             Element = element;
         }
 
-        [return: MaybeNull]
-        public T Get<T>(ComputedStyleKey<T> key)
+        public T Get<T>(AbstractStyleKey<T> key)
         {
-            return key.Compute(this);
+            return key.Get(this);
         }
 
-        [return: MaybeNull]
-        public T Get<T>(StyleKey<T> key)
-        {
-            return Get<T>((StyleKey)key);
-        }
-
-        [return: MaybeNull]
-        public T Get<T>(StyleKey key)
-        {
-            var hasKey = TryGet<T>(key, out var result);
-            if (!hasKey)
-            {
-                if (key.Default is T defaultValue)
-                {
-                    result = defaultValue;
-                }
-                else
-                {
-                    result = default;
-                }
-            }
-            return result;
-        }
-
-        public bool TryGet<T>(StyleKey<T> key, [MaybeNull] out T result)
-        {
-            return TryGet((StyleKey)key, out result);
-        }
-
-        public bool TryGet<T>(StyleKey key, [MaybeNull] out T result)
+        public T Get<T>(string key, bool inherited, T defaultValue)
         {
             if (key is null)
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (container.TryGet<T>(key, out var field))
+            if (container.TryGet<T>(key, out var containerField))
             {
-                result = field;
-                return true;
+                return containerField;
             }
 
             if (computed == null)
@@ -70,24 +39,21 @@ namespace Scriber.Layout.Styling
                 computed = Element.Document!.Styles.Compute(Element);
             }
 
-            if (computed.TryGet(key, out field))
+            if (computed.TryGet<T>(key, out var computedField))
             {
-                result = field;
-                return true;
+                return computedField;
             }
-            else if (key.Inherited && Element.Parent != null)
+            else if (inherited && Element.Parent != null)
             {
-                result = Element.Parent.Style.Get<T>(key);
-                return true;
+                return Element.Parent.Style.Get<T>(key, inherited, defaultValue);
             }
             else
             {
-                result = default;
-                return false;
+                return defaultValue;
             }
         }
 
-        public void Set(StyleKey key, object field)
+        public void Set<T>(StyleKey<T> key, [DisallowNull] T field)
         {
             if (key is null)
             {
@@ -100,17 +66,12 @@ namespace Scriber.Layout.Styling
             }
 
             var fieldType = field.GetType();
-            if (fieldType.IsAssignableFrom(key.Type))
+            if (!fieldType.IsAssignableFrom(typeof(T)))
             {
-                throw new ArgumentException($"Cannot assign value of type {fieldType.FormattedName()} to property {key}.");
+                throw new ArgumentException($"Cannot assign value of type {fieldType.FormattedName()} to property {key.Name}.");
             }
 
-            container.Set(key, field);
-        }
-
-        public void Set<T>(StyleKey<T> key, [DisallowNull] T field)
-        {
-            container.Set(key, field);
+            container.Set(key.Name, field);
         }
     }
 }

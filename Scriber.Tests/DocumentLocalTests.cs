@@ -65,6 +65,13 @@ namespace Scriber.Tests
         }
 
         [Fact]
+        public void NullConsumerValue()
+        {
+            var local = new DocumentLocal<object>(() => null);
+            Assert.Null(local.Get(new Document()));
+        }
+
+        [Fact]
         public void NonValueTypeValue()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
@@ -80,16 +87,6 @@ namespace Scriber.Tests
             var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 new DocumentLocal<object>(null);
-            });
-            Assert.Equal("consumer", ex.ParamName);
-        }
-
-        [Fact]
-        public void NullConsumerValue()
-        {
-            var ex = Assert.Throws<ArgumentException>(() =>
-            {
-                new DocumentLocal<object>(() => null);
             });
             Assert.Equal("consumer", ex.ParamName);
         }

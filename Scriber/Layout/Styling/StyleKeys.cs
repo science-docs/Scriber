@@ -1,9 +1,23 @@
 ﻿using Scriber.Text;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Scriber.Layout.Styling
 {
     public static class StyleKeys
     {
+        public static bool TryGetByName(string name, [MaybeNullWhen(false)] out IStyleKey styleKey)
+        {
+            return keys.TryGetValue(name, out styleKey);
+        }
+
+        internal static void Add(IStyleKey key)
+        {
+            keys.Add(key.Name, key);
+        }
+
+        private static readonly Dictionary<string, IStyleKey> keys = new Dictionary<string, IStyleKey>();
+
         public static StyleKey<Font> Font { get; } = new StyleKey<Font>(nameof(Font), true, Text.Font.Default);
         public static StyleKey<Unit> FontSize { get; } = new StyleKey<Unit>(nameof(FontSize), true, Unit.FromPoint(12));
 
@@ -17,6 +31,9 @@ namespace Scriber.Layout.Styling
             var weight = style.Get(FontWeight);
             var fontStyle = style.Get(FontStyle);
             return new Typeface(font, size, weight, fontStyle);
+        }, (styleContainer, typeface) =>
+        {
+
         });
 
         public static StyleKey<HorizontalAlignment> HorizontalAlignment { get; } = new StyleKey<HorizontalAlignment>(nameof(HorizontalAlignment), true, Layout.HorizontalAlignment.Justify);
@@ -34,6 +51,12 @@ namespace Scriber.Layout.Styling
             var bottom = style.Get(MarginBottom).Point;
             var left = style.Get(MarginLeft).Point;
             return new Thickness(top, left, bottom, right);
+        }, (styleContainer, margin) =>
+        {
+            styleContainer.Set(MarginTop, Unit.FromPoint(margin.Top));
+            styleContainer.Set(MarginRight, Unit.FromPoint(margin.Right));
+            styleContainer.Set(MarginBottom, Unit.FromPoint(margin.Bottom));
+            styleContainer.Set(MarginLeft, Unit.FromPoint(margin.Left));
         });
 
         // Paragraph styles

@@ -53,6 +53,7 @@ namespace Scriber.Util
         public static string[] Split(this string value, Func<char, bool> predicate, bool keepSplitChar, StringSplitOptions splitOptions)
         {
             var splits = new List<string>();
+            var span = value.AsSpan();
 
             int add = keepSplitChar ? 0 : 1;
             int last = 0;
@@ -60,19 +61,19 @@ namespace Scriber.Util
             {
                 if (predicate(value[i]))
                 {
-                    var split = value[last..i];
+                    var split = span[last..i];
                     last = i + add;
-                    if (splitOptions != StringSplitOptions.RemoveEmptyEntries || !string.IsNullOrEmpty(split))
+                    if (splitOptions != StringSplitOptions.RemoveEmptyEntries || split.Length != 0)
                     {
-                        splits.Add(split);
+                        splits.Add(split.ToString());
                     }
                 }
             }
 
-            var lastSplit = value[last..];
-            if (splitOptions != StringSplitOptions.RemoveEmptyEntries || !string.IsNullOrEmpty(lastSplit))
+            var lastSplit = span[last..];
+            if (splitOptions != StringSplitOptions.RemoveEmptyEntries || lastSplit.Length != 0)
             {
-                splits.Add(lastSplit);
+                splits.Add(lastSplit.ToString());
             }
 
             return splits.ToArray();

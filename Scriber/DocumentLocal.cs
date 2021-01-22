@@ -52,25 +52,17 @@ namespace Scriber
 
         public DocumentLocal(Func<T> consumer)
         {
-            if (consumer == null)
-            {
-                throw new ArgumentNullException(nameof(consumer));
-            }
-
-            if (consumer() == null)
-            {
-                throw new ArgumentException("Created object from consumer cannot be null.", nameof(consumer));
-            }
-
-            this.consumer = consumer;
+            this.consumer = consumer ?? throw new ArgumentNullException(nameof(consumer));
         }
 
+        [MaybeNull]
         public T this[Document document]
         {
             get => Get(document);
             set => Set(document, value);
         }
 
+        [return: MaybeNull]
         public virtual T Get(Document document)
         {
             if (table.TryGetValue(document, out var value))

@@ -12,9 +12,9 @@ namespace Scriber.Layout.Styling
         Author
     }
 
-    public class StyleContainer : IEnumerable<KeyValuePair<StyleKey, object>>
+    public class StyleContainer : IEnumerable<KeyValuePair<string, object>>
     {
-        private readonly Dictionary<StyleKey, object> fields = new Dictionary<StyleKey, object>();
+        private readonly Dictionary<string, object> fields = new Dictionary<string, object>();
 
         public StyleOrigin Origin { get; }
         public IReadOnlyList<StyleSelector> Selectors { get; }
@@ -31,12 +31,12 @@ namespace Scriber.Layout.Styling
             Selectors = selectors;
         }
 
-        public bool ContainsKey(StyleKey key)
+        public bool ContainsKey(string key)
         {
             return fields.ContainsKey(key);
         }
 
-        public bool TryGet<T>(StyleKey key, [MaybeNullWhen(false)] out T t)
+        public bool TryGet<T>(string key, [MaybeNullWhen(false)] out T t)
         {
             if (fields.TryGetValue(key, out var result) && result is T generic)
             {
@@ -51,7 +51,7 @@ namespace Scriber.Layout.Styling
         }
 
         [return: MaybeNull]
-        public T Get<T>(StyleKey key)
+        public T Get<T>(string key)
         {
             if (fields.TryGetValue(key, out var result) && result is T t)
             {
@@ -63,17 +63,17 @@ namespace Scriber.Layout.Styling
             }
         }
 
-        public void Set<T>(StyleKey<T> key, [DisallowNull] T value)
+        public void Set(IStyleKey key, object value)
+        {
+            Set(key.Name, value);
+        }
+
+        public void Set(string key, object value)
         {
             fields[key] = value;
         }
 
-        public void Set(StyleKey key, object value)
-        {
-            fields[key] = value;
-        }
-
-        public IEnumerator<KeyValuePair<StyleKey, object>> GetEnumerator()
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
             return fields.GetEnumerator();
         }

@@ -13,7 +13,8 @@ namespace Scriber.Engine.Converter
         typeof(short), typeof(ushort),
         typeof(long), typeof(ulong),
         typeof(decimal), typeof(bool),
-        typeof(Index), typeof(Range))]
+        typeof(Index), typeof(Range),
+        typeof(Thickness))]
     public class StringConverter : IConverter
     {
         /// <summary>
@@ -105,6 +106,13 @@ namespace Scriber.Engine.Converter
                         return unit;
                     }
                 }
+                else if (targetType == typeof(Thickness))
+                {
+                    if (Thickness.TryParse(value, out var thickness))
+                    {
+                        return thickness;
+                    }
+                }
                 else if (targetType == typeof(Index))
                 {
                     return ParseIndex(value);
@@ -131,17 +139,11 @@ namespace Scriber.Engine.Converter
             throw new ConverterException(source.GetType(), targetType);
         }
 
-        public static T Convert<T>(string input)
-        {
-            var converter = new StringConverter();
-            return (T)converter.Convert(input, typeof(T));
-        }
-
         private Index ParseIndex(string value)
         {
             if (value.StartsWith("^"))
             {
-                return new Index(int.Parse(value.Substring(1)), true);
+                return new Index(int.Parse(value[1..]), true);
             }
             else
             {

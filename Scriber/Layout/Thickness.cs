@@ -55,5 +55,74 @@ namespace Scriber.Layout
         {
             return !(left == right);
         }
+
+        public static bool TryParse(string input, out Thickness thickness)
+        {
+            var match = Unit.ParserRegex.Match(input.Trim());
+            thickness = Zero;
+
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            var units = match.Groups["unit"].Captures;
+
+            if (units.Count != 1 && units.Count != 2 && units.Count != 4)
+            {
+                return false;
+            }
+
+            if (units.Count == 1)
+            {
+                if (!Unit.TryParse(units[0].Value, out var unit))
+                {
+                    return false;
+                }
+
+                thickness = new Thickness(unit.Point);
+                return true;
+            }
+            else if (units.Count == 2)
+            {
+                if (!Unit.TryParse(units[0].Value, out var topBottom))
+                {
+                    return false;
+                }
+                if (!Unit.TryParse(units[1].Value, out var leftRight))
+                {
+                    return false;
+                }
+
+                thickness = new Thickness(topBottom.Point, leftRight.Point);
+                return true;
+            }
+            else if (units.Count == 4)
+            {
+                if (!Unit.TryParse(units[0].Value, out var top))
+                {
+                    return false;
+                }
+                if (!Unit.TryParse(units[1].Value, out var left))
+                {
+                    return false;
+                }
+                if (!Unit.TryParse(units[2].Value, out var bottom))
+                {
+                    return false;
+                }
+                if (!Unit.TryParse(units[3].Value, out var right))
+                {
+                    return false;
+                }
+
+                thickness = new Thickness(top.Point, left.Point, bottom.Point, right.Point);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

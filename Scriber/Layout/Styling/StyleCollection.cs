@@ -1,7 +1,6 @@
 ﻿using Scriber.Layout.Document;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Scriber.Layout.Styling
 {

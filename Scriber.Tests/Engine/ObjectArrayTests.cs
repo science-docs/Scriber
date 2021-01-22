@@ -61,8 +61,7 @@ namespace Scriber.Engine.Tests
             var objectArray = Create(firstParagraph, secondParagraph);
 
             var array = objectArray.Get(typeof(Paragraph));
-            Assert.IsType<Paragraph[]>(array);
-            var paragraphs = (Paragraph[])array;
+            var paragraphs = Assert.IsType<Paragraph[]>(array);
 
             Assert.Equal(firstParagraph, paragraphs[0]);
             Assert.Equal(secondParagraph, paragraphs[1]);
@@ -76,8 +75,7 @@ namespace Scriber.Engine.Tests
             creator.Fields.Add(new ObjectField(new FieldSyntax(), "A", new Argument(E, 123)));
 
             var array = objectArray.Get(typeof(SimpleObject));
-            Assert.IsType<SimpleObject[]>(array);
-            var objects = (SimpleObject[])array;
+            var objects = Assert.IsType<SimpleObject[]>(array);
 
             Assert.Equal(123, objects[0].A);
         }
@@ -87,8 +85,7 @@ namespace Scriber.Engine.Tests
         {
             var objectArray = Create(new object?[] { null });
             var array = objectArray.Get(typeof(SimpleObject));
-            Assert.IsType<SimpleObject[]>(array);
-            var objects = (SimpleObject[])array;
+            var objects = Assert.IsType<SimpleObject[]>(array);
 
             Assert.Null(objects[0]);
         }
@@ -98,8 +95,7 @@ namespace Scriber.Engine.Tests
         {
             var objectArray = Create("1", "2");
             var array = objectArray.Get(typeof(int));
-            Assert.IsType<int[]>(array);
-            var objects = (int[])array;
+            var objects = Assert.IsType<int[]>(array);
 
             Assert.Equal(1, objects[0]);
             Assert.Equal(2, objects[1]);
