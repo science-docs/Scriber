@@ -3,7 +3,6 @@ using PdfSharpCore.Pdf;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Scriber.Drawing;
 using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Logging;
@@ -14,6 +13,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using Scriber.Text;
 using Scriber.Layout.Styling;
+using System.Diagnostics.CodeAnalysis;
+using Scriber.Drawing.Pdf;
 
 namespace Scriber
 {
@@ -60,6 +61,7 @@ namespace Scriber
             }
         }
 
+        [return: MaybeNull]
         public T Variable<T>(DocumentLocal<T> local)
         {
             return local[this];

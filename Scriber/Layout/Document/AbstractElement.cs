@@ -1,4 +1,5 @@
-﻿using Scriber.Layout.Styling;
+﻿using Scriber.Drawing;
+using Scriber.Layout.Styling;
 using Scriber.Text;
 using System;
 using System.Collections.Generic;
@@ -54,6 +55,18 @@ namespace Scriber.Layout.Document
             clone.Tag = Tag;
             clone.Classes.AddRange(Classes);
             return clone;
+        }
+
+        protected T Clone<T>()
+        {
+            if (Clone() is T value)
+            {
+                return value;
+            }
+            else
+            {
+                throw new InvalidCastException();
+            }
         }
 
         public virtual IEnumerable<AbstractElement> ChildElements()

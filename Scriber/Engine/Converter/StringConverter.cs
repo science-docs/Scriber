@@ -1,7 +1,7 @@
-﻿using Scriber.Layout;
+﻿using Scriber.Drawing;
+using Scriber.Layout;
 using Scriber.Maths;
 using System;
-using System.Globalization;
 
 namespace Scriber.Engine.Converter
 {
@@ -14,7 +14,7 @@ namespace Scriber.Engine.Converter
         typeof(long), typeof(ulong),
         typeof(decimal), typeof(bool),
         typeof(Index), typeof(Range),
-        typeof(Thickness))]
+        typeof(Thickness), typeof(Color))]
     public class StringConverter : IConverter
     {
         /// <summary>
@@ -111,6 +111,13 @@ namespace Scriber.Engine.Converter
                     if (Thickness.TryParse(value, out var thickness))
                     {
                         return thickness;
+                    }
+                }
+                else if (targetType == typeof(Color))
+                {
+                    if (Color.TryParse(value, out var color))
+                    {
+                        return color;
                     }
                 }
                 else if (targetType == typeof(Index))

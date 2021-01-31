@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Scriber.Autocomplete;
+using Scriber.Drawing;
 using Scriber.Layout.Document;
-using Scriber.Text;
 using Scriber.Variables;
 
 namespace Scriber.Engine.Commands
@@ -21,7 +22,7 @@ namespace Scriber.Engine.Commands
 
             if (color != null)
             {
-                var customColors = ColorVariables.CustomColors.Get(state.Document);
+                var customColors = ColorVariables.CustomColors.Get(state.Document) ?? throw new InvalidOperationException();
                 customColors[colorName.Value] = color.Value;
             }
             else

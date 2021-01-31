@@ -152,7 +152,7 @@ namespace Scriber.Engine
             }
         }
 
-        public bool TryConvert<T>(object source, out T value)
+        public bool TryConvert<T>(object source, [MaybeNullWhen(false)] out T value)
         {
             if (TryConvert(source, typeof(T), out var x))
             {
@@ -161,9 +161,7 @@ namespace Scriber.Engine
             }
             else
             {
-                #pragma warning disable CS8601 // Possible null reference assignment.
                 value = default;
-                #pragma warning restore CS8601 // Possible null reference assignment.
                 return false;
             }
         }

@@ -33,7 +33,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Scriber.Text
+namespace Scriber.Drawing
 {
     public enum ColorSpace
     {
@@ -249,6 +249,13 @@ namespace Scriber.Text
                 return FromArgb(ToInt(hex[0..2]), ToInt(hex[2..4]), ToInt(hex[4..6]));
             }
             return null;
+        }
+
+        public static bool TryParse(string value, out Color color)
+        {
+            var nullableColor = FromCode(value) ?? FromName(value);
+            color = nullableColor ?? default;
+            return nullableColor != null;
         }
 
         /// <summary>

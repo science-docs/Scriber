@@ -7,7 +7,7 @@ namespace Scriber.Layout
 {
     public class Table : DocumentElement
     {
-        public List<TableRow> Rows { get; } = new List<TableRow>();
+        public ElementCollection<TableRow> Rows { get; }
 
         public int Height => Rows.Count;
 
@@ -16,6 +16,7 @@ namespace Scriber.Layout
         public Table()
         {
             Tag = "table";
+            Rows = new ElementCollection<TableRow>(this);
         }
 
         protected override Measurement MeasureOverride(Size availableSize)

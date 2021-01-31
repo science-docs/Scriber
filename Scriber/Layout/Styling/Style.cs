@@ -45,7 +45,7 @@ namespace Scriber.Layout.Styling
             }
             else if (inherited && Element.Parent != null)
             {
-                return Element.Parent.Style.Get<T>(key, inherited, defaultValue);
+                return Element.Parent.Style.Get(key, inherited, defaultValue);
             }
             else
             {

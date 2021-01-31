@@ -22,20 +22,22 @@ namespace Scriber.Layout
             {
                 var rowMeasurement = row.Measure(availableSize);
 
-                int i = 0;
-                foreach (var tdSub in rowMeasurement.Subs)
+                for (int i = 0; i < rowMeasurement.Subs.Count; i++)
                 {
+                    var tdSub = rowMeasurement.Subs[i];
                     var currentSize = desiredColumnSize[i];
                     desiredColumnSize[i] = Math.Max(currentSize, tdSub.TotalSize.Width);
-                    i++;
                 }
             }
 
             var optimum = FindOptimalColumnWidth(availableSize.Width, desiredColumnSize);
 
             double y = 0;
-            foreach (var row in table.Rows)
+            double[] actualColumnSizes = new double[width];
+            
+            for (int j = 0; j < table.Rows.Count; j++)
             {
+                var row = table.Rows[j];
                 var rowMeasurement = row.Measurement;
 
                 double x = 0;
@@ -47,15 +49,23 @@ namespace Scriber.Layout
                     sub.Element.Invalidate();
                     var dataMeasurement = sub.Element.Measure(new Size(columnWidth, availableSize.Height));
                     dataMeasurement.Position = new Position(x, 0);
-                    x += dataMeasurement.TotalSize.Width;
+                    x += columnWidth;
+                    actualColumnSizes[i] = Math.Max(actualColumnSizes[i], columnWidth);
                     rowMeasurement.Subs[i] = dataMeasurement;
                 }
 
                 rowMeasurement.Position = new Position(0, y);
 
-                y += rowMeasurement.Subs.Max(e => e.TotalSize.Height);
-
+                var maxHeight = rowMeasurement.Subs.Max(e => e.TotalSize.Height);
+                y += maxHeight;
+                rowMeasurement.Size = new Size(0, maxHeight);
                 measurement.Subs.Add(rowMeasurement);
+            }
+
+            var actualWidth = actualColumnSizes.Sum();
+            foreach (var ms in measurement.Subs)
+            {
+                ms.Size = new Size(actualWidth, ms.Size.Height);
             }
 
             return measurement;

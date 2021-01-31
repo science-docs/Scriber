@@ -1,6 +1,7 @@
 ﻿using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Variables;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +14,7 @@ namespace Scriber.Engine.Commands
         public static StackPanel ListOfAcronyms(CompilerState state, Argument<DynamicDictionary> acronyms)
         {
             var acro = acronyms.Value.GetContents();
-            var list = AcronymVariables.Acronyms.Get(state.Document);
+            var list = AcronymVariables.Acronyms.Get(state.Document) ?? throw new InvalidOperationException();
             var stackPanel = new StackPanel
             {
                 Orientation = Orientation.Vertical
@@ -36,7 +37,7 @@ namespace Scriber.Engine.Commands
                     var grid = new Grid();
                     grid.Rows.Add(new GridLength(GridUnit.Auto, 0));
                     grid.Columns.Add(new GridLength(GridUnit.Star, 1));
-                    grid.Columns.Add(new GridLength(GridUnit.Auto, 0));
+                    grid.Columns.Add(new GridLength(GridUnit.Star, 1));
 
                     grid.Set(Paragraph.FromText(key), 0, 0);
                     grid.Set(paragraph, 0, 1);
@@ -52,7 +53,7 @@ namespace Scriber.Engine.Commands
         public static IEnumerable<Leaf> SingleAcronym(CompilerState state, string name)
         {
             var list = AcronymVariables.Acronyms.Get(state.Document);
-            var usedAcronyms = AcronymVariables.UsedAcronyms.Get(state.Document);
+            var usedAcronyms = AcronymVariables.UsedAcronyms.Get(state.Document) ?? throw new InvalidOperationException();
             var pair = list.FirstOrDefault(e => e.Key.ToLowerInvariant() == name.ToLowerInvariant());
 
             if (!string.IsNullOrEmpty(pair.Key))

@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Scriber.Layout
 {
-    public struct Thickness
+    public struct Thickness : IEquatable<Thickness>
     {
         public static readonly Thickness Zero = new Thickness(0);
 
@@ -36,9 +37,14 @@ namespace Scriber.Layout
         {
             if (obj is Thickness thickness)
             {
-                return Top == thickness.Top && Bottom == thickness.Bottom && Left == thickness.Left && Right == thickness.Right;
+                return Equals(thickness);
             }
             return false;
+        }
+
+        public bool Equals([AllowNull] Thickness other)
+        {
+            return Top == other.Top && Bottom == other.Bottom && Left == other.Left && Right == other.Right;
         }
 
         public override int GetHashCode()

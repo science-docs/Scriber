@@ -46,6 +46,13 @@ namespace Scriber.Layout.Document
             LineNodeTransformer.Clean(lineNodes);
             if (lineNodes.Count > 0)
             {
+                var indent = Style.Get(StyleKeys.ParagraphIndent);
+
+                if (indent.Value > 0)
+                {
+                    lineNodes.Insert(0, LineNode.Box(indent.Point, string.Empty));
+                }
+
                 var linebreak = new Linebreak();
                 var breaks = linebreak.BreakLines(lineNodes, new double[] { availableSize.Width }, new LinebreakOptions());
                 var positionedItems = linebreak.PositionItems(lineNodes, new double[] { availableSize.Width }, breaks, false);
@@ -54,7 +61,6 @@ namespace Scriber.Layout.Document
 
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    var last = i == lines.Length - 1;
                     var line = lines[i];
                     var height = 0.0;
                     var lastElement = line[^1];
@@ -69,10 +75,7 @@ namespace Scriber.Layout.Document
                     var skip = Style.Get(StyleKeys.BaselineSkip) ?? Unit.FromPoint(height);
                     var stretch = Style.Get(StyleKeys.BaselineStretch);
 
-                    if (!last)
-                    {
-                        height = skip.Point * stretch;
-                    }
+                    height = skip.Point * stretch;
                     var size = new Size(width, height);
                     var measurement = new Measurement(this, size, Thickness.Zero)
                     {
@@ -216,7 +219,7 @@ namespace Scriber.Layout.Document
 
                         if (node.Element == null)
                         {
-                            throw new NullReferenceException("The Element property of a LineNode was null");
+                            continue;
                         }
 
                         var offset = new Position(item.Offset, sub.Position.Y);
@@ -277,12 +280,7 @@ namespace Scriber.Layout.Document
 
         public new Paragraph Clone()
         {
-            if (!(base.Clone() is Paragraph paragraph))
-            {
-                throw new InvalidCastException();
-            }
-
-            return paragraph;
+            return Clone<Paragraph>();
         }
 
         public static Paragraph FromText(string text)

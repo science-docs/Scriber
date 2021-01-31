@@ -1,4 +1,4 @@
-﻿using Scriber.Text;
+﻿using Scriber.Drawing;
 using System.Collections.Generic;
 
 namespace Scriber.Variables

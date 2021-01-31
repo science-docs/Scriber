@@ -25,7 +25,7 @@ namespace Scriber
     public class DocumentLocal<T>
     {
         private readonly ConditionalWeakTable<Document, ObjectBox> table = new ConditionalWeakTable<Document, ObjectBox>();
-        private readonly Func<T> consumer;
+        private readonly Func<T>? consumer;
 
         public DocumentLocal()
         {
@@ -42,7 +42,7 @@ namespace Scriber
 
             if (defaultValue == null)
             {
-                consumer = CreateDefault;
+                consumer = null;
             }
             else
             {
@@ -71,7 +71,7 @@ namespace Scriber
             }
             else
             {
-                var consumed = consumer();
+                var consumed = consumer is null ? default : consumer();
                 Set(document, consumed);
                 return consumed;
             }
@@ -80,12 +80,6 @@ namespace Scriber
         public virtual void Set(Document document, [AllowNull] T value)
         {
             table.AddOrUpdate(document, new ObjectBox(value));
-        }
-
-        [return: MaybeNull]
-        private static T CreateDefault()
-        {
-            return default;
         }
 
         private class ObjectBox

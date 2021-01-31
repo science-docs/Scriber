@@ -27,7 +27,7 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace Scriber.Text
+namespace Scriber.Drawing
 {
     public static class Colors
     {

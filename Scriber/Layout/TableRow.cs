@@ -9,7 +9,7 @@ namespace Scriber.Layout
 {
     public class TableRow : DocumentElement, IList<DocumentElement>
     {
-        private List<DocumentElement> data { get; } = new List<DocumentElement>();
+        private readonly ElementCollection<DocumentElement> data;
 
         public int Width => data.Count;
 
@@ -30,6 +30,7 @@ namespace Scriber.Layout
         public TableRow()
         {
             Tag = "tr";
+            data = new ElementCollection<DocumentElement>(this);
         }
 
         protected override Measurement MeasureOverride(Size availableSize)
@@ -55,12 +56,7 @@ namespace Scriber.Layout
 
         public new TableRow Clone()
         {
-            if (!(base.Clone() is TableRow row))
-            {
-                throw new InvalidCastException();
-            }
-
-            return row;
+            return Clone<TableRow>();
         }
 
         protected override AbstractElement CloneInternal()

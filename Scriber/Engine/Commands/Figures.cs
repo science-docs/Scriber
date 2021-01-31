@@ -2,6 +2,7 @@
 using Scriber.Layout.Document;
 using Scriber.Localization;
 using Scriber.Variables;
+using System;
 using System.Linq;
 
 namespace Scriber.Engine.Commands
@@ -23,7 +24,7 @@ namespace Scriber.Engine.Commands
 
             panel.Elements.AddRange(elements);
 
-            var caption = elements.OfType<Paragraph>().Where(e => "caption".Equals(e.Tag, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            var caption = elements.OfType<Paragraph>().Where(e => "caption".Equals(e.Tag, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             
             if (caption != null)
             {
@@ -38,7 +39,7 @@ namespace Scriber.Engine.Commands
                 };
                 caption.Leaves.Insert(0, text);
 
-                var figures = TableVariables.TableOfFigures.Get(state.Document);
+                var figures = TableVariables.TableOfFigures.Get(state.Document) ?? throw new InvalidOperationException();
                 var tableElement = new TableElement(figureCount.ToString(), 1, copiedCaption, panel);
                 figures.Add(tableElement);
             }
@@ -56,7 +57,7 @@ namespace Scriber.Engine.Commands
                     Orientation = Orientation.Vertical
                 };
 
-                var figures = TableVariables.TableOfFigures.Get(state.Document);
+                var figures = TableVariables.TableOfFigures.Get(state.Document) ?? throw new InvalidOperationException();
                 panel.Elements.AddRange(figures);
 
                 return panel;
