@@ -116,11 +116,9 @@ namespace Scriber.Engine.Tests
         public void InvalidNestedArrayType()
         {
             var objectArray = Create();
-
-            Assert.ThrowsAny<CompilerException>(() =>
-            {
-                objectArray.Get(typeof(SimpleObject[]));
-            });
+            var emptyNested = objectArray.Get(typeof(SimpleObject[]));
+            Assert.NotNull(emptyNested);
+            Assert.Empty(emptyNested);
         }
 
         private ObjectArray Create(params object?[] elements)
