@@ -23,14 +23,7 @@ namespace Scriber.Layout.Styling
             {
                 if (selectorCount < 0)
                 {
-                    lock (computedStyles)
-                    {
-                        selectorCount = 0;
-                        foreach (var container in styles)
-                        {
-                            selectorCount += container.Selectors.Count;
-                        }
-                    }
+                    selectorCount = styles.Count();
                 }
 
                 array = new BitArray(selectorCount);
@@ -39,10 +32,7 @@ namespace Scriber.Layout.Styling
             int index = 0;
             foreach (var container in styles)
             {
-                foreach (var selector in container.Selectors)
-                {
-                    array.Set(index++, selector.Matches(element));
-                }
+                array.Set(index++, container.Selector.Matches(element));
             }
 
             if (computedStyles.TryGetValue(array, out var computedContainer))
@@ -51,11 +41,11 @@ namespace Scriber.Layout.Styling
             }
             else
             {
-                var container = new StyleContainer(StyleOrigin.Engine);
+                var container = new StyleContainer(AllStyleSelector.Singleton);
 
                 foreach (var styleContainer in styles)
                 {
-                    if (styleContainer.Selectors.Any(e => e.Matches(element)))
+                    if (styleContainer.Selector.Matches(element))
                     {
                         foreach (var (key, value) in styleContainer)
                         {

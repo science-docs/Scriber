@@ -1,5 +1,7 @@
 ﻿using Scriber.Layout.Document;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Scriber.Layout.Styling
 {
@@ -7,28 +9,36 @@ namespace Scriber.Layout.Styling
     {
         public override int Specificity => 2;
 
-        public string Class { get; }
+        public IReadOnlyCollection<string> Classes { get; }
 
-        public ClassStyleSelector(string className)
+        public ClassStyleSelector(string selectorText)
         {
-            Class = className ?? throw new ArgumentNullException(nameof(className));
+            if (selectorText is null)
+            {
+                throw new ArgumentNullException(nameof(selectorText));
+            }
+
+            Classes = selectorText.Split('.', StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        public ClassStyleSelector(IEnumerable<string> classes)
+        {
+            if (classes is null)
+            {
+                throw new ArgumentNullException(nameof(classes));
+            }
+
+            Classes = classes.ToArray();
         }
 
         public override bool Matches(AbstractElement element)
         {
-            foreach (var className in element.Classes)
-            {
-                if (className.Equals(Class, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return Classes.All(e => element.Classes.Contains(e));
         }
 
         public override string ToString()
         {
-            return "." + Class;
+            return "." + string.Join('.', Classes);
         }
     }
 }

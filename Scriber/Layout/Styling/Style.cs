@@ -9,7 +9,7 @@ namespace Scriber.Layout.Styling
     {
         public AbstractElement Element { get; }
 
-        private readonly StyleContainer container = new StyleContainer(StyleOrigin.Author);
+        private readonly StyleContainer container = new StyleContainer(AllStyleSelector.Singleton);
         private StyleContainer? computed;
 
         public Style(AbstractElement element)

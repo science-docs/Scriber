@@ -1,34 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Scriber.Layout.Styling
 {
-    public enum StyleOrigin
-    {
-        Engine,
-        Template,
-        Author
-    }
 
     public class StyleContainer : IEnumerable<KeyValuePair<string, object>>
     {
         private readonly Dictionary<string, object> fields = new Dictionary<string, object>();
 
-        public StyleOrigin Origin { get; }
-        public IReadOnlyList<StyleSelector> Selectors { get; }
+        public StyleSelector Selector { get; }
 
-        public StyleContainer(StyleOrigin origin, string selectorText)
+        public StyleContainer(string selectorText)
         {
-            Origin = origin;
-            Selectors = StyleSelector.FromString(selectorText).ToArray();
+            Selector = StyleSelector.FromString(selectorText);
         }
 
-        public StyleContainer(StyleOrigin origin, params StyleSelector[] selectors)
+        public StyleContainer(StyleSelector selectors)
         {
-            Origin = origin;
-            Selectors = selectors;
+            Selector = selectors;
         }
 
         public bool ContainsKey(string key)
