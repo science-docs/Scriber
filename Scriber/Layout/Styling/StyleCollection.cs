@@ -6,7 +6,7 @@ namespace Scriber.Layout.Styling
 {
     public class StyleCollection : IEnumerable<StyleContainer>
     {
-        private readonly List<StyleContainer> styles = new List<StyleContainer>();
+        private readonly SortedList<Priority, StyleContainer> styles = new SortedList<Priority, StyleContainer>(new DuplicatePriorityComparer());
         private readonly StyleCache cache;
 
         public StyleCollection()
@@ -16,12 +16,12 @@ namespace Scriber.Layout.Styling
 
         public void Add(StyleContainer styleContainer)
         {
-            styles.Add(styleContainer);
+            styles.Add(styleContainer.Selector.Specificity, styleContainer);
         }
 
         public IEnumerator<StyleContainer> GetEnumerator()
         {
-            return styles.GetEnumerator();
+            return styles.Values.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -34,36 +34,17 @@ namespace Scriber.Layout.Styling
             return cache.Compute(element);
         }
 
-        //public StyleContainer Merge(AbstractElement element)
-        //{
-        //    var container = new StyleContainer(StyleOrigin.Engine);
+        private class DuplicatePriorityComparer : IComparer<Priority>
+        {
+            public int Compare(Priority x, Priority y)
+            {
+                int result = x.CompareTo(y);
 
-        //    foreach (var styleContainer in styles)
-        //    {
-        //        if (styleContainer.Selectors.Any(e => e.Matches(element)))
-        //        {
-        //            foreach (var (key, value) in styleContainer)
-        //            {
-        //                container.Set(key, value);
-        //            }
-        //        }
-        //    }
-
-        //    var parent = element.Parent;
-        //    if (parent != null)
-        //    {
-        //        var parentContainer = Compute(parent);
-
-        //        foreach (var (key, value) in parentContainer)
-        //        {
-        //            if (key.Inherited && !container.ContainsKey(key))
-        //            {
-        //                container.Set(key, value);
-        //            }
-        //        }
-        //    }
-
-        //    return container;
-        //}
+                if (result == 0)
+                    return 1;
+                else
+                    return result;
+            }
+        }
     }
 }

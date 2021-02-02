@@ -9,14 +9,14 @@ namespace Scriber.Layout.Styling
     {
         private readonly Dictionary<string, object> fields = new Dictionary<string, object>();
 
-        public StyleSelector Selector { get; }
+        public IStyleSelector Selector { get; }
 
         public StyleContainer(string selectorText)
         {
-            Selector = StyleSelector.FromString(selectorText);
+            Selector = StyleSelectorParser.Parse(selectorText);
         }
 
-        public StyleContainer(StyleSelector selectors)
+        public StyleContainer(IStyleSelector selectors)
         {
             Selector = selectors;
         }

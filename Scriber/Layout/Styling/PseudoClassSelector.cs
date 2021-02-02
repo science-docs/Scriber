@@ -4,12 +4,12 @@ using System;
 
 namespace Scriber.Layout.Styling
 {
-    public class PseudoClassSelector : StyleSelector
+    public class PseudoClassSelector : IStyleSelector
     {
-        public override int Specificity => 3;
-
         public string PseudoClassText { get; }
         public PseudoClass PseudoClass { get; }
+
+        public Priority Specificity => Priority.OneClass;
 
         public PseudoClassSelector(string pseudoClass)
         {
@@ -17,7 +17,7 @@ namespace Scriber.Layout.Styling
             PseudoClass = PseudoClass.FromString(pseudoClass);
         }
 
-        public override bool Matches(AbstractElement element)
+        public bool Matches(AbstractElement element)
         {
             return PseudoClass.Matches(element);
         }

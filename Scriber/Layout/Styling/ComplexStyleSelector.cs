@@ -12,22 +12,23 @@ namespace Scriber.Layout.Styling
         Next
     }
 
-    public class ComplexStyleSelector : StyleSelector
+    public class ComplexStyleSelector : IStyleSelector
     {
-        public StyleSelector Left { get; }
-        public StyleSelector Right { get; }
+        public IStyleSelector Left { get; }
+        public IStyleSelector Right { get; }
         public StyleOperator Operator { get; }
 
-        public override int Specificity => 3;
+        public Priority Specificity { get; private set; }
 
-        public ComplexStyleSelector(StyleSelector left, StyleSelector right, StyleOperator op)
+        public ComplexStyleSelector(IStyleSelector left, IStyleSelector right, StyleOperator op)
         {
             Left = left;
             Right = right;
             Operator = op;
+            Specificity = left.Specificity + right.Specificity;
         }
 
-        public override bool Matches(AbstractElement element)
+        public bool Matches(AbstractElement element)
         {
             if (Operator == StyleOperator.Or)
             {

@@ -6,7 +6,7 @@ namespace Scriber.Layout.Styling
 {
     public static class StyleSelectorParser
     {
-        public static StyleSelector Parse(ReadOnlySpan<char> input)
+        public static IStyleSelector Parse(ReadOnlySpan<char> input)
         {
             var tokens = Tokenize(input);
             return Parse(tokens);
@@ -53,7 +53,7 @@ namespace Scriber.Layout.Styling
             return tokens;
         }
 
-        public static StyleSelector Parse(Queue<string> tokens)
+        public static IStyleSelector Parse(Queue<string> tokens)
         {
             PopSpace(tokens);
             var left = ParseSimple(tokens);
@@ -98,7 +98,7 @@ namespace Scriber.Layout.Styling
             }
         }
 
-        private static StyleSelector ParseSimple(Queue<string> tokens)
+        private static IStyleSelector ParseSimple(Queue<string> tokens)
         {
             var token = tokens.Dequeue();
             if (token == ":")

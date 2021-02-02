@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace Scriber.Layout.Styling
 {
-    public class ClassStyleSelector : StyleSelector
+    public class ClassStyleSelector : IStyleSelector
     {
-        public override int Specificity => 2;
-
         public IReadOnlyCollection<string> Classes { get; }
+
+        public Priority Specificity => Priority.OneClass;
 
         public ClassStyleSelector(string selectorText)
         {
@@ -31,7 +31,7 @@ namespace Scriber.Layout.Styling
             Classes = classes.ToArray();
         }
 
-        public override bool Matches(AbstractElement element)
+        public bool Matches(AbstractElement element)
         {
             return Classes.All(e => element.Classes.Contains(e));
         }

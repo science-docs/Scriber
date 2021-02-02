@@ -22,7 +22,7 @@ namespace Scriber.Layout.Styling.Tests
         public void TestTagContainer()
         {
             var doc = new Scriber.Document();
-            var spanStyle = new StyleContainer(StyleOrigin.Author, "span");
+            var spanStyle = new StyleContainer("span");
             doc.Styles.Add(spanStyle);
             var text = new TextLeaf("text")
             {
@@ -38,7 +38,7 @@ namespace Scriber.Layout.Styling.Tests
         public void TestClassContainer()
         {
             var doc = new Scriber.Document();
-            var spanStyle = new StyleContainer(StyleOrigin.Author, ".class");
+            var spanStyle = new StyleContainer(".class");
             doc.Styles.Add(spanStyle);
             var text = new TextLeaf("text")
             {
