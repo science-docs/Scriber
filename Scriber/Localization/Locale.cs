@@ -55,12 +55,17 @@ namespace Scriber.Localization
 
         public string FormatNumber(double value, NumberFormat format)
         {
+            return FormatNumber(value, format, null);
+        }
+
+        public string FormatNumber(double value, NumberFormat format, Gender? gender)
+        {
             return format switch
             {
                 NumberFormat.Numeric => FormatNumber(value),
                 NumberFormat.Roman => FormatRomanNumber((int)value),
-                NumberFormat.LongOrdinal => FormatOrdinal((int)value, true),
-                NumberFormat.Ordinal => FormatOrdinal((int)value, false),
+                NumberFormat.LongOrdinal => FormatOrdinal((int)value, true, gender),
+                NumberFormat.Ordinal => FormatOrdinal((int)value, false, gender),
                 _ => string.Empty
             };
         }
@@ -92,10 +97,10 @@ namespace Scriber.Localization
                 .Reverse());
         }
 
-        private string FormatOrdinal(int value, bool isLong)
+        private string FormatOrdinal(int value, bool isLong, Gender? gender)
         {
             var term = GetOrdinalNumberTerm(value, isLong);
-            string? termValue = GetTerm(term);
+            string? termValue = GetTerm(term, null, null, gender);
 
             if (termValue == null)
             {
@@ -111,9 +116,9 @@ namespace Scriber.Localization
             }
         }
 
-        private TermName GetOrdinalNumberTerm(int value, bool _long)
+        private TermName GetOrdinalNumberTerm(int value, bool isLong)
         {
-            string name = $"{(_long ? "long-" : string.Empty)}ordinal-{value:00}";
+            string name = $"{(isLong ? "long-" : string.Empty)}ordinal-{value:00}";
             if (EnumUtility.TryParseEnum<TermName>(name, out var term))
             {
                 return term;
@@ -121,6 +126,19 @@ namespace Scriber.Localization
             else
             {
                 return TermName.Ordinal;
+            }
+        }
+
+        public Gender? GetTermGender(TermName name)
+        {
+            var term = File.Terms.FirstOrDefault(e => e.Name == name);
+            if (term.GenderSpecified)
+            {
+                return term.Gender;
+            }
+            else
+            {
+                return null;
             }
         }
 

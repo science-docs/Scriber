@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 
 namespace Scriber.Bibliography.Styling.Specification
 {
@@ -14,8 +15,12 @@ namespace Scriber.Bibliography.Styling.Specification
         [XmlAttribute("name")]
         public DatePartName Name
         {
-            get;
-            set;
+            get => name;
+            set
+            {
+                name = value;
+                SetDefaultFormat();
+            }
         }
 
         /// <summary>
@@ -94,6 +99,22 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             get;
             set;
+        }
+
+        private DatePartName name;
+
+        private void SetDefaultFormat()
+        {
+            if (!FormatSpecified)
+            {
+                Format = name switch
+                {
+                    DatePartName.Year => DatePartFormat.Long,
+                    DatePartName.Month => DatePartFormat.Long,
+                    DatePartName.Day => DatePartFormat.Numeric,
+                    _ => throw new IndexOutOfRangeException()
+                };
+            }
         }
 
         public override void EvaluateOverride(Interpreter interpreter)

@@ -315,7 +315,7 @@ namespace Scriber.Bibliography.Styling.Renderer
                     };
 
                     // render
-                    var text = interpreter.Locale.GetTerm(group.Term.Value, label.Format, plural);
+                    var text = interpreter.Locale.GetTerm(group.Term.Value, label.Format, !plural);
 
                     if (!string.IsNullOrEmpty(text))
                     {

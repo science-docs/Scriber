@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace Scriber.Bibliography
 {
@@ -205,6 +206,42 @@ namespace Scriber.Bibliography
                 && DayFrom == other.DayFrom
                 && DayTo == other.DayTo
                 && IsApproximate && other.IsApproximate;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(YearFrom);
+
+            if (MonthFrom.HasValue)
+            {
+                sb.Append('/');
+                sb.Append(MonthFrom.Value);
+            }
+            if (DayFrom.HasValue)
+            {
+                sb.Append('/');
+                sb.Append(DayFrom.Value);
+            }
+            if (YearFrom != YearTo)
+            {
+                sb.Append('-');
+                sb.Append(YearTo);
+
+                if (MonthTo.HasValue)
+                {
+                    sb.Append('/');
+                    sb.Append(MonthTo.Value);
+                }
+                if (DayTo.HasValue)
+                {
+                    sb.Append('/');
+                    sb.Append(DayTo.Value);
+                }
+            }
+
+            return sb.ToString();
         }
 
         public static bool operator ==(DateVariable left, DateVariable right)

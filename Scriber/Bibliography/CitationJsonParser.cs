@@ -36,6 +36,11 @@ namespace Scriber.Bibliography
                     case "volume":
                         variable = ParseNumber(property.Value);
                         break;
+                    case "page":
+                        var num = ParseNumber(property.Value);
+                        variable = num;
+                        cb.Set(new NumberVariable(num.Min), "page-first");
+                        break;
                     case "accessed":
                     case "container":
                     case "event-date":
@@ -79,6 +84,8 @@ namespace Scriber.Bibliography
             int? toMonth = null;
             int? toDay = null;
 
+            Season? season = null;
+
             if (json.TryGetProperty("date-parts", out var dateParts))
             {
                 var fromToParts = dateParts.EnumerateArray();
@@ -114,13 +121,17 @@ namespace Scriber.Bibliography
                     }
                 }
             }
-            
-            //if (json.TryGetProperty("season", out var seasonElement))
-            //{
 
-            //}
+            if (json.TryGetProperty("season", out var seasonElement))
+            {
+                var intValue = GetInt32(seasonElement);
+                if (intValue.HasValue)
+                {
+                    season = (Season)intValue.Value;
+                }
+            }
 
-            return new DateVariable(fromYear, null, fromMonth, fromDay, toYear ?? fromYear, null, toMonth, toDay, false);
+            return new DateVariable(fromYear, season, fromMonth, fromDay, toYear ?? fromYear, season, toMonth, toDay, false);
         }
 
         private static INamesVariable ParseName(JsonElement json)
