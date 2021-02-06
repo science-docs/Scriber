@@ -3,8 +3,7 @@
 }
 
 h1 {
-	margin-top: 12pt;
-	margin-bottom: 8pt;
+	margin: 12pt 0pt 8pt 0pt;
 	font-size: 18pt;
 }
 
@@ -21,15 +20,30 @@ h3 {
 }
 
 img {
+	horizontal-alignment: center;
 	margin-top: 8pt;
 	margin-bottom: 8pt;
 }
 
 caption {
+	horizontal-alignment: center;
 	margin-top: 4pt;
 	margin-bottom: 16pt;
 }
 
 .footnote-reference {
 	font-style: superscript;
+}
+
+td {
+	margin: 4pt;
+}
+
+table {
+	horizontal-alignment: center;
+	border: 0.5pt 0;
+}
+
+th {
+	border: 0 0 0.7pt 0;
 }

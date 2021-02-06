@@ -1,42 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Scriber.Layout.Styling
 {
-    public enum StyleOrigin
+
+    public class StyleContainer : IEnumerable<KeyValuePair<string, object>>
     {
-        Engine,
-        Template,
-        Author
-    }
+        private readonly Dictionary<string, object> fields = new Dictionary<string, object>();
 
-    public class StyleContainer : IEnumerable<KeyValuePair<StyleKey, object>>
-    {
-        private readonly Dictionary<StyleKey, object> fields = new Dictionary<StyleKey, object>();
+        public IStyleSelector Selector { get; }
 
-        public StyleOrigin Origin { get; }
-        public IReadOnlyList<StyleSelector> Selectors { get; }
-
-        public StyleContainer(StyleOrigin origin, string selectorText)
+        public StyleContainer(string selectorText)
         {
-            Origin = origin;
-            Selectors = StyleSelector.FromString(selectorText).ToArray();
+            Selector = StyleSelectorParser.Parse(selectorText);
         }
 
-        public StyleContainer(StyleOrigin origin, params StyleSelector[] selectors)
+        public StyleContainer(IStyleSelector selectors)
         {
-            Origin = origin;
-            Selectors = selectors;
+            Selector = selectors;
         }
 
-        public bool ContainsKey(StyleKey key)
+        public bool ContainsKey(string key)
         {
             return fields.ContainsKey(key);
         }
 
-        public bool TryGet<T>(StyleKey key, [MaybeNullWhen(false)] out T t)
+        public bool TryGet<T>(string key, [MaybeNullWhen(false)] out T t)
         {
             if (fields.TryGetValue(key, out var result) && result is T generic)
             {
@@ -51,7 +41,7 @@ namespace Scriber.Layout.Styling
         }
 
         [return: MaybeNull]
-        public T Get<T>(StyleKey key)
+        public T Get<T>(string key)
         {
             if (fields.TryGetValue(key, out var result) && result is T t)
             {
@@ -63,17 +53,17 @@ namespace Scriber.Layout.Styling
             }
         }
 
-        public void Set<T>(StyleKey<T> key, [DisallowNull] T value)
+        public void Set(IStyleKey key, object value)
+        {
+            Set(key.Name, value);
+        }
+
+        public void Set(string key, object value)
         {
             fields[key] = value;
         }
 
-        public void Set(StyleKey key, object value)
-        {
-            fields[key] = value;
-        }
-
-        public IEnumerator<KeyValuePair<StyleKey, object>> GetEnumerator()
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
             return fields.GetEnumerator();
         }

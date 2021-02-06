@@ -1,5 +1,4 @@
-﻿using Scriber.Language;
-using Scriber.Language.Syntax;
+﻿using Scriber.Language.Syntax;
 using Scriber.Util;
 using System;
 using System.Collections.Generic;
@@ -28,11 +27,6 @@ namespace Scriber.Engine
             if (type is null)
             {
                 throw new ArgumentNullException(nameof(type));
-            }
-
-            if (type.IsArray)
-            {
-                throw new CompilerException(Origin, "Cannot create nested arrays.");
             }
 
             var arrType = type.MakeArrayType();

@@ -27,12 +27,7 @@ namespace Scriber.Layout.Document
 
         public new Leaf Clone()
         {
-            if (!(base.Clone() is Leaf leaf))
-            {
-                throw new InvalidCastException($"Cloned element is not of type {nameof(Leaf)}");
-            }
-
-            return leaf;
+            return Clone<Leaf>();
         }
     }
 }

@@ -1,67 +1,30 @@
-﻿using Scriber.Util;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Scriber.Layout.Styling
 {
-    public class StyleKey : IEquatable<StyleKey>
+    public class StyleKey<T> : AbstractStyleKey<T>
     {
-        public static bool TryGetStyleKey(string name, [MaybeNullWhen(false)] out StyleKey styleKey)
-        {
-            return keys.TryGetValue(name, out styleKey);
-        }
+        [NotNull]
+        public T Default { get; }
 
-        private static readonly Dictionary<string, StyleKey> keys = new Dictionary<string, StyleKey>();
-
-        public string Name { get; }
-        public bool Inherited { get; } = false;
-        public object? Default { get; }
-        public Type Type { get; }
-
-        public StyleKey(string name, Type type, object? defaultValue) : this(name, type, false, defaultValue)
+        public StyleKey(string name, T defaultValue) : this(name, false, defaultValue)
         {
         }
 
-        public StyleKey(string name, Type type, bool inherited, object? defaultValue)
+        public StyleKey(string name, bool inherited, T defaultValue) : base(name, inherited)
         {
-            Name = name;
-            Type = type;
             Default = defaultValue;
-            Inherited = inherited;
-            keys.Add(name, this);
         }
 
-        public bool Equals([AllowNull] StyleKey other)
+        [return: NotNull]
+        public override T Get(Style style)
         {
-            if (other == null)
-            {
-                return false;
-            }
-
-            return Name == other.Name;
+            return style.Get(Name, Inherited, Default) ?? Default;
         }
 
-        public override bool Equals(object? obj)
+        public override void Set(StyleContainer style, [DisallowNull] T value)
         {
-            if (obj is StyleKey key)
-            {
-                return Equals(key);
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Name);
-        }
-
-        public override string ToString()
-        {
-            return $"{Name}<{Type.FormattedName()}>";
+            style.Set(Name, value);
         }
     }
 }

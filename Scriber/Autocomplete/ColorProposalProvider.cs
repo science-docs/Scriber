@@ -1,5 +1,5 @@
-﻿using Scriber.Engine;
-using Scriber.Text;
+﻿using Scriber.Drawing;
+using Scriber.Engine;
 using Scriber.Variables;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace Scriber.Autocomplete
         {
             var knownColors = new List<string>(Enum.GetNames(typeof(KnownColor)));
 
-            var customColors = state.Document.Variable(ColorVariables.CustomColors);
+            var customColors = state.Document.Variable(ColorVariables.CustomColors)!;
             knownColors.AddRange(customColors.Keys);
             knownColors.Sort();
 

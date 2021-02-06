@@ -25,7 +25,7 @@ namespace Scriber
     public class DocumentLocal<T>
     {
         private readonly ConditionalWeakTable<Document, ObjectBox> table = new ConditionalWeakTable<Document, ObjectBox>();
-        private readonly Func<T> consumer;
+        private readonly Func<T>? consumer;
 
         public DocumentLocal()
         {
@@ -42,7 +42,7 @@ namespace Scriber
 
             if (defaultValue == null)
             {
-                consumer = CreateDefault;
+                consumer = null;
             }
             else
             {
@@ -52,25 +52,17 @@ namespace Scriber
 
         public DocumentLocal(Func<T> consumer)
         {
-            if (consumer == null)
-            {
-                throw new ArgumentNullException(nameof(consumer));
-            }
-
-            if (consumer() == null)
-            {
-                throw new ArgumentException("Created object from consumer cannot be null.", nameof(consumer));
-            }
-
-            this.consumer = consumer;
+            this.consumer = consumer ?? throw new ArgumentNullException(nameof(consumer));
         }
 
+        [MaybeNull]
         public T this[Document document]
         {
             get => Get(document);
             set => Set(document, value);
         }
 
+        [return: MaybeNull]
         public virtual T Get(Document document)
         {
             if (table.TryGetValue(document, out var value))
@@ -79,7 +71,7 @@ namespace Scriber
             }
             else
             {
-                var consumed = consumer();
+                var consumed = consumer is null ? default : consumer();
                 Set(document, consumed);
                 return consumed;
             }
@@ -88,12 +80,6 @@ namespace Scriber
         public virtual void Set(Document document, [AllowNull] T value)
         {
             table.AddOrUpdate(document, new ObjectBox(value));
-        }
-
-        [return: MaybeNull]
-        private static T CreateDefault()
-        {
-            return default;
         }
 
         private class ObjectBox

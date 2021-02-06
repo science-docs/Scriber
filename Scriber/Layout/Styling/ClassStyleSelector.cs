@@ -1,34 +1,44 @@
 ﻿using Scriber.Layout.Document;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Scriber.Layout.Styling
 {
-    public class ClassStyleSelector : StyleSelector
+    public class ClassStyleSelector : IStyleSelector
     {
-        public override int Specificity => 2;
+        public IReadOnlyCollection<string> Classes { get; }
 
-        public string Class { get; }
+        public Priority Specificity => Priority.OneClass;
 
-        public ClassStyleSelector(string className)
+        public ClassStyleSelector(string selectorText)
         {
-            Class = className ?? throw new ArgumentNullException(nameof(className));
+            if (selectorText is null)
+            {
+                throw new ArgumentNullException(nameof(selectorText));
+            }
+
+            Classes = selectorText.Split('.', StringSplitOptions.RemoveEmptyEntries);
         }
 
-        public override bool Matches(AbstractElement element)
+        public ClassStyleSelector(IEnumerable<string> classes)
         {
-            foreach (var className in element.Classes)
+            if (classes is null)
             {
-                if (className.Equals(Class, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return true;
-                }
+                throw new ArgumentNullException(nameof(classes));
             }
-            return false;
+
+            Classes = classes.ToArray();
+        }
+
+        public bool Matches(AbstractElement element)
+        {
+            return Classes.All(e => element.Classes.Contains(e));
         }
 
         public override string ToString()
         {
-            return "." + Class;
+            return "." + string.Join('.', Classes);
         }
     }
 }

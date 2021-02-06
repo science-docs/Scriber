@@ -1,6 +1,7 @@
 ﻿using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.AcroForms;
 using Scriber.Drawing;
+using Scriber.Drawing.Pdf;
 using System;
 
 namespace Scriber.Layout.Document

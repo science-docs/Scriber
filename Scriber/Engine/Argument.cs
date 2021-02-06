@@ -30,6 +30,23 @@ namespace Scriber.Engine
             return list.ToArray();
         }
 
+        public Argument Unwrap()
+        {
+            var value = Value;
+            if (value is Argument argument)
+            {
+                return argument.Unwrap();
+            }
+            else if (value is Array array1 && array1.Length == 1 && array1.GetValue(0) is Argument arrayArg)
+            {
+                return arrayArg.Unwrap();
+            }
+            else
+            {
+                return this;
+            }
+        }
+
         public Argument MakeGeneric(Type type, object value)
         {
             if (type is null)

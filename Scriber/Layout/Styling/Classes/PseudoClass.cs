@@ -48,7 +48,7 @@ namespace Scriber.Layout.Styling.Classes
             {
                 pseudoClassSelector = nameGroup.Value switch
                 {
-                    "not" => new NotPseudoClass(StyleSelector.FromString(argsGroup.Value).FirstOrDefault()),
+                    "not" => new NotPseudoClass(StyleSelectorParser.Parse(argsGroup.Value)),
                     "nth-child" => new NthChildPseudoClass(argsGroup.Value),
                     _ => throw new InvalidProgramException()
                 };

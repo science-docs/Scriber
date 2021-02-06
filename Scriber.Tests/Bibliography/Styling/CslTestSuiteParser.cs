@@ -10,7 +10,7 @@ namespace Scriber.Bibliography.Styling.Tests
 {
     public static class CslTestSuiteParser
     {
-        private static readonly Regex ParserRegex = new Regex(@"(>>=+\s(?<name>\w+)\s=+>>(?<content>.*?)<<=+\s\w+\s=+<<)+", RegexOptions.Compiled);
+        private static readonly Regex ParserRegex = new Regex(@"(?:>>=+\s(?<name>[\w-]+)\s=+>>(?<content>.*?)<<=+\s[\w-]+\s=+<<)+", RegexOptions.Compiled | RegexOptions.Singleline);
 
         public static CslTestSuite Parse(string input)
         {
@@ -19,40 +19,34 @@ namespace Scriber.Bibliography.Styling.Tests
 
             foreach (Match match in matches)
             {
-                var names = match.Groups["name"].Captures;
-                var contents = match.Groups["content"].Captures;
+                var name = match.Groups["name"].Value;
+                var content = match.Groups["content"].Value.Trim();
 
-                for (int i = 0; i < names.Count; i++)
+                switch (name)
                 {
-                    var name = names[i].Value.Trim();
-                    var content = contents[i].Value.Trim();
-
-                    switch (name)
-                    {
-                        case "MODE":
-                            suite.Mode = EnumUtility.ParseEnum<CslTestMode>(content).Value;
-                            break;
-                        case "INPUT":
-                            var array = JsonDocument.Parse(content).RootElement.EnumerateArray();
-                            var inputs = new List<Citation>();
-                            while (array.MoveNext())
-                            {
-                                inputs.Add(Citation.FromJson(array.Current));
-                            }
-                            suite.Input = inputs.ToArray();
-                            break;
-                        case "RESULT":
-                            suite.Result = content;
-                            break;
-                        case "CSL":
-                            suite.Csl = File.Parse<StyleFile>(content);
-                            break;
-                        case "CITATIONS":
-                            break;
-                        case "VERSION":
-                            suite.Version = content;
-                            break;
-                    }
+                    case "MODE":
+                        suite.Mode = EnumUtility.ParseEnum<CslTestMode>(content).Value;
+                        break;
+                    case "INPUT":
+                        var array = JsonDocument.Parse(content).RootElement.EnumerateArray();
+                        var inputs = new List<Citation>();
+                        while (array.MoveNext())
+                        {
+                            inputs.Add(Citation.FromJson(array.Current));
+                        }
+                        suite.Input = inputs.ToArray();
+                        break;
+                    case "RESULT":
+                        suite.Result = content;
+                        break;
+                    case "CSL":
+                        suite.Csl = File.Parse<StyleFile>(content);
+                        break;
+                    case "CITATIONS":
+                        break;
+                    case "VERSION":
+                        suite.Version = content;
+                        break;
                 }
             }
 

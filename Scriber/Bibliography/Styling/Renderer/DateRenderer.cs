@@ -1,4 +1,5 @@
 ﻿using Scriber.Bibliography.Styling.Specification;
+using Scriber.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -101,7 +102,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             if (differing.Length == 0)
             {
                 // render single date
-                RenderDateParts(interpreter, dateParts, date.YearFrom, date.SeasonFrom, date.MonthFrom, date.DayFrom, delimiter, true, true);
+                RenderDateParts(interpreter, precision, dateParts, date.YearFrom, date.SeasonFrom, date.MonthFrom, date.DayFrom, delimiter, true, true);
             }
             else
             {
@@ -114,7 +115,7 @@ namespace Scriber.Bibliography.Styling.Renderer
                     .Take(delimiterIndex)
                     .ToArray();
 
-                RenderDateParts(interpreter, fromParts, date.YearFrom, date.SeasonFrom, date.MonthFrom, date.DayFrom, delimiter, true, false);
+                RenderDateParts(interpreter, precision, fromParts, date.YearFrom, date.SeasonFrom, date.MonthFrom, date.DayFrom, delimiter, true, false);
 
                 var lastFromPart = fromParts[^1];
 
@@ -124,11 +125,11 @@ namespace Scriber.Bibliography.Styling.Renderer
                 var toParts = dateParts
                     .Where(x => differing.Contains(x.Name) || !fromParts.Contains(x))
                     .ToArray();
-                RenderDateParts(interpreter, toParts, date.YearTo, date.SeasonTo, date.MonthTo, date.DayTo, delimiter, true, false);
+                RenderDateParts(interpreter, precision, toParts, date.YearTo, date.SeasonTo, date.MonthTo, date.DayTo, delimiter, true, false);
             }
         }
 
-        public static void RenderDateParts(Interpreter interpreter,  DatePartElement[] elements, int year, Season? season, int? month, int? day, string? delimiter, bool renderFirstPrefix, bool renderLastSuffix)
+        public static void RenderDateParts(Interpreter interpreter, DatePrecision precision, DatePartElement[] elements, int year, Season? season, int? month, int? day, string? delimiter, bool renderFirstPrefix, bool renderLastSuffix)
         {
             for (int i = 0; i < elements.Length; i++)
             {
@@ -136,7 +137,7 @@ namespace Scriber.Bibliography.Styling.Renderer
                 var renderPrefix = i > 0 || renderFirstPrefix;
                 var renderSuffix = i < elements.Length - 1 || renderLastSuffix;
 
-                RenderDatePart(interpreter, element, year, season, month, day, renderPrefix, renderSuffix);
+                RenderDatePart(interpreter, precision, element, year, season, month, day, renderPrefix, renderSuffix);
 
                 if (delimiter != null && i < elements.Length - 1)
                 {
@@ -145,7 +146,7 @@ namespace Scriber.Bibliography.Styling.Renderer
             }
         }
 
-        public static void RenderDatePart(Interpreter interpreter, DatePartElement element, int year, Season? season, int? month, int? day, bool renderPrefix, bool renderSuffix)
+        public static void RenderDatePart(Interpreter interpreter, DatePrecision precision, DatePartElement element, int year, Season? season, int? month, int? day, bool renderPrefix, bool renderSuffix)
         {
             // init
             string? text = null;
@@ -166,35 +167,43 @@ namespace Scriber.Bibliography.Styling.Renderer
                     }
                     break;
                 case DatePartName.Month:
-                    if (month.HasValue && month.Value >= 1 && month.Value <= 12)
+                    if (precision == DatePrecision.YearMonth || precision == DatePrecision.YearMonthDay)
                     {
-                        // month
-                        text = element.Format switch
+                        if (month.HasValue && month.Value >= 1 && month.Value <= 12)
                         {
-                            DatePartFormat.Numeric => month.Value.ToString(),
-                            DatePartFormat.NumericLeadingZeros => month.Value.ToString("00"),
-                            DatePartFormat.Long => interpreter.Locale.GetTerm(GetTermName(month.Value), TermFormat.Long),
-                            DatePartFormat.Short => interpreter.Locale.GetTerm(GetTermName(month.Value), TermFormat.Short),
-                            DatePartFormat.Ordinal => throw new NotSupportedException(),
-                            _ => throw new NotSupportedException(),
-                        };
-                    }
-                    else if (season.HasValue)
-                    {
-                        // season
-                        text = season.Value switch
+                            // month
+                            text = element.Format switch
+                            {
+                                DatePartFormat.Numeric => month.Value.ToString(),
+                                DatePartFormat.NumericLeadingZeros => month.Value.ToString("00"),
+                                DatePartFormat.Long => interpreter.Locale.GetTerm(GetTermName(month.Value), TermFormat.Long),
+                                DatePartFormat.Short => interpreter.Locale.GetTerm(GetTermName(month.Value), TermFormat.Short),
+                                DatePartFormat.Ordinal => throw new NotSupportedException(),
+                                _ => throw new NotSupportedException(),
+                            };
+
+                            if (text != null)
+                            {
+                                text = text.ToFirstUpper();
+                            }
+                        }
+                        else if (season.HasValue)
                         {
-                            Season.Spring => interpreter.Locale.GetTerm(TermName.Season01, TermFormat.Long),
-                            Season.Summer => interpreter.Locale.GetTerm(TermName.Season02, TermFormat.Long),
-                            Season.Autumn => interpreter.Locale.GetTerm(TermName.Season03, TermFormat.Long),
-                            Season.Winter => interpreter.Locale.GetTerm(TermName.Season04, TermFormat.Long),
-                            _ => throw new NotSupportedException(),
-                        };
+                            // season
+                            text = season.Value switch
+                            {
+                                Season.Spring => interpreter.Locale.GetTerm(TermName.Season01, TermFormat.Long),
+                                Season.Summer => interpreter.Locale.GetTerm(TermName.Season02, TermFormat.Long),
+                                Season.Autumn => interpreter.Locale.GetTerm(TermName.Season03, TermFormat.Long),
+                                Season.Winter => interpreter.Locale.GetTerm(TermName.Season04, TermFormat.Long),
+                                _ => throw new NotSupportedException(),
+                            };
+                        }
                     }
                     break;
                 case DatePartName.Day:
                     // day
-                    if (day.HasValue && day.Value >= 1 && day.Value <= 31)
+                    if (precision == DatePrecision.YearMonthDay && day.HasValue && day.Value >= 1 && day.Value <= 31)
                     {
                         switch (element.Format)
                         {
@@ -206,18 +215,19 @@ namespace Scriber.Bibliography.Styling.Renderer
                                 break;
                             case DatePartFormat.Ordinal:
                                 // TODO: this
-                                //if (interpreter.Locale.LimitDayOrdinalsToDay1 && day.Value > 1)
-                                //{
-                                //    text = day.Value.ToString();
-                                //}
-                                //else
-                                //{
-                                //    // get gender
-                                //    var gender = (month.HasValue ? interpreter.Locale.GetTermGender(GetTermName(month.Value)) : (Gender?)null);
+                                var day1Limit = interpreter.LocaleFile.StyleOptions?.LimitDayOrdinalsToDay1 ?? false;
+                                if (day1Limit && day.Value > 1)
+                                {
+                                    text = day.Value.ToString();
+                                }
+                                else
+                                {
+                                    // get gender
+                                    var gender = month.HasValue ? interpreter.Locale.GetTermGender(GetTermName(month.Value)) : null;
 
-                                //    // done
-                                //    text = interpreter.Locale.FormatNumberAsOrdinal((uint)day.Value, gender);
-                                //}
+                                    // done
+                                    text = interpreter.Locale.FormatNumber(day.Value, NumberFormat.Ordinal, gender);
+                                }
                                 break;
                             default:
                                 throw new NotSupportedException();

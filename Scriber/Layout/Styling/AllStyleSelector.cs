@@ -2,11 +2,17 @@
 
 namespace Scriber.Layout.Styling
 {
-    public class AllStyleSelector : StyleSelector
+    public class AllStyleSelector : IStyleSelector
     {
-        public override int Specificity => 0;
+        public static AllStyleSelector Singleton { get; } = new AllStyleSelector();
 
-        public override bool Matches(AbstractElement element)
+        public Priority Specificity => Priority.Zero;
+
+        private AllStyleSelector()
+        {
+        }
+
+        public bool Matches(AbstractElement element)
         {
             return true;
         }

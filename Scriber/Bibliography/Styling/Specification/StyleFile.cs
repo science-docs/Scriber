@@ -407,7 +407,7 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             get
             {
-                return this.NamesDelimiter;
+                return NamesDelimiter;
             }
         }
 
@@ -580,7 +580,7 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             get
             {
-                return this.NameFormat;
+                return NameFormat;
             }
         }
         /// <summary>
@@ -590,7 +590,7 @@ namespace Scriber.Bibliography.Styling.Specification
         {
             get
             {
-                return this.NameFormatSpecified;
+                return NameFormatSpecified;
             }
         }
 

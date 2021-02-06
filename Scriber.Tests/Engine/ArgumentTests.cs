@@ -97,8 +97,8 @@ namespace Scriber.Engine.Tests
         public void GenericArgument()
         {
             var arg = new Argument<string>(E, "value");
-            Assert.IsType<string>(arg.Value);
-            Assert.Equal("value", arg.Value);
+            var value = Assert.IsType<string>(arg.Value);
+            Assert.Equal("value", value);
         }
 
         [Fact]
@@ -106,8 +106,7 @@ namespace Scriber.Engine.Tests
         {
             var arg = new Argument(E, "value");
             var genArg = arg.MakeGeneric(typeof(string), "text");
-            Assert.IsType<Argument<string>>(genArg);
-            var actualGenericArg = genArg as Argument<string>;
+            var actualGenericArg = Assert.IsType<Argument<string>>(genArg);
             Assert.Equal("text", actualGenericArg.Value);
         }
 

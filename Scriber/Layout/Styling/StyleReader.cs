@@ -1,6 +1,7 @@
 ﻿using ExCSS;
 using Scriber.Engine;
 using Scriber.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,21 +12,14 @@ namespace Scriber.Layout.Styling
     public class StyleReader
     {
         private static readonly Context context = new Context();
-        private static readonly StyleContainer[] defaultContainers;
-
-        static StyleReader()
-        {
-            StyleKeys.Font.ToString();
-            new ReflectionLoader().Discover(context, typeof(StyleReader).Assembly);
-            defaultContainers = new StyleReader().Read(typeof(StyleReader).Assembly.GetManifestResourceStream("Scriber.Resources.Styles.Style.css")!);
-        }
+        private static readonly Lazy<StyleContainer[]> defaultContainers = new Lazy<StyleContainer[]>(LoadDefaultStyles);
 
         public static StyleContainer[] GetDefaultStyles()
         {
-            return defaultContainers;
+            return defaultContainers.Value;
         }
 
-        public StyleContainer[] Read(Stream content, StyleOrigin origin = StyleOrigin.Author)
+        public StyleContainer[] Read(Stream content)
         {
             var parser = new StylesheetParser(true, true, true, true, true, false);
             var stylesheet = parser.Parse(content);
@@ -33,32 +27,40 @@ namespace Scriber.Layout.Styling
 
             foreach (var rule in stylesheet.StyleRules)
             {
-                styles.Add(ToContainer(rule, origin));
+                styles.Add(ToContainer(rule));
             }
 
             return styles.ToArray();
         }
 
-        public StyleContainer[] Read(string content, StyleOrigin origin = StyleOrigin.Author)
+        public StyleContainer[] Read(string content)
         {
             var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(content), false);
-            return Read(memoryStream, origin);
+            return Read(memoryStream);
         }
 
-        private StyleContainer ToContainer(IStyleRule rule, StyleOrigin origin)
+        private StyleContainer ToContainer(IStyleRule rule)
         {
-            var container = new StyleContainer(origin, rule.SelectorText);
+            var container = new StyleContainer(rule.SelectorText);
 
             foreach (var property in rule.Style)
             {
                 var propName = StringUtility.ToPascalCase(property.Name);
-                if (StyleKey.TryGetStyleKey(propName, out var styleKey) && context.Converters.TryConvert(property.Value, styleKey.Type, out var propertyValue))
+                if (StyleKeys.TryGetByName(propName, out var styleKey) && context.Converters.TryConvert(property.Value, styleKey.Type, out var propertyValue))
                 {
-                    container.Set(styleKey, propertyValue);
+                    styleKey.Set(container, propertyValue);
                 }
             }
 
             return container;
+        }
+
+        private static StyleContainer[] LoadDefaultStyles()
+        {
+            StyleKeys.Font.ToString();
+            new ReflectionLoader().Discover(context, typeof(StyleReader).Assembly);
+            var defaultContainers = new StyleReader().Read(typeof(StyleReader).Assembly.GetManifestResourceStream("Scriber.Resources.Styles.Style.css")!);
+            return defaultContainers;
         }
     }
 }

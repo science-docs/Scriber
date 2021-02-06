@@ -5,9 +5,9 @@ namespace Scriber.Layout.Styling.Classes
 {
     public class NotPseudoClass : PseudoClass
     {
-        public StyleSelector Selector { get; }
+        public IStyleSelector Selector { get; }
 
-        public NotPseudoClass(StyleSelector selector)
+        public NotPseudoClass(IStyleSelector selector)
         {
             Selector = selector ?? throw new ArgumentNullException(nameof(selector));
         }

@@ -17,8 +17,8 @@ namespace Scriber.Engine.Instructions.Tests
         public void EmptyBlock()
         {
             var blockContent = Block.Evaluate(CS, new ListSyntax());
-            Assert.IsType<Argument[]>(blockContent);
-            Assert.Empty((Argument[])blockContent);
+            var content = Assert.IsType<Argument[]>(blockContent);
+            Assert.Empty(content);
         }
 
         [Fact]
@@ -45,11 +45,9 @@ namespace Scriber.Engine.Instructions.Tests
         public void GroupedLeafBlock()
         {
             var blockContent = ParseBlock("some text");
-            Assert.IsType<Argument[]>(blockContent);
-            var argResult = (Argument[])blockContent;
-            Assert.Single(argResult);
-            Assert.IsType<Paragraph>(argResult[0].Value);
-            var paragraph = (Paragraph)argResult[0].Value;
+            var argResult = Assert.IsType<Argument[]>(blockContent);
+            var singleResult = Assert.Single(argResult);
+            var paragraph = Assert.IsType<Paragraph>(singleResult.Value);
             var leaf = paragraph.Leaves[0] as ITextLeaf;
             Assert.Equal("some text", leaf.Content);
         }
@@ -61,8 +59,7 @@ namespace Scriber.Engine.Instructions.Tests
         public void WhitespaceBlock(string input)
         {
             var blockContent = ParseBlock(input);
-            Assert.IsType<Argument[]>(blockContent);
-            var argResult = (Argument[])blockContent;
+            var argResult = Assert.IsType<Argument[]>(blockContent);
             Assert.Single(argResult);
         }
 
@@ -70,13 +67,12 @@ namespace Scriber.Engine.Instructions.Tests
         public void MixedBlock()
         {
             var blockContent = ParseBlock("first @Heading(1; A) second");
-            Assert.IsType<Argument[]>(blockContent);
-            var argResult = (Argument[])blockContent;
+            var argResult = Assert.IsType<Argument[]>(blockContent);
             Assert.Equal(3, argResult.Length);
-            Assert.All(argResult, arg => Assert.IsType<Paragraph>(arg.Value));
-            var firstParagraph = (Paragraph)argResult[0].Value;
+            Assert.IsType<Paragraph>(argResult[1].Value);
+            var firstParagraph = Assert.IsType<Paragraph>(argResult[0].Value);
             var firstLeaf = firstParagraph.Leaves[0] as ITextLeaf;
-            var secondParagraph = (Paragraph)argResult[2].Value;
+            var secondParagraph = Assert.IsType<Paragraph>(argResult[2].Value);
             var secondLeaf = secondParagraph.Leaves[0] as ITextLeaf;
             Assert.Equal("first ", firstLeaf.Content);
             Assert.Equal(" second", secondLeaf.Content);

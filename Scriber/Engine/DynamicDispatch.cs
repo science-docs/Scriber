@@ -170,11 +170,14 @@ namespace Scriber.Engine
             }
 
             var isArgument = Argument.IsArgumentType(type, out var argType);
-            transformed = TryConvertSingle(state, type, overrides, argument);
-            
-            if (transformed == null)
+
+            if (argType.IsArrayType())
             {
                 transformed = TryConvertArray(state, type, overrides, argument);
+            }
+            else
+            {
+                transformed = TryConvertSingle(state, type, overrides, argument);
             }
 
             if (isArgument && transformed != null)
@@ -187,13 +190,25 @@ namespace Scriber.Engine
 
         private static object? TryConvertSingle(CompilerState state, Type type, IEnumerable<Type>? overrides, Argument argument)
         {
-            var value = argument.Value!;
-            Argument.IsArgumentType(type, out var argType);
+            var value = argument.Unwrap().Value!;
 
             if (value is Array array)
             {
-                value = array.GetValue(0)!;
+                if (array.Length == 1)
+                {
+                    value = array.GetValue(0)!;
+                    if (value is Argument arg)
+                    {
+                        value = arg.Unwrap().Value!;
+                    }
+                }
+                else
+                {
+                    throw new CompilerException();
+                }
             }
+
+            Argument.IsArgumentType(type, out var argType);
 
             if (type == typeof(Argument))
             {
@@ -218,7 +233,7 @@ namespace Scriber.Engine
         private static object? TryConvertArray(CompilerState state, Type type, IEnumerable<Type>? overrides, Argument argument)
         {
             Array? array = null;
-            var value = argument.Value!;
+            var value = argument.Unwrap().Value!;
             Argument.IsArgumentType(type, out var argType);
             var innerArgument = false;
 
@@ -242,9 +257,9 @@ namespace Scriber.Engine
                 }
                 array = objectArray.Get(arrayType, overrides);
             }
-            else if (value.GetType().IsArray)
+            else if (value is Array arrayValue)
             {
-                array = (Array)value;
+                array = arrayValue;
             }
 
             if (array != null)

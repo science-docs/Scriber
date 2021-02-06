@@ -1,6 +1,6 @@
-﻿using System;
-using Scriber.Drawing;
+﻿using Scriber.Drawing;
 using Scriber.Layout.Styling;
+using Scriber.Text;
 
 namespace Scriber.Layout.Document
 {
@@ -101,6 +101,8 @@ namespace Scriber.Layout.Document
                 drawingContext.PushTransform(Transform);
             }
 
+            RenderBorder(drawingContext, measurement);
+
             OnRender(drawingContext, measurement);
 
             if (Transform != null)
@@ -115,12 +117,54 @@ namespace Scriber.Layout.Document
 
         public new DocumentElement Clone()
         {
-            if (!(base.Clone() is DocumentElement element))
-            {
-                throw new InvalidCastException();
-            }
+            return Clone<DocumentElement>();
+        }
 
-            return element;
+        private void RenderBorder(IDrawingContext drawingContext, Measurement measurement)
+        {
+            var borderThickness = Style.Get(StyleKeys.Border);
+            var size = measurement.Size;
+            var color = Style.Get(StyleKeys.BorderColor);
+            if (borderThickness.Top > 0)
+            {
+                var y1 = -borderThickness.Top / 2;
+                var x1 = 0;
+                var y2 = y1;
+                var x2 = size.Width;
+                var s = new Position(x1, y1);
+                var e = new Position(x2, y2);
+                drawingContext.DrawLine(s, e, new Pen(color, borderThickness.Top));
+            }
+            if (borderThickness.Left > 0)
+            {
+                var y1 = -borderThickness.Top;
+                var x1 = -borderThickness.Left / 2;
+                var y2 = size.Height + borderThickness.Bottom;
+                var x2 = x1;
+                var s = new Position(x1, y1);
+                var e = new Position(x2, y2);
+                drawingContext.DrawLine(s, e, new Pen(color, borderThickness.Left));
+            }
+            if (borderThickness.Bottom > 0)
+            {
+                var y1 = size.Height + borderThickness.Bottom / 2;
+                var x1 = 0;
+                var y2 = y1;
+                var x2 = size.Width;
+                var s = new Position(x1, y1);
+                var e = new Position(x2, y2);
+                drawingContext.DrawLine(s, e, new Pen(color, borderThickness.Bottom));
+            }
+            if (borderThickness.Right > 0)
+            {
+                var y1 = -borderThickness.Top;
+                var x1 = size.Width + borderThickness.Right / 2;
+                var y2 = size.Height + borderThickness.Bottom;
+                var x2 = x1;
+                var s = new Position(x1, y1);
+                var e = new Position(x2, y2);
+                drawingContext.DrawLine(s, e, new Pen(color, borderThickness.Right));
+            }
         }
     }
 }

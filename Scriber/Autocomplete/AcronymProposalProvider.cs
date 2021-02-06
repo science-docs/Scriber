@@ -1,6 +1,7 @@
 ﻿using Scriber.Engine;
 using Scriber.Engine.Converter;
 using Scriber.Variables;
+using System;
 using System.Collections.Generic;
 
 namespace Scriber.Autocomplete
@@ -9,7 +10,7 @@ namespace Scriber.Autocomplete
     {
         public IEnumerable<Proposal> Propose(CompilerState state)
         {
-            var acronyms = AcronymVariables.Acronyms.Get(state.Document);
+            var acronyms = AcronymVariables.Acronyms.Get(state.Document) ?? throw new InvalidOperationException();
 
             foreach (var (name, full) in acronyms)
             {

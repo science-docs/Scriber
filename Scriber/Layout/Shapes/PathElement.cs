@@ -32,7 +32,7 @@ namespace Scriber.Layout.Shapes
 
         protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
-            drawingContext.DrawPath(Path, Fill, Stroke, StrokeWidth);
+            drawingContext.DrawPath(Path, Fill, new Pen(Stroke, StrokeWidth));
         }
     }
 }

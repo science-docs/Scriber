@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -32,28 +33,15 @@ namespace Scriber.Bibliography.Styling.Specification
             foreach (var key in Keys)
             {
                 var orderFunction = OrderValue(interpreter, key);
+                var comparer = new SortComparer(key.SortOrder);
 
-                if (key.SortOrder == SortOrder.Ascending)
+                if (sorted == null)
                 {
-                    if (sorted == null)
-                    {
-                        sorted = citations.OrderBy(orderFunction);
-                    }
-                    else
-                    {
-                        sorted = sorted.ThenBy(orderFunction);
-                    }
+                    sorted = citations.OrderBy(orderFunction, comparer);
                 }
                 else
                 {
-                    if (sorted == null)
-                    {
-                        sorted = citations.OrderByDescending(orderFunction);
-                    }
-                    else
-                    {
-                        sorted = sorted.ThenByDescending(orderFunction);
-                    }
+                    sorted = sorted.ThenBy(orderFunction, comparer);
                 }
             }
             interpreter.Clear();
@@ -93,6 +81,37 @@ namespace Scriber.Bibliography.Styling.Specification
             else
             {
                 return citation => null;
+            }
+        }
+
+        private class SortComparer : IComparer<string?>
+        {
+            public SortOrder Order { get; set; }
+
+            public SortComparer(SortOrder order)
+            {
+                Order = order;
+            }
+
+            public int Compare([AllowNull] string? x, [AllowNull] string? y)
+            {
+                var multiplier = Order == SortOrder.Ascending ? 1 : -1;
+                if (x is null && y is null)
+                {
+                    return 0;
+                }
+                else if (y is null)
+                {
+                    return -1 * multiplier;
+                }
+                else if (x is null)
+                {
+                    return 1 * multiplier;
+                }
+                else
+                {
+                    return x.CompareTo(y) * multiplier;
+                }
             }
         }
 

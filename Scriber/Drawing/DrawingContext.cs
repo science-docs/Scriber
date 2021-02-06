@@ -17,7 +17,9 @@ namespace Scriber.Drawing
         public abstract void AddLink(Rectangle rectangle, int targetPage);
         public abstract void DrawImage(Image image, Rectangle rectangle);
         public abstract void DrawText(TextRun run, Color color);
-        public abstract void DrawPath(Path path, Color fill, Color stroke, double strokeWidth);
+        public abstract void DrawLine(Position start, Position end, Pen pen);
+        public abstract void DrawRectangle(Rectangle rect, Color fill, Pen pen);
+        public abstract void DrawPath(Path path, Color fill, Pen pen);
 
         protected void ClearTransform()
         {

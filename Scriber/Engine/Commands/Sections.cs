@@ -39,19 +39,20 @@ namespace Scriber.Engine.Commands
         [Command("Label")]
         public static void Label(CompilerState state, LabelType type, string name)
         {
-            TableElement element = type switch
+            List<TableElement> elementList = type switch
             {
-                LabelType.Figure => state.Document.Variable(TableVariables.TableOfFigures)[^1],
-                LabelType.Table => state.Document.Variable(TableVariables.TableOfTables)[^1],
-                _ => state.Document.Variable(TableVariables.TableOfContent)[^1]
-            };
-            LabelVariables.Labels.Get(state.Document)[name] = element;
+                LabelType.Figure => state.Document.Variable(TableVariables.TableOfFigures),
+                LabelType.Table => state.Document.Variable(TableVariables.TableOfTables),
+                _ => state.Document.Variable(TableVariables.TableOfContent)
+            } ?? throw new InvalidOperationException();
+            var labels = LabelVariables.Labels.Get(state.Document) ?? throw new InvalidOperationException();
+            labels[name] = elementList[^1];
         }
 
         [Command("Reference")]
         public static ITextLeaf? Reference(CompilerState state, Argument<string> label)
         {
-            var labels = LabelVariables.Labels.Get(state.Document);
+            var labels = LabelVariables.Labels.Get(state.Document) ?? throw new InvalidOperationException();
             if (labels.TryGetValue(label.Value, out var tableElement))
             {
                 if (string.IsNullOrWhiteSpace(tableElement.Preamble))
@@ -115,7 +116,8 @@ namespace Scriber.Engine.Commands
             }
             var paragraph = content.Value;
             var entry = new TableElement(preamble, lvl, paragraph.Clone(), paragraph);
-            state.Document.Variable(TableVariables.TableOfContent).Add(entry);
+            var toc = state.Document.Variable(TableVariables.TableOfContent) ?? throw new InvalidOperationException();
+            toc.Add(entry);
             return preamble;
         }
 
@@ -205,7 +207,7 @@ namespace Scriber.Engine.Commands
 
         private static void AddOutline(CompilerState state, int level, Paragraph content)
         {
-            if (state.Converters.TryConvert(content, out string stringContent))
+            if (state.Converters.TryConvert<string>(content, out var stringContent))
             {
                 var doc = state.Document;
                 var outlineChildren = GetParentOutline(doc.Outlines, 1, level)?.Children ?? doc.Outlines;

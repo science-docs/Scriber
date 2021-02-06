@@ -8,7 +8,9 @@ namespace Scriber.Drawing
     {
         Position Offset { get; set; }
         void DrawText(TextRun run, Color color);
-        void DrawPath(Path path, Color fill, Color stroke, double strokeWidth);
+        void DrawLine(Position start, Position end, Pen pen);
+        void DrawRectangle(Rectangle rect, Color fill, Pen pen);
+        void DrawPath(Path path, Color fill, Pen pen);
         void DrawImage(Image image, Rectangle rectangle);
         void AddLink(Rectangle rectangle, int targetPage);
         void PushTransform(Transform transform);

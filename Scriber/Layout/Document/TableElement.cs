@@ -68,6 +68,8 @@ namespace Scriber.Layout.Document
                 drawingContext.Offset = referencePagePosition;
                 drawingContext.DrawText(new TextRun(".", typeface), Foreground);
             }
+
+            //drawingContext.AddLink(new Rectangle(measurement.Position, measurement.Size), Reference.Page!.Index);
         }
 
         private static double CalculateLeft(int level)

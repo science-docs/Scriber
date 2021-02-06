@@ -1,9 +1,24 @@
-﻿using Scriber.Text;
+﻿using Scriber.Drawing;
+using Scriber.Text;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Scriber.Layout.Styling
 {
     public static class StyleKeys
     {
+        public static bool TryGetByName(string name, [MaybeNullWhen(false)] out IStyleKey styleKey)
+        {
+            return keys.TryGetValue(name, out styleKey);
+        }
+
+        internal static void Add(IStyleKey key)
+        {
+            keys.Add(key.Name, key);
+        }
+
+        private static readonly Dictionary<string, IStyleKey> keys = new Dictionary<string, IStyleKey>();
+
         public static StyleKey<Font> Font { get; } = new StyleKey<Font>(nameof(Font), true, Text.Font.Default);
         public static StyleKey<Unit> FontSize { get; } = new StyleKey<Unit>(nameof(FontSize), true, Unit.FromPoint(12));
 
@@ -17,6 +32,9 @@ namespace Scriber.Layout.Styling
             var weight = style.Get(FontWeight);
             var fontStyle = style.Get(FontStyle);
             return new Typeface(font, size, weight, fontStyle);
+        }, (styleContainer, typeface) =>
+        {
+
         });
 
         public static StyleKey<HorizontalAlignment> HorizontalAlignment { get; } = new StyleKey<HorizontalAlignment>(nameof(HorizontalAlignment), true, Layout.HorizontalAlignment.Justify);
@@ -27,14 +45,26 @@ namespace Scriber.Layout.Styling
         public static StyleKey<Unit> MarginBottom { get; } = new StyleKey<Unit>(nameof(MarginBottom), Unit.Zero);
         public static StyleKey<Unit> MarginLeft { get; } = new StyleKey<Unit>(nameof(MarginLeft), Unit.Zero);
 
-        public static ComputedStyleKey<Thickness> Margin { get; } = new ComputedStyleKey<Thickness>(nameof(Margin), style =>
-        {
-            var top = style.Get(MarginTop).Point;
-            var right = style.Get(MarginRight).Point;
-            var bottom = style.Get(MarginBottom).Point;
-            var left = style.Get(MarginLeft).Point;
-            return new Thickness(top, left, bottom, right);
-        });
+        public static ThicknessStyleKey Margin { get; } = new ThicknessStyleKey(nameof(Margin), MarginTop, MarginLeft, MarginBottom, MarginRight);
+
+        public static StyleKey<Unit> PaddingTop { get; } = new StyleKey<Unit>(nameof(PaddingTop), Unit.Zero);
+        public static StyleKey<Unit> PaddingRight { get; } = new StyleKey<Unit>(nameof(PaddingRight), Unit.Zero);
+        public static StyleKey<Unit> PaddingBottom { get; } = new StyleKey<Unit>(nameof(PaddingBottom), Unit.Zero);
+        public static StyleKey<Unit> PaddingLeft { get; } = new StyleKey<Unit>(nameof(PaddingLeft), Unit.Zero);
+
+        public static ThicknessStyleKey Padding { get; } = new ThicknessStyleKey(nameof(Padding), PaddingTop, PaddingLeft, PaddingBottom, PaddingRight);
+
+        public static StyleKey<Color> BorderColor { get; } = new StyleKey<Color>(nameof(BorderColor), true, Colors.Black);
+
+        public static StyleKey<Unit> BorderTop { get; } = new StyleKey<Unit>(nameof(BorderTop), Unit.Zero);
+        public static StyleKey<Unit> BorderRight { get; } = new StyleKey<Unit>(nameof(BorderRight), Unit.Zero);
+        public static StyleKey<Unit> BorderBottom { get; } = new StyleKey<Unit>(nameof(BorderBottom), Unit.Zero);
+        public static StyleKey<Unit> BorderLeft { get; } = new StyleKey<Unit>(nameof(BorderLeft), Unit.Zero);
+
+        public static ThicknessStyleKey Border { get; } = new ThicknessStyleKey(nameof(Border), BorderTop, BorderLeft, BorderBottom, BorderRight);
+
+        public static StyleKey<int> RowSpan { get; } = new StyleKey<int>(nameof(RowSpan), 1);
+        public static StyleKey<int> ColumnSpan { get; } = new StyleKey<int>(nameof(ColumnSpan), 1);
 
         // Paragraph styles
         public static StyleKey<Unit?> BaselineSkip { get; } = new StyleKey<Unit?>(nameof(BaselineSkip), true, null);

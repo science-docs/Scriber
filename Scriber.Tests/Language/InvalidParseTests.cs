@@ -14,10 +14,8 @@ namespace Scriber.Language.Tests
             Assert.NotNull(result);
             var nodes = result.Nodes;
             var list = nodes.First() as ListSyntax;
-            var command = list[0] as CommandSyntax;
-            var text = list[1] as TextSyntax;
-            Assert.IsType<CommandSyntax>(command);
-            Assert.IsType<TextSyntax>(text);
+            var command = Assert.IsType<CommandSyntax>(list[0]);
+            var text = Assert.IsType<TextSyntax>(list[1]);
             Assert.Equal("Command", command.Name.Value);
             Assert.Empty(command.Arguments);
             Assert.Equal(")", text.Text);
@@ -31,16 +29,14 @@ namespace Scriber.Language.Tests
             Assert.NotNull(result);
             var nodes = result.Nodes;
             var list = nodes.First() as ListSyntax;
-            var command = list[0] as CommandSyntax;
-            var text = list[1] as TextSyntax;
-            Assert.IsType<CommandSyntax>(command);
-            Assert.IsType<TextSyntax>(text);
+            var command = Assert.IsType<CommandSyntax>(list[0]);
+            var text = Assert.IsType<TextSyntax>(list[1]);
             Assert.Equal("Command", command.Name.Value);
             Assert.Single(command.Arguments);
             var obj = command.Arguments[0].Content[0] as ObjectSyntax;
             Assert.NotNull(obj);
-            Assert.Single(obj.Fields);
-            Assert.Equal("field", obj.Fields[0].Name.Value);
+            var field = Assert.Single(obj.Fields);
+            Assert.Equal("field", field.Name.Value);
             Assert.Equal(" rest", text.Text);
         }
 
@@ -52,10 +48,8 @@ namespace Scriber.Language.Tests
             Assert.NotNull(result);
             var nodes = result.Nodes;
             var list = nodes.First() as ListSyntax;
-            var command = list[0] as CommandSyntax;
-            var text = list[1] as TextSyntax;
-            Assert.IsType<CommandSyntax>(command);
-            Assert.IsType<TextSyntax>(text);
+            var command = Assert.IsType<CommandSyntax>(list[0]);
+            var text = Assert.IsType<TextSyntax>(list[1]);
             Assert.Equal("Command", command.Name.Value);
             Assert.Empty(command.Arguments);
             Assert.Equal("[]", text.Text);

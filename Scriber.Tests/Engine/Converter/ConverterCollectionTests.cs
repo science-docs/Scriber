@@ -102,8 +102,8 @@ namespace Scriber.Engine.Converter.Tests
         {
             converters.Add(new StringConverter(), typeof(string), typeof(int));
             Assert.True(converters.TryConvert("123", typeof(int), out var value));
-            Assert.IsType<int>(value);
-            Assert.Equal(123, value);
+            var intValue = Assert.IsType<int>(value);
+            Assert.Equal(123, intValue);
         }
 
         [Fact]

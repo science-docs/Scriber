@@ -62,8 +62,23 @@ namespace Scriber.Engine.Converter.Tests
         {
             var converted = converter.Convert("32.4", typeof(decimal));
 
-            Assert.IsType<decimal>(converted);
-            Assert.Equal(32.4m, converted);
+            var dec = Assert.IsType<decimal>(converted);
+            Assert.Equal(32.4m, dec);
+        }
+
+        [Theory]
+        [InlineData("2pt", 2, 2, 2, 2)]
+        [InlineData("2pt 3pt", 2, 3, 2, 3)]
+        [InlineData("2pt 4 5pt 6pt", 2, 4, 5, 6)]
+        public void StringToThicknessSuccess(string input, double top, double left, double bottom, double right)
+        {
+            var thickness = converter.Convert(input, typeof(Thickness));
+
+            var value = Assert.IsType<Thickness>(thickness);
+            Assert.Equal(top, value.Top, 3);
+            Assert.Equal(left, value.Left, 3);
+            Assert.Equal(bottom, value.Bottom, 3);
+            Assert.Equal(right, value.Right, 3);
         }
 
         [Fact]
@@ -71,8 +86,34 @@ namespace Scriber.Engine.Converter.Tests
         {
             var converted = converter.Convert("32.4cm", typeof(Unit));
 
-            Assert.IsType<Unit>(converted);
-            Assert.Equal(new Unit(32.4, UnitType.Centimeter), converted);
+            var unit = Assert.IsType<Unit>(converted);
+            Assert.Equal(new Unit(32.4, UnitType.Centimeter), unit);
+        }
+
+        [Theory]
+        [InlineData("0", 5, 0)]
+        [InlineData("2", 5, 2)]
+        [InlineData("^0", 5, 5)]
+        [InlineData("^2", 5, 3)]
+        public void StringToIndexSuccess(string input, int length, int resultIndex)
+        {
+            var converted = converter.Convert(input, typeof(Index));
+
+            var index = Assert.IsType<Index>(converted);
+            Assert.Equal(resultIndex, index.GetOffset(length));
+        }
+
+        [Theory]
+        [InlineData("0", 5, 0, 0)]
+        [InlineData("2-3", 5, 2, 1)]
+        [InlineData("^4-^2", 5, 1, 2)]
+        [InlineData("0-^1", 5, 0, 4)]
+        public void StringToRangeSuccess(string input, int rangeSize, int offset, int length)
+        {
+            var converted = converter.Convert(input, typeof(Range));
+
+            var range = Assert.IsType<Range>(converted);
+            Assert.Equal((offset, length), range.GetOffsetAndLength(rangeSize));
         }
 
         private const string TooLargeForLong = "92233720368547758070";

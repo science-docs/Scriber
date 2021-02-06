@@ -13,7 +13,7 @@ namespace Scriber.Bibliography.Styling.Tests
         [MemberData(nameof(CollectTests))]
         public void TestCslSuite(string testSuitePath)
         {
-            var fileContent = File.ReadAllText(testSuitePath).Replace('\n', ' ').Replace('\r', ' ');
+            var fileContent = File.ReadAllText(testSuitePath).Replace('\r', '\n').Replace("\n\n", "\n");
             var suite = CslTestSuiteParser.Parse(fileContent);
             try
             {
@@ -59,6 +59,8 @@ namespace Scriber.Bibliography.Styling.Tests
             "Resources/Csl/processor-tests/humans/sort_VariousNameMacros2.txt",
             "Resources/Csl/processor-tests/humans/sort_VariousNameMacros3.txt",
             "Resources/Csl/processor-tests/humans/textcase_LocaleUnicode.txt",
+            // Date Literals are not supported in CSL 1.0.1
+            "Resources/Csl/processor-tests/humans/date_OtherAlone.txt",
         };
     }
 }

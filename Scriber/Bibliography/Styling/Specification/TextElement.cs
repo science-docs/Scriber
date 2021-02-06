@@ -199,12 +199,6 @@ namespace Scriber.Bibliography.Styling.Specification
                 {
                     interpreter.Push(variable.ToString(), this);
                 }
-
-                //method.Name = "this.RenderTextByVariable";
-                //method.AddElement(this);
-                //method.AddLiteral(this.Variable.ToLower());
-                //method.AddLiteral(Utility.GetXmlEnum<TermName>(this.Variable));
-                //method.AddLiteral(this.FormatSpecified ? this.Format : TermFormat.Long);
             }
             else if (!string.IsNullOrEmpty(Macro))
             {
