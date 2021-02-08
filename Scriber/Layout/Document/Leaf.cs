@@ -1,5 +1,4 @@
 ﻿using Scriber.Layout.Styling;
-using System;
 
 namespace Scriber.Layout.Document
 {
@@ -7,7 +6,21 @@ namespace Scriber.Layout.Document
     {
         public double DesiredHeight { get; private set; }
 
-        public abstract LineNode[] GetNodes();
+        private LineNode[]? lineNodeCache;
+
+        public LineNode[] GetNodes()
+        {
+            if (lineNodeCache != null && IsValid)
+            {
+                return lineNodeCache;
+            }
+
+            IsValid = true;
+            lineNodeCache = GetNodesOverride();
+            return lineNodeCache;
+        }
+
+        protected abstract LineNode[] GetNodesOverride();
 
         public double Measure(Size availableSize)
         {
@@ -16,7 +29,6 @@ namespace Scriber.Layout.Document
                 return DesiredHeight;
             }
 
-            IsValid = true;
             return DesiredHeight = MeasureOverride(availableSize);
         }
 

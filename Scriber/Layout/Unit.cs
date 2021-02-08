@@ -49,7 +49,7 @@ namespace Scriber.Layout
     [DebuggerDisplay("{DebuggerDisplay}")]
     public struct Unit : IFormattable, IEquatable<Unit>
     {
-        public static Regex ParserRegex = new Regex(@"^(?:(?<unit>(?<value>\d+(?:\.\d+)?)\s*(?<type>pt|px|in|mm|cm)?)\s*)+$", RegexOptions.Compiled);
+        public static Regex ParserRegex = new Regex(@"^(?:(?<unit>(?<value>\d+(?:\.\d+)?)\s*(?<type>pt|pu|in|mm|cm)?)\s*)+$", RegexOptions.Compiled);
 
         internal const double PointFactor = 1;
         internal const double InchFactor = 72;

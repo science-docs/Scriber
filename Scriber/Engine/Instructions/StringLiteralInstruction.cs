@@ -8,7 +8,8 @@ namespace Scriber.Engine.Instructions
         {
             return new Layout.Document.TextLeaf
             {
-                Content = node.Content
+                Content = node.Content,
+                Source = node
             };
         }
     }

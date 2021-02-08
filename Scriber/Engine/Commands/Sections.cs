@@ -217,7 +217,7 @@ namespace Scriber.Engine.Commands
 
         private static Outline? GetParentOutline(List<Outline> outlines, int outlineLevel, int level)
         {
-            if (outlineLevel >= level)
+            if (outlineLevel >= level || outlines.Count == 0)
             {
                 return null;
             }

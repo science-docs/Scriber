@@ -13,7 +13,7 @@
             Preamble = preamble;
         }
 
-        public override LineNode[] GetNodes()
+        protected override LineNode[] GetNodesOverride()
         {
             var items = LineNodeTransformer.Create(this);
             if (Referenced.Page != null)
@@ -23,7 +23,7 @@
                     item.Link = Referenced.Page.Index;
                 }
             }
-            
+
             return items.ToArray();
         }
 

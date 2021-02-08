@@ -1,4 +1,5 @@
 ﻿using Scriber.Drawing;
+using Scriber.Language.Syntax;
 using Scriber.Layout.Styling;
 using Scriber.Text;
 using System;
@@ -24,6 +25,8 @@ namespace Scriber.Layout.Document
             get => foreground ?? Parent?.Foreground ?? Colors.Black;
             set => foreground = value;
         }
+
+        public SyntaxNode? Source { get; set; }
 
         public DocumentPage? Page
         {
@@ -52,6 +55,7 @@ namespace Scriber.Layout.Document
         public AbstractElement Clone()
         {
             var clone = CloneInternal();
+            clone.Source = Source;
             clone.Tag = Tag;
             clone.Classes.AddRange(Classes);
             return clone;

@@ -14,7 +14,8 @@ namespace Scriber.Engine.Instructions
 
             return new Layout.Document.TextLeaf
             {
-                Content = text.Text
+                Content = text.Text,
+                Source = text
             };
         }
     }

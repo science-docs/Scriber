@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Scriber.Language.Syntax;
+using Scriber.Layout.Document;
 
 namespace Scriber.Engine.Instructions
 {
@@ -56,6 +57,12 @@ namespace Scriber.Engine.Instructions
             try
             {
                 var obj = command.Execution(commandSyntax, state, arguments.ToArray());
+
+                if (obj is AbstractElement element)
+                {
+                    element.Source = commandSyntax;
+                }
+
                 state.Context.Logger.Debug($"Successfully executed command '{command.Name}'.");
                 return obj;
             }

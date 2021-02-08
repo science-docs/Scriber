@@ -37,13 +37,8 @@ namespace Scriber.Layout.Document
             return new TextLeaf(Content);
         }
 
-        public override LineNode[] GetNodes()
+        protected override LineNode[] GetNodesOverride()
         {
-            if (Content == null)
-            {
-                throw new LayoutException("Content property is null");
-            }
-
             return LineNodeTransformer.Create(this).ToArray();
         }
     }

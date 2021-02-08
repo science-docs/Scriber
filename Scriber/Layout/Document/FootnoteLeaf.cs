@@ -19,10 +19,8 @@ namespace Scriber.Layout.Document
         {
             Tag = "span";
             Classes.Add("footnote-reference");
-            //FontStyle = FontStyle.Superscript;
             Content = content;
             Element = value ?? throw new ArgumentNullException(nameof(value));
-            //value.VerticalAlignment = VerticalAlignment.Bottom;
 
             if (addPrefix)
             {
@@ -37,7 +35,7 @@ namespace Scriber.Layout.Document
             yield return Element;
         }
 
-        public override LineNode[] GetNodes()
+        protected override LineNode[] GetNodesOverride()
         {
             Element.Parent = Parent;
             return LineNodeTransformer.Create(this).ToArray();
@@ -47,5 +45,7 @@ namespace Scriber.Layout.Document
         {
             return new FootnoteLeaf(Content, Element.Clone(), false);
         }
+
+        
     }
 }

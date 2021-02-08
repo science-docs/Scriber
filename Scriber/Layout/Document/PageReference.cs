@@ -18,19 +18,14 @@
             ReferencedElement = referenced;
         }
 
-        public override LineNode[] GetNodes()
+        protected override LineNode[] GetNodesOverride()
         {
             return LineNodeTransformer.Create(this).ToArray();
         }
 
         public override void Interlude()
         {
-            if (ReferencedElement.Page == null)
-            {
-                throw new LayoutException("Page property of the referenced element was not set");
-            }
-
-            PageNumber = ReferencedElement.Page.Number ?? throw new LayoutException("Pagenumber was not set");
+            PageNumber = ReferencedElement.Page?.Number ?? throw new LayoutException("Pagenumber was not set");
             Invalidate();
         }
 

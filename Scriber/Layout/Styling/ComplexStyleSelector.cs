@@ -18,14 +18,36 @@ namespace Scriber.Layout.Styling
         public IStyleSelector Right { get; }
         public StyleOperator Operator { get; }
 
-        public Priority Specificity { get; private set; }
+        public Priority Specificity { get; }
 
         public ComplexStyleSelector(IStyleSelector left, IStyleSelector right, StyleOperator op)
         {
             Left = left;
             Right = right;
             Operator = op;
-            Specificity = left.Specificity + right.Specificity;
+            Specificity = CalculateComplexPriority();
+        }
+
+        private Priority CalculateComplexPriority()
+        {
+            var left = Left.Specificity;
+            var right = Right.Specificity;
+            if (Operator == StyleOperator.Or)
+            {
+                var compared = left.CompareTo(right);
+                if (compared > 0)
+                {
+                    return left;
+                }
+                else
+                {
+                    return right;
+                }
+            }
+            else
+            {
+                return left + right;
+            }
         }
 
         public bool Matches(AbstractElement element)

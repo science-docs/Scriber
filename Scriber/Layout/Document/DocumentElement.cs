@@ -22,7 +22,6 @@ namespace Scriber.Layout.Document
                 return Measurement;
             }
 
-            IsValid = true;
             if (!IsVisible)
             {
                 return Measurement = new Measurement(this);
@@ -30,7 +29,9 @@ namespace Scriber.Layout.Document
 
             var margin = Style.Get(StyleKeys.Margin);
             var marginSize = new Size(margin.Width, margin.Height);
-            return Measurement = MeasureOverride(availableSize - marginSize);
+            Measurement = MeasureOverride(availableSize - marginSize);
+            IsValid = true;
+            return Measurement;
         }
 
         public void Arrange(Measurement finalMeasurement)

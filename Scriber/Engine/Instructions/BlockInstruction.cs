@@ -39,7 +39,7 @@ namespace Scriber.Engine.Instructions
                 {
                     if (currentParagraph == null)
                     {
-                        currentParagraph = new Paragraph();
+                        currentParagraph = new Paragraph { Source = element.Source };
                         results.Add(new Argument(element.Source, currentParagraph));
                     }
 
@@ -49,11 +49,11 @@ namespace Scriber.Engine.Instructions
                 {
                     if (currentParagraph == null)
                     {
-                        currentParagraph = new Paragraph();
+                        currentParagraph = new Paragraph { Source = element.Source };
                         results.Add(new Argument(element.Source, currentParagraph));
                     }
 
-                    currentParagraph.Leaves.Add(new TextLeaf(str));
+                    currentParagraph.Leaves.Add(new TextLeaf(str) { Source = element.Source });
                 }
                 else if (element.Value != null)
                 {

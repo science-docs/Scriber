@@ -9,11 +9,6 @@ namespace Scriber.Text
     {
         public static Font Default { get; } = new Font("Times New Roman");
 
-        static Font()
-        {
-            GlobalFontSettings.FontResolver = new FontResolver();
-        }
-
         private static readonly Dictionary<(string, FontWeight, double), XFont> fonts = new Dictionary<(string, FontWeight, double), XFont>();
         private static readonly XGraphics graphics = XGraphics.CreateMeasureContext(new XSize(100000, 100000), XGraphicsUnit.Point, XPageDirection.Downwards);
 
