@@ -75,7 +75,7 @@ namespace Scriber.Language
 
         private static bool NeverTextToken(TokenType type)
         {
-            return type == TokenType.Percent || type == TokenType.At || type == TokenType.DoubleSlash || type == TokenType.SlashAsterisk || type == TokenType.AsteriskSlash || type == TokenType.Quotation;
+            return type == TokenType.Percent || type == TokenType.At || type == TokenType.DoubleSlash || type == TokenType.SlashAsterisk || type == TokenType.Quotation;
         }
 
         private static SyntaxNode ParseSinglelineComment(ParserContext context)
@@ -118,7 +118,6 @@ namespace Scriber.Language
                 sb.Append(token.Content);
                 if (token.Type == TokenType.AsteriskSlash)
                 {
-                    context.Tokens.Dequeue();
                     break;
                 }
                 token = context.Tokens.Dequeue();

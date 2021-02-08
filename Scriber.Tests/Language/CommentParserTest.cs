@@ -3,24 +3,48 @@ using Scriber.Language.Syntax;
 using System.Linq;
 using Xunit;
 
-namespace Scriber.Tests.Language
+namespace Scriber.Language.Tests
 {
     public class CommentParserTest
     {
         [Fact]
-        public void TestWithoutSpace()
+        public void TestWithSpace()
         {
-            var element = ParseAsSyntax<CommentSyntax>("/*test*/ end");
+            var element = ParseAsSyntax("/*test*/ end");
+            Assert.IsType<CommentSyntax>(element[0]);
+            Assert.IsType<TextSyntax>(element[1]);
         }
 
-        private T ParseAsSyntax<T>(string input) where T : SyntaxNode
+        [Fact]
+        public void TestWithoutSpaceAfter()
+        {
+            var element = ParseAsSyntax("/*test*/end");
+            Assert.IsType<CommentSyntax>(element[0]);
+            Assert.IsType<TextSyntax>(element[1]);
+        }
+
+        [Fact]
+        public void TestWithoutSpaceBefore()
+        {
+            var element = ParseAsSyntax("start/*test*/");
+            Assert.IsType<TextSyntax>(element[0]);
+            Assert.IsType<CommentSyntax>(element[1]);
+        }
+
+        [Fact]
+        public void TestIncorrectStart()
+        {
+            var element = ParseAsSyntax("/test*/ end");
+            Assert.Single(element);
+            Assert.IsType<TextSyntax>(element[0]);
+        }
+
+        private SyntaxNode[] ParseAsSyntax(string input)
         {
             var result = Parser.ParseFromString(input).Nodes;
             var list = result.FirstOrDefault() as ListSyntax;
             Assert.NotNull(list);
-            var element = list.FirstOrDefault() as T;
-            Assert.NotNull(element);
-            return element;
+            return list.ToArray();
         }
     }
 }
