@@ -8,5 +8,7 @@ namespace Scriber.Variables
         public static DocumentLocal<List<TableElement>> TableOfContent { get; } = new DocumentLocal<List<TableElement>>();
         public static DocumentLocal<List<TableElement>> TableOfFigures { get; } = new DocumentLocal<List<TableElement>>();
         public static DocumentLocal<List<TableElement>> TableOfTables { get; } = new DocumentLocal<List<TableElement>>();
+
+        public static DocumentLocal<int> TableCounter { get; } = new DocumentLocal<int>(0);
     }
 }
