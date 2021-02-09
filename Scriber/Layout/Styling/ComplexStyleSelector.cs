@@ -6,6 +6,7 @@ namespace Scriber.Layout.Styling
     public enum StyleOperator
     {
         Or,
+        And,
         Descendant,
         Child,
         Previous,
@@ -55,6 +56,10 @@ namespace Scriber.Layout.Styling
             if (Operator == StyleOperator.Or)
             {
                 return Left.Matches(element) || Right.Matches(element);
+            }
+            else if (Operator == StyleOperator.And)
+            {
+                return Left.Matches(element) && Right.Matches(element);
             }
 
             var parent = element.Parent;

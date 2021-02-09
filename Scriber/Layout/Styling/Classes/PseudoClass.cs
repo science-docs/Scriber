@@ -19,15 +19,15 @@ namespace Scriber.Layout.Styling.Classes
             if (!group.Success)
                 throw new ArgumentException();
 
-            var nameGroup = group.Groups["name"];
+            var name = group.Groups["name"].Value;
             var argsGroup = group.Groups["args"];
 
-            if (!PseudoClasses.Contains(nameGroup.Value))
+            if (!PseudoClasses.Contains(name))
             {
-                throw new ArgumentException($"Pseudo class {nameGroup.Value} does not exist.");
+                throw new ArgumentException($"Pseudo class {name} does not exist.");
             }
 
-            PseudoClass? pseudoClassSelector = nameGroup.Value switch
+            PseudoClass? pseudoClassSelector = name switch
             {
                 "root" => new RootPseudoClass(),
                 "only-child" => new OnlyChildPseudoClass(),
@@ -38,15 +38,15 @@ namespace Scriber.Layout.Styling.Classes
 
             if (pseudoClassSelector != null && argsGroup.Success)
             {
-                throw new ArgumentException($"Pseudo class {nameGroup.Value} does not support arguments.");
+                throw new ArgumentException($"Pseudo class {name} does not support arguments.");
             }
             else if (pseudoClassSelector == null && !argsGroup.Success)
             {
-                throw new ArgumentException($"Pseudo class {nameGroup.Value} requires arguments.");
+                throw new ArgumentException($"Pseudo class {name} requires arguments.");
             }
             else if (pseudoClassSelector == null)
             {
-                pseudoClassSelector = nameGroup.Value switch
+                pseudoClassSelector = name switch
                 {
                     "not" => new NotPseudoClass(StyleSelectorParser.Parse(argsGroup.Value)),
                     "nth-child" => new NthChildPseudoClass(argsGroup.Value),

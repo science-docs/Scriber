@@ -20,9 +20,9 @@ namespace Scriber.Layout.Styling
             for (int i = 0; i < input.Length; i++)
             {
                 var c = input[i];
+                bool special;
                 switch (c)
                 {
-                    case ' ':
                     case ':':
                     case ',':
                     case '~':
@@ -32,16 +32,25 @@ namespace Scriber.Layout.Styling
                     case '.':
                     case '>':
                     case '*':
-                        if (sb.Length > 0)
-                        {
-                            tokens.Enqueue(sb.ToString());
-                            sb.Clear();
-                        }
-                        tokens.Enqueue(c.ToString());
+                        special = true;
                         break;
                     default:
-                        sb.Append(c);
+                        special = false;
                         break;
+                }
+
+                if (char.IsWhiteSpace(c) || special)
+                {
+                    if (sb.Length > 0)
+                    {
+                        tokens.Enqueue(sb.ToString());
+                        sb.Clear();
+                    }
+                    tokens.Enqueue(c.ToString());
+                }
+                else
+                {
+                    sb.Append(c);
                 }
             }
 
@@ -57,11 +66,23 @@ namespace Scriber.Layout.Styling
         {
             PopSpace(tokens);
             var left = ParseSimple(tokens);
+
+            if (tokens.TryPeek(out var token) && token == ":")
+            {
+                var right = Parse(tokens);
+                return new ComplexStyleSelector(left, right, StyleOperator.And);
+            }
+
             PopSpace(tokens);
             if (tokens.Count > 0)
             {
-                if (tokens.TryDequeue(out var token))
+                if (tokens.TryPeek(out token))
                 {
+                    if (token == ">" || token == "," || token == "~" || token == "+")
+                    {
+                        tokens.Dequeue();
+                    }
+
                     var right = Parse(tokens);
                     ComplexStyleSelector complex;
                     if (token == ">")
@@ -92,7 +113,7 @@ namespace Scriber.Layout.Styling
 
         private static void PopSpace(Queue<string> tokens)
         {
-            while (tokens.TryPeek(out var token) && token == " ")
+            while (tokens.TryPeek(out var token) && token.Length == 1 && char.IsWhiteSpace(token[0]))
             {
                 tokens.Dequeue();
             }
@@ -105,8 +126,10 @@ namespace Scriber.Layout.Styling
             {
                 var pseudoClass = tokens.Dequeue();
 
-                if (tokens.TryDequeue(out token) && token == "(")
+                if (tokens.TryPeek(out token) && token == "(")
                 {
+                    pseudoClass += token;
+                    tokens.Dequeue();
                     int count = 1;
                     while (tokens.TryDequeue(out token))
                     {
@@ -133,10 +156,14 @@ namespace Scriber.Layout.Styling
             {
                 var classes = new List<string>();
                 var isDot = true;
-                while (tokens.TryDequeue(out token) && isDot)
+                while (isDot && tokens.TryDequeue(out token))
                 {
                     classes.Add(token);
-                    isDot = tokens.TryDequeue(out token) && token == ".";
+                    isDot = tokens.TryPeek(out token) && token == ".";
+                    if (isDot)
+                    {
+                        tokens.Dequeue();
+                    }
                 }
                 return new ClassStyleSelector(classes);
             }
