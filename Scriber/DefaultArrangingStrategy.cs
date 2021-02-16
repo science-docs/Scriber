@@ -67,7 +67,7 @@ namespace Scriber
                             measurements[i] = split.Measurement;
                             if (split.Next != null)
                             {
-                                measurements.Insert(i + 1, split.Next);
+                                measurements[i] = split.Next;
                             }
                         }
                         else if (curHeight == boxSize.Height)
@@ -81,6 +81,7 @@ namespace Scriber
 
                         curHeight = boxSize.Height;
                         curPage = AddPage(document, pageSize, contentArea);
+                        i--;
                     }
                 }
             }
@@ -191,7 +192,8 @@ namespace Scriber
                 height -= 5;
             }
 
-            if (size.Height > height)
+            // ignore bottom margin when calculating whether the measurement fits on the page
+            if (size.Height > height + measurement.Margin.Bottom)
             {
                 if (measurement.Flexible)
                 {

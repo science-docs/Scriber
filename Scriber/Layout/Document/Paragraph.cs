@@ -134,18 +134,30 @@ namespace Scriber.Layout.Document
 
         public override SplitResult Split(Measurement source, double height)
         {
-            var measurement = new Measurement(this);
+            var measurement = new Measurement(this)
+            {
+                Margin = source.Margin
+            };
             Measurement? next = new Measurement(this)
             {
                 Margin = source.Margin
             };
             double carryOver = -1;
 
-            foreach (var sub in source.Subs)
+            // Never try to split less lines than the threshold specifies
+            const int widowLineThreshold = 2;
+            if (source.Subs.Count < widowLineThreshold * 2 ||
+                source.Subs.Take(widowLineThreshold).Sum(e => e.TotalSize.Height + e.AccumulatedExtra.TotalSize.Height) > height)
             {
+                return new SplitResult(source, source, null);
+            }
+
+            for (int i = 0; i < source.Subs.Count; i++)
+            {
+                var sub = source.Subs[i];
                 var pos = sub.Position;
                 var size = sub.TotalSize + sub.AccumulatedExtra.TotalSize;
-                if (pos.Y + size.Height >= height)
+                if (pos.Y + size.Height >= height || i >= source.Subs.Count - widowLineThreshold)
                 {
                     if (carryOver == -1)
                     {
