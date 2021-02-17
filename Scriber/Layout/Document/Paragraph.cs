@@ -30,8 +30,6 @@ namespace Scriber.Layout.Document
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            //var doc = Document ?? throw new LayoutException("Document was not set");
-
             var ms = new Measurement(this);
             lineNodes = new List<LineNode>();
             foreach (var leaf in Leaves)
@@ -149,7 +147,7 @@ namespace Scriber.Layout.Document
             if (source.Subs.Count < widowLineThreshold * 2 ||
                 source.Subs.Take(widowLineThreshold).Sum(e => e.TotalSize.Height + e.AccumulatedExtra.TotalSize.Height) > height)
             {
-                return new SplitResult(source, source, null);
+                return SplitResult.Fail(source);
             }
 
             for (int i = 0; i < source.Subs.Count; i++)
@@ -192,7 +190,7 @@ namespace Scriber.Layout.Document
 
             if (next.Subs.Count == 0)
             {
-                next = null;
+                return SplitResult.Fail(source);
             }
             else
             {
