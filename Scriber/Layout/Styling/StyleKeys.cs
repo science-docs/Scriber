@@ -32,13 +32,10 @@ namespace Scriber.Layout.Styling
             var weight = style.Get(FontWeight);
             var fontStyle = style.Get(FontStyle);
             return new Typeface(font, size, weight, fontStyle);
-        }, (styleContainer, typeface) =>
-        {
-
         });
 
-        public static StyleKey<HorizontalAlignment> HorizontalAlignment { get; } = new StyleKey<HorizontalAlignment>(nameof(HorizontalAlignment), true, Layout.HorizontalAlignment.Justify);
-        public static StyleKey<VerticalAlignment> VerticalAlignment { get; } = new StyleKey<VerticalAlignment>(nameof(VerticalAlignment), true, Layout.VerticalAlignment.Top);
+        public static StyleKey<HorizontalAlignment> HorizontalAlignment { get; } = new StyleKey<HorizontalAlignment>(nameof(HorizontalAlignment), Layout.HorizontalAlignment.Justify);
+        public static StyleKey<VerticalAlignment> VerticalAlignment { get; } = new StyleKey<VerticalAlignment>(nameof(VerticalAlignment), Layout.VerticalAlignment.Top);
 
         public static StyleKey<Unit> MarginTop { get; } = new StyleKey<Unit>(nameof(MarginTop), Unit.Zero);
         public static StyleKey<Unit> MarginRight { get; } = new StyleKey<Unit>(nameof(MarginRight), Unit.Zero);
