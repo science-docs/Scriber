@@ -54,7 +54,7 @@ namespace Scriber.Layout.Document
             yield return Child;
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             foreach (var sub in measurement.Subs)
             {

@@ -165,7 +165,7 @@ namespace Scriber.Layout
             }
 
             ms.Size = new Size(columnWidths.Sum(), rowHeight);
-            ms.Margin = Style.Get(StyleKeys.Margin);
+            ms.Margin = Style.Get(StyleKeys.FullMargin);
 
             return ms;
         }
@@ -300,7 +300,7 @@ namespace Scriber.Layout
                     y = Math.Max(0, y);
 
                     Measurement = element.Measure(new Size(x, y));
-                    Measurement.Margin = element.Style.Get(StyleKeys.Margin);
+                    Measurement.Margin = element.Style.Get(StyleKeys.FullMargin);
                     Size = Measurement.TotalSize;
 
                     if (rowUnit == GridUnit.Point)

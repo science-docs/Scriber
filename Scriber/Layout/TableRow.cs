@@ -33,9 +33,14 @@ namespace Scriber.Layout
             data = new ElementCollection<DocumentElement>(this);
         }
 
+        public override IEnumerable<AbstractElement> ChildElements()
+        {
+            return data;
+        }
+
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            var margin = Style.Get(StyleKeys.Margin);
+            var margin = Style.Get(StyleKeys.FullMargin);
             var measurement = new Measurement(this, null, margin);
 
             foreach (var td in data)
@@ -46,7 +51,7 @@ namespace Scriber.Layout
             return measurement;
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             foreach (var sub in measurement.Subs)
             {

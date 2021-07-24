@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Scriber.Language.Syntax
 {
@@ -6,7 +7,7 @@ namespace Scriber.Language.Syntax
     {
         public TextSpan Span { get; set; }
         public SyntaxNode? Parent { get; set; }
-        public Resource? Resource
+        public Resource Resource
         {
             get
             {
@@ -18,7 +19,7 @@ namespace Scriber.Language.Syntax
                 {
                     return Parent.Resource;
                 }
-                return null;
+                throw new NullReferenceException();
             }
             set
             {

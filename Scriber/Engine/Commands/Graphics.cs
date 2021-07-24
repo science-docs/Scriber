@@ -23,7 +23,7 @@ namespace Scriber.Engine.Commands
             {
                 try
                 {
-                    var bytes = state.Context.ResourceSet.RelativeResource(imagePath.Value).GetContent();
+                    var bytes = state.Context.ResourceManager.RelativeResource(imagePath.Value).GetContent();
                     var image = new ImageElement(bytes, imagePath.Value);
 
                     if (options != null)

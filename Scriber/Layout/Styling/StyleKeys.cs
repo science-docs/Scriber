@@ -60,13 +60,17 @@ namespace Scriber.Layout.Styling
 
         public static ThicknessStyleKey Border { get; } = new ThicknessStyleKey(nameof(Border), BorderTop, BorderLeft, BorderBottom, BorderRight);
 
+        public static ComputedStyleKey<Thickness> FullMargin { get; } = new ComputedStyleKey<Thickness>(nameof(FullMargin), style =>
+        {
+            return style.Get(Margin) + style.Get(Border) + style.Get(Padding);
+        });
+
         public static StyleKey<int> RowSpan { get; } = new StyleKey<int>(nameof(RowSpan), 1);
         public static StyleKey<int> ColumnSpan { get; } = new StyleKey<int>(nameof(ColumnSpan), 1);
 
         // Paragraph styles
         public static StyleKey<Unit?> BaselineSkip { get; } = new StyleKey<Unit?>(nameof(BaselineSkip), true, null);
         public static StyleKey<double> BaselineStretch { get; } = new StyleKey<double>(nameof(BaselineStretch), true, 1.25);
-        //public static StyleKey<Unit> ParagraphSkip { get; } = new StyleKey<Unit>(nameof(ParagraphSkip), true, Unit.FromPoint(8));
         public static StyleKey<Unit> ParagraphIndent { get; } = new StyleKey<Unit>(nameof(ParagraphIndent), true, Unit.FromPoint(0));
     }
 }

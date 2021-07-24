@@ -12,7 +12,7 @@ namespace Scriber.Layout.Document
             return new Pagebreak();
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
         }
 

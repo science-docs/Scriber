@@ -52,6 +52,15 @@ namespace Scriber.Layout
             return HashCode.Combine(Top, Bottom, Left, Right);
         }
 
+        public static Thickness operator +(Thickness left, Thickness right)
+        {
+            left.Top += right.Top;
+            left.Bottom += right.Bottom;
+            left.Left += right.Left;
+            left.Right += right.Right;
+            return left;
+        }
+
         public static bool operator ==(Thickness left, Thickness right)
         {
             return left.Equals(right);

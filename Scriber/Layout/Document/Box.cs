@@ -12,7 +12,7 @@ namespace Scriber.Layout.Document
             Size = size;
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             // Is only spacing and does not render anything
         }
@@ -24,7 +24,7 @@ namespace Scriber.Layout.Document
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            return new Measurement(this, Size, Style.Get(StyleKeys.Margin));
+            return new Measurement(this, Size, Style.Get(StyleKeys.FullMargin));
         }
     }
 }

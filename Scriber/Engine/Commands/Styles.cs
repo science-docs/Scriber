@@ -1,5 +1,6 @@
 ﻿using Scriber.Layout.Styling;
 using Scriber.Util;
+using System;
 
 namespace Scriber.Engine.Commands
 {
@@ -7,9 +8,19 @@ namespace Scriber.Engine.Commands
     public static class Styles
     {
         [Command("AddStyle")]
-        public static void AddStyle(CompilerState state, string selector, DynamicDictionary style)
+        public static void AddStyle(CompilerState state, Argument<string> selector, DynamicDictionary style)
         {
-            var styleSelector = StyleSelectorParser.Parse(selector);
+            IStyleSelector styleSelector;
+            try
+            {
+                styleSelector = StyleSelectorParser.Parse(selector.Value);
+            }
+            catch (Exception e)
+            {
+                state.Issues.Add(selector.Source, CompilerIssueType.Warning, e.Message);
+                return;
+            }
+            
             var container = new StyleContainer(styleSelector);
 
             foreach (var (name, value) in style.GetContents())
@@ -33,8 +44,8 @@ namespace Scriber.Engine.Commands
         [Command("IncludeCss")]
         public static void IncludeCss(CompilerState state, Argument<string> path)
         {
-            var uri = state.Context.ResourceSet.RelativeUri(path.Value);
-            var resource = state.Context.ResourceSet.Get(uri);
+            var uri = state.Context.ResourceManager.RelativeUri(path.Value);
+            var resource = state.Context.ResourceManager.Get(uri);
             var styleReader = new StyleReader();
             var styles = styleReader.Read(resource.GetContentAsString());
 

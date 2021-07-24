@@ -129,10 +129,8 @@ namespace Scriber.Engine
                             throw new CompilerException(argument.Source, $"Argument 'null' was supplied for non nullable command parameter '{parm.ToString(true)}'.");
                         }
                         // result[i] is null by default, therefore continue
-                        continue;
                     }
-
-                    if (!IsAssignableFrom(state, parm.Type, parm.Overrides, argument, out var transformed))
+                    else if (!IsAssignableFrom(state, parm.Type, parm.Overrides, argument, out var transformed))
                     {
                         throw new CompilerException(argument.Source, $"Object of type '{argument.Value.GetType().FormattedName()}' cannot be assigned or transformed to parameter of type '{parm.Type.FormattedName(parm.Info, true)}'.");
                     }

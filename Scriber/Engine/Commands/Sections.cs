@@ -71,11 +71,11 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("TableOfContent")]
-        public static CallbackBlock TableOfContent(CompilerState state)
+        public static LazyElement TableOfContent(CompilerState state)
         {
-            return new CallbackBlock(() =>
+            return new LazyElement(() =>
             {
-                var entries = state.Document.Variable(TableVariables.TableOfContent);
+                var entries = state.Document.Variable(TableVariables.TableOfContent)!;
 
                 var tableOfContent = new StackPanel { Orientation = Orientation.Vertical };
                 tableOfContent.Elements.AddRange(entries);

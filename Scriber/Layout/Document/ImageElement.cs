@@ -49,7 +49,7 @@ namespace Scriber.Layout.Document
             Origin = new Position(OriginalHeight.Presentation / 2, OriginalWidth.Presentation / 2);
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             var image = new Image(imageData, Image);
             drawingContext.DrawImage(image, new Rectangle(Position.Zero, measurement.Size));
@@ -87,7 +87,7 @@ namespace Scriber.Layout.Document
             }
 
             var size = new Size(Width.Point * Scale, Height.Point * Scale);
-            var margin = Style.Get(StyleKeys.Margin);
+            var margin = Style.Get(StyleKeys.FullMargin);
             if (size.Width > availableSize.Width)
             {
                 var ratio = size.Width / (availableSize.Width - margin.Width - 2);

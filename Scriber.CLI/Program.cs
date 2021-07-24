@@ -21,7 +21,7 @@ namespace Scriber.CLI
             context.Logger.Level = LogLevel.Debug;
             new ReflectionLoader().Discover(context, typeof(TestPackage).Assembly);
 
-            var resource = context.ResourceSet.Get(new Uri("C:\\Users\\Mark\\Desktop\\Docdown\\test.sc"));
+            var resource = context.ResourceManager.Get(new Uri("C:\\Users\\Mark\\Desktop\\Docdown\\main.sc"));
             context.Logger.Logged += Logger_Logged;
             var result = Compiler.Compile(context, resource);
 

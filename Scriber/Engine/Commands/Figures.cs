@@ -48,9 +48,9 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("TableOfFigures")]
-        public static CallbackBlock TableOfFigures(CompilerState state)
+        public static LazyElement TableOfFigures(CompilerState state)
         {
-            return new CallbackBlock(() =>
+            return new LazyElement(() =>
             {
                 var panel = new StackPanel
                 {

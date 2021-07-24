@@ -7,7 +7,7 @@ namespace Scriber
     public class Context
     {
         public IFileSystem FileSystem { get; }
-        public ResourceSet ResourceSet { get; }
+        public ResourceManager ResourceManager { get; }
         public Logger Logger { get; } = new Logger();
         public ConverterCollection Converters { get; } = new ConverterCollection();
         public CommandCollection Commands { get; } = new CommandCollection();
@@ -21,7 +21,7 @@ namespace Scriber
         public Context(IFileSystem? fileSystem)
         {
             FileSystem = fileSystem ?? new FileSystem();
-            ResourceSet = new ResourceSet(FileSystem);
+            ResourceManager = new ResourceManager(FileSystem);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Scriber.Layout.Document
     {
         public abstract void Manipulate(Scriber.Document document);
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
         }
 

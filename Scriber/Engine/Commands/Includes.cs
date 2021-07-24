@@ -18,8 +18,8 @@ namespace Scriber.Engine.Commands
         [Command("IncludePdf")]
         public static PdfElement? IncludePdf(CompilerState state, [Argument(ProposalProvider = typeof(IncludePdfFileProposalProvider))] Argument<string> path, Argument<PdfIncludeOptions>? options = null)
         {
-            var uri = state.Context.ResourceSet.RelativeUri(path.Value);
-            var bytes = state.Context.ResourceSet.GetBytes(uri);
+            var uri = state.Context.ResourceManager.RelativeUri(path.Value);
+            var bytes = state.Context.ResourceManager.GetBytes(uri);
 
             var fields = options?.Value?.Fields;
 
@@ -140,8 +140,8 @@ namespace Scriber.Engine.Commands
         [Command("Include")]
         public static void Include(CompilerState state, [Argument(ProposalProvider = typeof(IncludeFileProposalProvider))] Argument<string> path)
         {
-            var uri = state.Context.ResourceSet.RelativeUri(path.Value);
-            var resource = state.Context.ResourceSet.Get(uri);
+            var uri = state.Context.ResourceManager.RelativeUri(path.Value);
+            var resource = state.Context.ResourceManager.Get(uri);
             Compiler.Compile(state, resource);
         }
 
@@ -149,7 +149,7 @@ namespace Scriber.Engine.Commands
         public static void Root(CompilerState state, Argument<string> rootFile)
         {
             // Root command only executes if the current document is the first in the compile order
-            if (state.Context.ResourceSet.ResourceCount > 1)
+            if (state.Context.ResourceManager.ResourceCount > 1)
             {
                 state.Context.Logger.Debug("Root command skipped.");
                 return;

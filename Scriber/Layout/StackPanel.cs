@@ -9,7 +9,7 @@ namespace Scriber.Layout
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            var measurement = new Measurement(this, null, Style.Get(StyleKeys.Margin));
+            var measurement = new Measurement(this, null, Style.Get(StyleKeys.FullMargin));
 
             if (Orientation == Orientation.Vertical)
             {

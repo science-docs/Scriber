@@ -16,7 +16,7 @@ namespace Scriber.Layout.Document
             Elements = new ElementCollection<DocumentElement>(this);
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             elementMap[measurement].Render(drawingContext, measurement);
         }

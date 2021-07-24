@@ -27,7 +27,7 @@ namespace Scriber.Layout.Document
                 return Measurement = new Measurement(this);
             }
 
-            var margin = Style.Get(StyleKeys.Margin);
+            var margin = Style.Get(StyleKeys.FullMargin);
             var marginSize = new Size(margin.Width, margin.Height);
             Measurement = MeasureOverride(availableSize - marginSize);
             IsValid = true;
@@ -114,7 +114,7 @@ namespace Scriber.Layout.Document
             drawingContext.PopTransform();
         }
 
-        protected abstract void OnRender(IDrawingContext drawingContext, Measurement measurement);
+        protected internal abstract void OnRender(IDrawingContext drawingContext, Measurement measurement);
 
         public new DocumentElement Clone()
         {
@@ -124,23 +124,24 @@ namespace Scriber.Layout.Document
         private void RenderBorder(IDrawingContext drawingContext, Measurement measurement)
         {
             var borderThickness = Style.Get(StyleKeys.Border);
+            var padding = Style.Get(StyleKeys.Padding);
             var size = measurement.Size;
             var color = Style.Get(StyleKeys.BorderColor);
             if (borderThickness.Top > 0)
             {
-                var y1 = -borderThickness.Top / 2;
-                var x1 = 0;
+                var y1 = -borderThickness.Top / 2 - padding.Top;
+                var x1 = -padding.Left;
                 var y2 = y1;
-                var x2 = size.Width;
+                var x2 = size.Width + padding.Right;
                 var s = new Position(x1, y1);
                 var e = new Position(x2, y2);
                 drawingContext.DrawLine(s, e, new Pen(color, borderThickness.Top));
             }
             if (borderThickness.Left > 0)
             {
-                var y1 = -borderThickness.Top;
-                var x1 = -borderThickness.Left / 2;
-                var y2 = size.Height + borderThickness.Bottom;
+                var y1 = -borderThickness.Top - padding.Top;
+                var x1 = -borderThickness.Left / 2 - padding.Left;
+                var y2 = size.Height + borderThickness.Bottom + padding.Bottom;
                 var x2 = x1;
                 var s = new Position(x1, y1);
                 var e = new Position(x2, y2);
@@ -148,19 +149,19 @@ namespace Scriber.Layout.Document
             }
             if (borderThickness.Bottom > 0)
             {
-                var y1 = size.Height + borderThickness.Bottom / 2;
-                var x1 = 0;
+                var y1 = size.Height + borderThickness.Bottom / 2 + padding.Bottom;
+                var x1 = -padding.Left;
                 var y2 = y1;
-                var x2 = size.Width;
+                var x2 = size.Width + padding.Right;
                 var s = new Position(x1, y1);
                 var e = new Position(x2, y2);
                 drawingContext.DrawLine(s, e, new Pen(color, borderThickness.Bottom));
             }
             if (borderThickness.Right > 0)
             {
-                var y1 = -borderThickness.Top;
-                var x1 = size.Width + borderThickness.Right / 2;
-                var y2 = size.Height + borderThickness.Bottom;
+                var y1 = -borderThickness.Top - padding.Top;
+                var x1 = size.Width + borderThickness.Right / 2 + padding.Right;
+                var y2 = size.Height + borderThickness.Bottom + padding.Bottom;
                 var x2 = x1;
                 var s = new Position(x1, y1);
                 var e = new Position(x2, y2);

@@ -33,7 +33,7 @@ namespace Scriber.Layout.Document
             return new Measurement(this, new Size(0, double.PositiveInfinity), new Thickness(0));
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             Render(drawingContext);
         }

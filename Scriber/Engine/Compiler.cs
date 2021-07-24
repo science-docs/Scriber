@@ -11,7 +11,7 @@ namespace Scriber.Engine
 {
     public static class Compiler
     {
-        public static CompilerResult Compile(Context context, IEnumerable<SyntaxNode> elements)
+        public static CompilerState Compile(Context context, IEnumerable<SyntaxNode> elements)
         {
             var state = new CompilerState(context);
             state.Issues.CollectionChanged += (_, e) => IssuesChanged(context.Logger, e);
@@ -23,11 +23,7 @@ namespace Scriber.Engine
                     state.Document.Elements.AddRange(Execute(state, element));
                 }
             }
-
-            ResolveCallbacks(state.Document.Elements);
-
-            var result = new CompilerResult(state.Document, state.Issues);
-            return result;
+            return state;
         }
 
         public static void Compile(CompilerState state, IEnumerable<SyntaxNode> elements)
@@ -38,23 +34,23 @@ namespace Scriber.Engine
             }
         }
 
-        public static CompilerResult Compile(Context context, Resource resource)
+        public static CompilerState Compile(Context context, Resource resource)
         {
-            context.ResourceSet.PushResource(resource);
+            context.ResourceManager.PushResource(resource);
             var tokens = Lexer.Tokenize(resource.GetContentAsString());
             var parserResult = Parser.Parse(tokens, resource, context.Logger);
             var result = Compile(context, parserResult.Nodes);
-            context.ResourceSet.PopResource();
+            context.ResourceManager.PopResource();
             return result;
         }
 
         public static void Compile(CompilerState state, Resource resource)
         {
-            state.Context.ResourceSet.PushResource(resource);
+            state.Context.ResourceManager.PushResource(resource);
             var tokens = Lexer.Tokenize(resource.GetContentAsString());
             var parserResult = Parser.Parse(tokens, resource, state.Context.Logger);
             Compile(state, parserResult.Nodes);
-            state.Context.ResourceSet.PopResource();
+            state.Context.ResourceManager.PopResource();
         }
 
         private static void IssuesChanged(Logger logger, NotifyCollectionChangedEventArgs e)
@@ -82,18 +78,6 @@ namespace Scriber.Engine
             else
             {
                 return Array.Empty<DocumentElement>();
-            }
-        }
-
-        private static void ResolveCallbacks(ElementCollection<DocumentElement> blocks)
-        {
-            for (int i = 0; i < blocks.Count; i++)
-            {
-                var block = blocks[i];
-                if (block is CallbackBlock callbackBlock)
-                {
-                    blocks[i] = callbackBlock.Callback();
-                }
             }
         }
     }

@@ -5,7 +5,7 @@ using System.IO.Abstractions;
 
 namespace Scriber
 {
-    public class ResourceSet
+    public class ResourceManager
     {
         public IFileSystem FileSystem { get; }
         public Resource? CurrentResource
@@ -22,9 +22,11 @@ namespace Scriber
 
         public int ResourceCount => resourceStack.Count;
 
+        public Func<Uri, Resource?>? Interject { get; set; }
+
         private readonly Stack<Resource> resourceStack = new Stack<Resource>();
 
-        public ResourceSet(IFileSystem fileSystem)
+        public ResourceManager(IFileSystem fileSystem)
         {
             FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         }
@@ -85,6 +87,15 @@ namespace Scriber
             if (uri is null)
             {
                 throw new ArgumentNullException(nameof(uri));
+            }
+
+            if (Interject != null)
+            {
+                var interjected = Interject(uri);
+                if (interjected != null)
+                {
+                    return interjected;
+                }
             }
 
             return Get(uri, DefaultResolver);

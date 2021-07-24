@@ -43,7 +43,7 @@ namespace Scriber.Layout.Document
             return base.MeasureOverride(availableSize);
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             var font = Style.Get(StyleKeys.Font);
             var fontSize = Style.Get(StyleKeys.FontSize).Point;

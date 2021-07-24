@@ -97,7 +97,7 @@ namespace Scriber.Layout.Document
 
             if (ms.Subs.Count > 0)
             {
-                ms.Margin = Style.Get(StyleKeys.Margin);
+                ms.Margin = Style.Get(StyleKeys.FullMargin);
             }
 
             return ms;
@@ -132,14 +132,8 @@ namespace Scriber.Layout.Document
 
         public override SplitResult Split(Measurement source, double height)
         {
-            var measurement = new Measurement(this)
-            {
-                Margin = source.Margin
-            };
-            Measurement? next = new Measurement(this)
-            {
-                Margin = source.Margin
-            };
+            var measurement = new Measurement(this, null, source.Margin);
+            Measurement? next = new Measurement(this, null, source.Margin);
             double carryOver = -1;
 
             // Never try to split less lines than the threshold specifies
@@ -212,7 +206,7 @@ namespace Scriber.Layout.Document
             }
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             if (lineNodes == null)
             {

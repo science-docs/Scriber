@@ -2,6 +2,7 @@
 using Scriber.Language.Syntax;
 using System;
 using System.IO.Abstractions;
+using System.Linq;
 
 namespace Scriber.Engine
 {
@@ -10,6 +11,7 @@ namespace Scriber.Engine
         public Context Context { get; }
         public Document Document { get; }
         public CompilerIssueCollection Issues { get; }
+        public bool Success => !Issues.Any(e => e.Type == CompilerIssueType.Error);
         public IFileSystem FileSystem => Context.FileSystem;
         public CommandCollection Commands => Context.Commands;
         public ConverterCollection Converters => Context.Converters;

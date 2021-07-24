@@ -8,7 +8,7 @@ namespace Scriber.Layout
     {
         public static Measurement Measure(Table table, Size availableSize)
         {
-            var measurement = new Measurement(table, null, table.Style.Get(StyleKeys.Margin));
+            var measurement = new Measurement(table, null, table.Style.Get(StyleKeys.FullMargin));
             var width = table.Width;
 
             if (width == 0 || table.Height == 0)

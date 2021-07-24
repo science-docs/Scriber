@@ -36,14 +36,14 @@ caption {
 }
 
 td {
-	margin: 4pt;
+	padding: 4pt;
 }
 
 table {
 	horizontal-alignment: center;
-	border: 0.5pt 0;
+	border: 0.7pt 0;
 }
 
 th {
-	border: 0 0 0.7pt 0;
+	border: 0 0 0.5pt 0;
 }

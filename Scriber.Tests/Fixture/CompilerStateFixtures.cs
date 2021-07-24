@@ -11,7 +11,7 @@ namespace Scriber.Tests.Fixture
 
         public static CompilerState ReflectionLoaded()
         {
-            var loader = new ReflectionLoader();
+            var loader = new PluginLoader();
             var context = new Context();
             loader.Discover(context, typeof(CompilerStateFixtures).Assembly);
             return new CompilerState(context);

@@ -40,7 +40,7 @@ namespace Scriber.Layout
             return Rows;
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             foreach (var sub in measurement.Subs)
             {

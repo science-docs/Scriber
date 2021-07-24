@@ -51,8 +51,8 @@ namespace Scriber.Engine.Commands
                 }
             }
             
-            var uri = state.Context.ResourceSet.RelativeUri(path);
-            var resource = state.Context.ResourceSet.Get(uri);
+            var uri = state.Context.ResourceManager.RelativeUri(path);
+            var resource = state.Context.ResourceManager.Get(uri);
             Compiler.Compile(state, resource);
 
             if (dynamicDictionary != null)

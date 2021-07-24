@@ -18,7 +18,7 @@ namespace Scriber.Language
             };
         }
 
-        private static SyntaxNode ParseText(ParserContext context, params TokenType[] stop)
+        private static TextSyntax ParseText(ParserContext context, params TokenType[] stop)
         {
             var token = context.Tokens.Peek();
             var span = token.Span;
@@ -370,7 +370,7 @@ namespace Scriber.Language
                     break;
                 }
 
-                list.Add(ParseBlock(context));
+                list.Add(ParseBlock(context, TokenType.CurlyClose));
                 token = context.Tokens.Peek();
             }
 
@@ -556,9 +556,9 @@ namespace Scriber.Language
             return ParseFromString(text, null);
         }
 
-        public static ParserResult ParseFromString(string text, Logger? logger)
+        public static ParserResult ParseFromString(string text, Resource? resource)
         {
-            return Parse(Lexer.Tokenize(text), null, logger);
+            return Parse(Lexer.Tokenize(text), resource, null);
         }
 
         private static ParserResult ParseInternal(IEnumerable<Token> tokens, Resource? resource, Logger? logger)
@@ -595,6 +595,10 @@ namespace Scriber.Language
             var token = context.Tokens.Peek();
             var span = token!.Span;
             var list = new ListSyntax();
+            if (context.Resource != null)
+            {
+                list.Resource = context.Resource;
+            }
             bool continueParsing = true;
             SyntaxNode? outNode = null;
 

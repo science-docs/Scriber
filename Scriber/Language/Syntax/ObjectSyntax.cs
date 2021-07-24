@@ -8,7 +8,11 @@ namespace Scriber.Language.Syntax
         public ListSyntax<FieldSyntax> Fields
         {
             get => fields ?? throw new NullReferenceException();
-            set => fields = value ?? throw new NullReferenceException();
+            set  
+            {
+                fields = value ?? throw new NullReferenceException();
+                fields.Parent = this;
+            }
         }
 
         private ListSyntax<FieldSyntax>? fields;

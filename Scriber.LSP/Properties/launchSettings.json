@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Scriber.LSP": {
+      "commandName": "Project",
+      "commandLineArgs": "--lsp=5008"
+    }
+  }
+}

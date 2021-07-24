@@ -27,10 +27,10 @@ namespace Scriber.Layout.Shapes
 
         protected override Measurement MeasureOverride(Size availableSize)
         {
-            return new Measurement(this, Path.Size, Style.Get(StyleKeys.Margin));
+            return new Measurement(this, Path.Size, Style.Get(StyleKeys.FullMargin));
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             drawingContext.DrawPath(Path, Fill, new Pen(Stroke, StrokeWidth));
         }

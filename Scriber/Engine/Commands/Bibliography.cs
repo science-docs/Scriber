@@ -20,7 +20,7 @@ namespace Scriber.Engine.Commands
         {
             try
             {
-                var bytes = state.Context.ResourceSet.RelativeResource(style.Value).GetContent();
+                var bytes = state.Context.ResourceManager.RelativeResource(style.Value).GetContent();
                 var styleFile = File.Load<StyleFile>(bytes);
                 state.Document.Citations = new Citations(new Processor(styleFile, LocaleFile.Defaults), state.Document.Locale.File);
             }
@@ -40,7 +40,7 @@ namespace Scriber.Engine.Commands
 
             try
             {
-                var text = state.Context.ResourceSet.RelativeResource(bibliographyPath.Value).GetContentAsString();
+                var text = state.Context.ResourceManager.RelativeResource(bibliographyPath.Value).GetContentAsString();
                 var bibEntries = BibParser.Parse(text, out var _);
                 state.Document.Citations.AddRange(bibEntries.Select(e => e.ToCitation()));
             }

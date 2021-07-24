@@ -85,7 +85,7 @@ namespace Scriber.Layout.Document
 
         }
 
-        public void Invalidate()
+        public virtual void Invalidate()
         {
             IsValid = false;
             Parent?.Invalidate();

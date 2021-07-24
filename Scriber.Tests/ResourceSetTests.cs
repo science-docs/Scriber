@@ -8,7 +8,7 @@ namespace Scriber.Tests
 {
     public class ResourceSetTests
     {
-        private readonly ResourceSet rs = new ResourceSet(FileSystemMock.FileSystem);
+        private readonly ResourceManager rs = new ResourceManager(FileSystemMock.FileSystem);
 
         [Theory]
         [InlineData("https://www.dummy.com/folder/sample.pdf", "test.png", "https://www.dummy.com/folder/test.png")]

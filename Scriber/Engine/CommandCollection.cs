@@ -81,6 +81,11 @@ namespace Scriber.Engine
             return commands.Remove(name);
         }
 
+        public IEnumerable<string> GetNames()
+        {
+            return commands.Keys;
+        }
+
         public IEnumerator<Command> GetEnumerator()
         {
             return commands.Values.SelectMany(e => e).GetEnumerator();

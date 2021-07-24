@@ -44,13 +44,19 @@ namespace Scriber.Layout.Document
             Set(referenceParagraph, 0, 2);
         }
 
-        protected override void OnRender(IDrawingContext drawingContext, Measurement measurement)
+        protected internal override void OnRender(IDrawingContext drawingContext, Measurement measurement)
         {
             base.OnRender(drawingContext, measurement);
             var font = Style.Get(StyleKeys.Font);
             var fontSize = Style.Get(StyleKeys.FontSize).Point;
             // render additional dots/lines/whatever
             const double size = 9;
+
+            if (Content.Measurement.Subs.Count == 0)
+            {
+                return;
+            }
+
             var lastContentLine = Content.Measurement.Subs[^1];
             var position = Content.Measurement.Position + lastContentLine.Position;
             position.X += lastContentLine.Size.Width + (fontSize / 3);
