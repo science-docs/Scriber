@@ -17,7 +17,7 @@ namespace Scriber.Autocomplete
             knownColors.AddRange(customColors.Keys);
             knownColors.Sort();
 
-            return knownColors.Select(e => new Proposal(e));
+            return knownColors.Select(e => new Proposal(e) { Type = ProposalType.Color } );
         }
     }
 }

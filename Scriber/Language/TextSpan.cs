@@ -17,6 +17,11 @@ namespace Scriber.Language
             Line = line;
         }
 
+        public bool Contains(int index)
+        {
+            return index >= Start && index < End;
+        }
+
         public TextSpan WithEnd(int end)
         {
             return new TextSpan(Start, end - Start, Line);

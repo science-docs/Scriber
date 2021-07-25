@@ -27,7 +27,7 @@ namespace Scriber.Autocomplete
             foreach (var file in subFiles.OrderBy(e => e))
             {
                 var relativePath = state.FileSystem.Path.GetRelativePath(currentDir, file);
-                yield return new Proposal(relativePath);
+                yield return new Proposal(relativePath) { Type = ProposalType.File };
             }
         }
 

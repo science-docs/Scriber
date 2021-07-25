@@ -14,7 +14,7 @@ namespace Scriber.Autocomplete
 
             foreach (var (name, full) in acronyms)
             {
-                yield return new Proposal(name) { Info = ParagraphConverter.ToString(full) };
+                yield return new Proposal(name) { Info = ParagraphConverter.ToString(full), Type = ProposalType.Reference };
             }
         }
     }

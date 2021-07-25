@@ -3,6 +3,7 @@ using Scriber.Language.Syntax;
 using System;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Threading;
 
 namespace Scriber.Engine
 {
@@ -11,26 +12,36 @@ namespace Scriber.Engine
         public Context Context { get; }
         public Document Document { get; }
         public CompilerIssueCollection Issues { get; }
-        public bool Success => !Issues.Any(e => e.Type == CompilerIssueType.Error);
+        public bool Success => Continue && !Issues.Any(e => e.Type == CompilerIssueType.Error);
         public IFileSystem FileSystem => Context.FileSystem;
         public CommandCollection Commands => Context.Commands;
         public ConverterCollection Converters => Context.Converters;
-        public bool Continue { get; private set; } = true;
+        public bool Continue => continued && !cancellationToken.IsCancellationRequested;
 
-        public CompilerState(Context context)
+        private bool continued = true;
+        private readonly CancellationToken cancellationToken;
+
+
+        public CompilerState(Context context, CancellationToken cancellationToken)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
             Document = new Document();
             Issues = new CompilerIssueCollection();
+            this.cancellationToken = cancellationToken;
         }
 
         public void Stop()
         {
-            Continue = false;
+            continued = false;
         }
 
         public Argument? Execute(SyntaxNode node)
         {
+            if (!Continue)
+            {
+                return null;
+            }
+
             try
             {
                 var result = EngineInstruction.Evaluate(this, node);

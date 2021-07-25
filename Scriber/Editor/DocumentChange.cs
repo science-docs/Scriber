@@ -11,6 +11,8 @@ namespace Scriber.Editor
         public DocumentChange(string text)
         {
             Text = text;
+            Start = -1;
+            End = -1;
         }
 
         public DocumentChange(string text, int start, int end)

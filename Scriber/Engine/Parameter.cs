@@ -27,6 +27,11 @@ namespace Scriber.Engine
             Name = attribute?.Name ?? Info.Name;
             ProposalProvider = attribute?.GetProposalProvider();
             Overrides = attribute?.Overrides ?? Array.Empty<Type>();
+
+            if (ProposalProvider == null && Type.IsEnum)
+            {
+                ProposalProvider = EnumProposalProvider.From(Type);
+            }
         }
 
         public override string ToString()

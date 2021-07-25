@@ -15,6 +15,17 @@ namespace Scriber.Language
             Issues = issues;
         }
 
+        public SyntaxNode? NodeAt(int offset)
+        {
+            foreach (var node in Nodes)
+            {
+                var indexNode = node.ChildAtIndex(offset);
+                if (indexNode != null)
+                    return indexNode;
+            }
+            return null;
+        }
+
         public static ParserResult Empty()
         {
             return new ParserResult(Array.Empty<SyntaxNode>(), Array.Empty<ParserIssue>());

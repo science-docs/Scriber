@@ -23,7 +23,7 @@ namespace Scriber.CLI
 
             var resource = context.ResourceManager.Get(new Uri("C:\\Users\\Mark\\Desktop\\Docdown\\main.sc"));
             context.Logger.Logged += Logger_Logged;
-            var result = Compiler.Compile(context, resource);
+            var result = Compiler.Compile(context, resource, CancellationToken.None);
 
             var document = result.Document;
 

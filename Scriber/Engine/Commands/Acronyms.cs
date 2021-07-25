@@ -1,4 +1,5 @@
-﻿using Scriber.Layout;
+﻿using Scriber.Autocomplete;
+using Scriber.Layout;
 using Scriber.Layout.Document;
 using Scriber.Variables;
 using System;
@@ -50,7 +51,7 @@ namespace Scriber.Engine.Commands
         }
 
         [Command("Acronym")]
-        public static IEnumerable<Leaf> SingleAcronym(CompilerState state, string name)
+        public static IEnumerable<Leaf> SingleAcronym(CompilerState state, [Argument(ProposalProvider = typeof(AcronymProposalProvider))] string name)
         {
             var list = AcronymVariables.Acronyms.Get(state.Document);
             var usedAcronyms = AcronymVariables.UsedAcronyms.Get(state.Document) ?? throw new InvalidOperationException();

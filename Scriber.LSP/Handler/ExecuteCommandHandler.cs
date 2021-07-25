@@ -20,7 +20,7 @@ namespace Scriber.LSP.Handler
         {
             return new ExecuteCommandRegistrationOptions
             {
-                Commands = new Container<string>("toHtml", "toPdf")
+                Commands = new("toHtml", "toPdf")
             };
         }
 
@@ -35,7 +35,7 @@ namespace Scriber.LSP.Handler
 
             if (uri != null && request.Command == "toPdf")
             {
-                var state = environment.Compile(uri);
+                var state = environment.Compile(uri, cancellationToken);
                 return Task.FromResult(Convert.ToBase64String(state.Document.ToPdf()));
             }
 

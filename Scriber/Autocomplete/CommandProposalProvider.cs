@@ -10,5 +10,10 @@ namespace Scriber.Autocomplete
         {
             return state.Commands.GetNames().Select(e => new Proposal(e));
         }
+
+        public IEnumerable<Proposal> Propose(CommandCollection commands, string prefix = "")
+        {
+            return commands.GetNames().Where(e => e.StartsWith(prefix)).Select(e => new Proposal(e) { Type = ProposalType.Method });
+        }
     }
 }

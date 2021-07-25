@@ -18,11 +18,6 @@ namespace Scriber.Engine
                 return null;
             }
 
-            if (!ProposalProvider.IsSubclassOf(typeof(IProposalProvider)))
-            {
-                return null;
-            }
-
             var provider = Activator.CreateInstance(ProposalProvider) as IProposalProvider;
             return provider;
         }

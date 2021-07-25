@@ -13,7 +13,7 @@ namespace Scriber.Autocomplete
             {
                 foreach (var citation in citations.GetCitations())
                 {
-                    yield return new Proposal(citation.Key);
+                    yield return new Proposal(citation.Key) { Type = ProposalType.Field };
                 }
             }
         }

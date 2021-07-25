@@ -1,13 +1,16 @@
-﻿using Scriber.Engine;
+﻿using Scriber.Autocomplete;
+using Scriber.Engine;
 using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Threading;
 
 namespace Scriber.Editor
 {
     public class Environment
     {
         public Context Context { get; }
+        public Completion Completion { get; }
         public CompilerState CurrentState { get; private set; }
 
         private readonly Dictionary<Uri, EditorDocument> documents = new Dictionary<Uri, EditorDocument>();
@@ -22,7 +25,8 @@ namespace Scriber.Editor
             Context.ResourceManager.Interject = InterjectResourceManager;
             var reflectionLoader = new ReflectionLoader();
             reflectionLoader.Discover(Context);
-            CurrentState = new CompilerState(Context);
+            CurrentState = new CompilerState(Context, CancellationToken.None);
+            Completion = new Completion(this);
         }
 
         public EditorDocument GetDocument(Uri uri)
@@ -68,14 +72,14 @@ namespace Scriber.Editor
             }
         }
 
-        public CompilerState Compile(Uri uri)
+        public CompilerState Compile(Uri uri, CancellationToken cancellationToken)
         {
             if (!documents.TryGetValue(uri, out var document))
             {
                 document = Open(uri, false);
             }
             Context.ResourceManager.PushResource(new Resource(uri, ""));
-            CurrentState = Compiler.Compile(Context, document.ParserResult.Nodes);
+            CurrentState = Compiler.Compile(Context, document.ParserResult.Nodes, cancellationToken);
             Context.ResourceManager.PopResource();
             UpdateCompilerIssues();
             RemoveUnecessaryDocuments();

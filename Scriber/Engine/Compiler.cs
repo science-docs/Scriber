@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using Scriber.Language;
 using Scriber.Language.Syntax;
 using Scriber.Layout.Document;
@@ -11,17 +12,18 @@ namespace Scriber.Engine
 {
     public static class Compiler
     {
-        public static CompilerState Compile(Context context, IEnumerable<SyntaxNode> elements)
+        public static CompilerState Compile(Context context, IEnumerable<SyntaxNode> elements, CancellationToken? cancellationToken)
         {
-            var state = new CompilerState(context);
+            var state = new CompilerState(context, cancellationToken ?? CancellationToken.None);
             state.Issues.CollectionChanged += (_, e) => IssuesChanged(context.Logger, e);
 
             foreach (var element in elements)
             {
-                if (state.Continue)
+                if (!state.Continue)
                 {
-                    state.Document.Elements.AddRange(Execute(state, element));
+                    break;
                 }
+                state.Document.Elements.AddRange(Execute(state, element));
             }
             return state;
         }
@@ -34,12 +36,12 @@ namespace Scriber.Engine
             }
         }
 
-        public static CompilerState Compile(Context context, Resource resource)
+        public static CompilerState Compile(Context context, Resource resource, CancellationToken? cancellationToken)
         {
             context.ResourceManager.PushResource(resource);
             var tokens = Lexer.Tokenize(resource.GetContentAsString());
             var parserResult = Parser.Parse(tokens, resource, context.Logger);
-            var result = Compile(context, parserResult.Nodes);
+            var result = Compile(context, parserResult.Nodes, cancellationToken);
             context.ResourceManager.PopResource();
             return result;
         }
