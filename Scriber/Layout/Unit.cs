@@ -49,7 +49,7 @@ namespace Scriber.Layout
     [DebuggerDisplay("{DebuggerDisplay}")]
     public struct Unit : IFormattable, IEquatable<Unit>
     {
-        public static Regex ParserRegex = new(@"^(?:(?<unit>(?<value>\d+(?:\.\d+)?)\s*(?<type>pt|px|in|mm|cm)?)\s*)+$", RegexOptions.Compiled);
+        public readonly static Regex ParserRegex = new(@"^(?:(?<unit>(?<value>\d+(?:\.\d+)?)\s*(?<type>pt|px|in|mm|cm)?)\s*)+$", RegexOptions.Compiled);
 
         internal const double PointFactor = 1;
         internal const double InchFactor = 72;
@@ -400,18 +400,13 @@ namespace Scriber.Layout
 
         public bool Equals([AllowNull] Unit other)
         {
-            if (other == null)
-            {
-                return false;
-            }
-
             return Type == other.Type && Value == other.Value;
         }
 
         /// <summary>
         /// Represents a unit with all values zero.
         /// </summary>
-        public static readonly Unit Zero = new Unit();
+        public static readonly Unit Zero = new();
 
 
         public static bool TryParse(string value, out Unit unit)
