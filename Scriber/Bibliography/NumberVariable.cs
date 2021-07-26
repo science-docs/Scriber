@@ -30,7 +30,8 @@ namespace Scriber.Bibliography
 
             return TrySplitNumber(value, ",", out variable) 
                 || TrySplitNumber(value, "&", out variable) 
-                || TrySplitNumber(value, "-", out variable);
+                || TrySplitNumber(value, "-", out variable)
+                || TrySplitNumber(value, "–", out variable);
         }
 
         public static bool TryParseOrdinal(string value, out NumberVariable variable)
@@ -114,10 +115,6 @@ namespace Scriber.Bibliography
 
         public bool Equals([AllowNull] NumberVariable other)
         {
-            if (other == null)
-            {
-                return false;
-            }
             return Min == other.Min && Max == other.Max && Separator == other.Separator;
         }
 

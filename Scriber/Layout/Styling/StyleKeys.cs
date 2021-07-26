@@ -66,7 +66,7 @@ namespace Scriber.Layout.Styling
         public static StyleKey<int> ColumnSpan { get; } = new(nameof(ColumnSpan), 1);
 
         // Paragraph styles
-        public static StyleKey<Unit?> BaselineSkip { get; } = new(nameof(BaselineSkip), true, null);
+        public static StyleKey<Unit> BaselineSkip { get; } = new(nameof(BaselineSkip), true, Unit.FromPoint(-1));
         public static StyleKey<double> BaselineStretch { get; } = new(nameof(BaselineStretch), true, 1.25);
         public static StyleKey<Unit> ParagraphIndent { get; } = new(nameof(ParagraphIndent), true, Unit.FromPoint(0));
     }

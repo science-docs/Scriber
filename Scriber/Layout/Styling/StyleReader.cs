@@ -58,7 +58,7 @@ namespace Scriber.Layout.Styling
         private static StyleContainer[] LoadDefaultStyles()
         {
             // Force creating all style keys
-            StyleKeys.Font.ToString();
+            typeof(StyleKeys).ToString();
             new ReflectionLoader().Discover(context, typeof(StyleReader).Assembly);
             var defaultContainers = new StyleReader().Read(typeof(StyleReader).Assembly.GetManifestResourceStream("Scriber.Resources.Styles.Style.css")!);
             return defaultContainers;

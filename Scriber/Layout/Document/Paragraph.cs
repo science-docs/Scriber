@@ -70,7 +70,11 @@ namespace Scriber.Layout.Document
                         height = Math.Max(lineNodes[item.Index].Element?.DesiredHeight ?? 0, height);
                     }
 
-                    var skip = Style.Get(StyleKeys.BaselineSkip) ?? Unit.FromPoint(height);
+                    var skip = Style.Get(StyleKeys.BaselineSkip);
+                    if (skip.Value < 0)
+                    {
+                        skip = Unit.FromPoint(height);
+                    }
                     var stretch = Style.Get(StyleKeys.BaselineStretch);
 
                     height = skip.Point * stretch;

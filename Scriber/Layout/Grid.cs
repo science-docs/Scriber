@@ -12,7 +12,7 @@ namespace Scriber.Layout
         public List<GridLength> Rows { get; }
         public List<GridLength> Columns { get; }
 
-        private readonly Dictionary<(int row, int column), (DocumentElement element, int rowSpan, int columnSpan)> positions = new Dictionary<(int, int), (DocumentElement, int, int)>();
+        private readonly Dictionary<(int row, int column), (DocumentElement element, int rowSpan, int columnSpan)> positions = new();
 
         public Grid()
         {
@@ -182,7 +182,7 @@ namespace Scriber.Layout
             }
         }
 
-        private void AlignCell(Cell cell)
+        private static void AlignCell(Cell cell)
         {
             if (cell.Measurement != null)
             {
@@ -332,7 +332,7 @@ namespace Scriber.Layout
                 return orders[(row, column)];
             }
 
-            private GridUnit GetUnit(List<GridLength> lengths, int index, int span, out double value)
+            private static GridUnit GetUnit(List<GridLength> lengths, int index, int span, out double value)
             {
                 GridUnit gridUnit = GridUnit.Point;
                 value = 0;
@@ -351,7 +351,7 @@ namespace Scriber.Layout
                 return gridUnit;
             }
 
-            private bool GreaterThan(GridUnit a, GridUnit b)
+            private static bool GreaterThan(GridUnit a, GridUnit b)
             {
                 if (a == b)
                 {
@@ -361,7 +361,7 @@ namespace Scriber.Layout
                 return a == GridUnit.Auto && b == GridUnit.Point || a == GridUnit.Star && (b == GridUnit.Point || b == GridUnit.Auto);
             }
 
-            private static readonly Dictionary<(GridUnit row, GridUnit column), int> orders = new Dictionary<(GridUnit, GridUnit), int>
+            private static readonly Dictionary<(GridUnit row, GridUnit column), int> orders = new()
             {
                 { (GridUnit.Point, GridUnit.Point), 1 }, { (GridUnit.Point, GridUnit.Auto), 1 }, { (GridUnit.Point, GridUnit.Star), 2 },
                 { (GridUnit.Auto, GridUnit.Point), 1 }, { (GridUnit.Auto, GridUnit.Auto), 1 }, { (GridUnit.Auto, GridUnit.Star), 2 }
@@ -384,10 +384,6 @@ namespace Scriber.Layout
 
         public bool Equals([AllowNull] GridLength other)
         {
-            if (other == null)
-            {
-                return false;
-            }
             return Unit == other.Unit && Value == other.Value;
         }
 

@@ -57,9 +57,9 @@ namespace Scriber.Engine
 
         private static void IssuesChanged(Logger logger, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == NotifyCollectionChangedAction.Add)
+            if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
             {
-                foreach (CompilerIssue issue in e.NewItems.OfType<CompilerIssue>().Where(e => e != null))
+                foreach (CompilerIssue issue in e.NewItems.OfType<CompilerIssue>())
                 {
                     logger.Log((LogLevel)(int)issue.Type, issue.Message);
                 }

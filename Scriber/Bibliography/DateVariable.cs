@@ -192,11 +192,6 @@ namespace Scriber.Bibliography
 
         public bool Equals([AllowNull] DateVariable other)
         {
-            if (other == null)
-            {
-                return false;
-            }
-
             return YearFrom == other.YearFrom
                 && YearTo == other.YearTo
                 && SeasonFrom == other.SeasonFrom

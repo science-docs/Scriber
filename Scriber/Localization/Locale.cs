@@ -14,7 +14,7 @@ namespace Scriber.Localization
         public Locale(Culture culture)
         {
             Culture = culture;
-            File = LocaleFile.Defaults.FirstOrDefault(e => e.XmlLang == culture.ToString());
+            File = LocaleFile.Defaults.First(e => e.XmlLang == culture.ToString());
         }
 
         public Locale(LocaleFile file)
@@ -82,11 +82,11 @@ namespace Scriber.Localization
         {
             if (number == 0)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(number));
             }
             else if (number >= 4000)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(number));
             }
 
             // done
@@ -116,7 +116,7 @@ namespace Scriber.Localization
             }
         }
 
-        private TermName GetOrdinalNumberTerm(int value, bool isLong)
+        private static TermName GetOrdinalNumberTerm(int value, bool isLong)
         {
             string name = $"{(isLong ? "long-" : string.Empty)}ordinal-{value:00}";
             if (EnumUtility.TryParseEnum<TermName>(name, out var term))
@@ -132,7 +132,7 @@ namespace Scriber.Localization
         public Gender? GetTermGender(TermName name)
         {
             var term = File.Terms.FirstOrDefault(e => e.Name == name);
-            if (term.GenderSpecified)
+            if (term != null && term.GenderSpecified)
             {
                 return term.Gender;
             }

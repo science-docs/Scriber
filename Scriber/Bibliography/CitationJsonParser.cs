@@ -12,12 +12,12 @@ namespace Scriber.Bibliography
             var id = string.Empty;
             if (json.TryGetProperty("id", out var idElement))
             {
-                id = idElement.ToString();
+                id = idElement.ToString() ?? string.Empty;
             }
             var type = string.Empty;
             if (json.TryGetProperty("type", out var typeElement))
             {
-                type = typeElement.ToString();
+                type = typeElement.ToString() ?? string.Empty;
             }
             var cb = new CitationBuilder(id, type);
 
@@ -65,7 +65,7 @@ namespace Scriber.Bibliography
                         variable = ParseName(property.Value);
                         break;
                     default:
-                        variable = new TextVariable(property.Value.ToString());
+                        variable = new TextVariable(property.Value.ToString() ?? string.Empty);
                         break;
                 }
                 cb.Set(variable, property.Name);
@@ -151,11 +151,11 @@ namespace Scriber.Bibliography
                     string? nonDroppingParticles = null;
                     if (hasFamilyName)
                     {
-                        family = familyName.GetString();
+                        family = familyName.GetString() ?? throw new InvalidOperationException();
                     }
                     if (hasGivenName)
                     {
-                        given = givenName.GetString();
+                        given = givenName.GetString() ?? throw new InvalidOperationException();
                     }
                     if (nameElement.TryGetProperty("suffix", out var suffixElement))
                     {
@@ -175,7 +175,7 @@ namespace Scriber.Bibliography
                 }
                 else if (nameElement.TryGetProperty("literal", out var literalName))
                 {
-                    names.Add(new InstitutionalName(literalName.GetString()));
+                    names.Add(new InstitutionalName(literalName.GetString() ?? throw new InvalidOperationException()));
                 }
                 else
                 {
@@ -188,7 +188,10 @@ namespace Scriber.Bibliography
 
         private static INumberVariable ParseNumber(JsonElement json)
         {
-            NumberVariable.TryParse(json.ToString(), out var number);
+            if (!NumberVariable.TryParse(json.ToString() ?? string.Empty, out var number))
+            {
+                return new NumberVariable(0);
+            }
             return number;
         }
 

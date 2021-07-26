@@ -52,7 +52,7 @@ namespace Scriber.Engine
             }
 
             commands.TryGetValue(name, out var command);
-            return command.FirstOrDefault();
+            return command?.FirstOrDefault();
         }
 
         public Command? Find(string name, IEnumerable<ArgumentSyntax> arguments)

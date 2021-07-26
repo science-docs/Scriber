@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Scriber.Layout.Styling
 {
@@ -7,13 +8,13 @@ namespace Scriber.Layout.Styling
         [NotNull]
         public T Default { get; }
 
-        public StyleKey(string name, T defaultValue) : this(name, false, defaultValue)
+        public StyleKey(string name, [NotNull] T defaultValue) : this(name, false, defaultValue)
         {
         }
 
-        public StyleKey(string name, bool inherited, T defaultValue) : base(name, inherited)
+        public StyleKey(string name, bool inherited, [NotNull] T defaultValue) : base(name, inherited)
         {
-            Default = defaultValue;
+            Default = defaultValue ?? throw new InvalidOperationException();
         }
 
         [return: NotNull]

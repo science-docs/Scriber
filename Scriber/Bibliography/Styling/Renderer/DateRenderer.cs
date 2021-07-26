@@ -24,7 +24,7 @@ namespace Scriber.Bibliography.Styling.Renderer
 
             var locale = interpreter.LocaleFile;
 
-            var localeDate = locale.Dates!.FirstOrDefault(e => e.Format == dateFormat);
+            var localeDate = locale.Dates.First(e => e.Format == dateFormat);
 
             parts.AddRange(localeDate.DateParts);
 

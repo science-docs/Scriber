@@ -65,7 +65,10 @@ namespace Scriber.LSP
                     )
                     .OnInitialize((server, request, token) =>
                         {
-                            Directory.SetCurrentDirectory(request.RootPath);
+                            if (request.RootPath != null)
+                            {
+                                Directory.SetCurrentDirectory(request.RootPath);
+                            }
                             return Task.CompletedTask;
                         }
                     )

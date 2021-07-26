@@ -53,7 +53,7 @@ namespace Scriber.Engine.Commands
         [Command("Acronym")]
         public static IEnumerable<Leaf> SingleAcronym(CompilerState state, [Argument(ProposalProvider = typeof(AcronymProposalProvider))] string name)
         {
-            var list = AcronymVariables.Acronyms.Get(state.Document);
+            var list = AcronymVariables.Acronyms.Get(state.Document) ?? throw new InvalidOperationException();
             var usedAcronyms = AcronymVariables.UsedAcronyms.Get(state.Document) ?? throw new InvalidOperationException();
             var pair = list.FirstOrDefault(e => e.Key.ToLowerInvariant() == name.ToLowerInvariant());
 

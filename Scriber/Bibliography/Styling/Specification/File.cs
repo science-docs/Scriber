@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -154,20 +151,21 @@ namespace Scriber.Bibliography.Styling.Specification
                 var xs = new XmlSerializer(type);
                 xs.UnknownNode += XmlSerializer_UnknownNode;
                 xs.UnknownAttribute += XS_UnknownAttribute;
-                result = (File)xs.Deserialize(reader);
+                var file = xs.Deserialize(reader) as File;
+                result = file ?? throw new InvalidCastException();
             }
 
             // done
             return result ?? throw new InvalidOperationException();
         }
 
-        static void XS_UnknownAttribute(object sender, XmlAttributeEventArgs e)
+        static void XS_UnknownAttribute(object? sender, XmlAttributeEventArgs e)
         {
             // unknown attribute encountered
             throw new XmlException(string.Format("Unexpected attribute '{0}' encountered.", e.Attr.LocalName), null, e.LineNumber, e.LinePosition - 2 - e.Attr.Name.Length);
         }
 
-        static void XmlSerializer_UnknownNode(object sender, XmlNodeEventArgs e)
+        static void XmlSerializer_UnknownNode(object? sender, XmlNodeEventArgs e)
         {
             if (e.NodeType != XmlNodeType.Attribute)
             {

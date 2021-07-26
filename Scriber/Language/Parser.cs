@@ -687,9 +687,9 @@ namespace Scriber.Language
 
         private static void IssuesChanged(Logger logger, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
             {
-                foreach (ParserIssue issue in e.NewItems.OfType<ParserIssue>().Where(e => e != null))
+                foreach (ParserIssue issue in e.NewItems.OfType<ParserIssue>())
                 {
                     logger.Log((LogLevel)(int)issue.Type, issue.Message);
                 }
