@@ -8,13 +8,18 @@ namespace Scriber.Bibliography
 {
     public class Citations
     {
-        public Processor Processor { get; }
-        public LocaleFile Locale { get; }
+        public Processor? Processor { get; set; }
+        public LocaleFile? Locale { get; set; }
 
-        private readonly Dictionary<string, Citation> citations = new Dictionary<string, Citation>();
-        private readonly Dictionary<string, Citation> citedCitations = new Dictionary<string, Citation>();
+        private readonly Dictionary<string, Citation> citations = new();
+        private readonly Dictionary<string, Citation> citedCitations = new();
 
-        public Citations(Processor processor, LocaleFile locale)
+        public Citations()
+        {
+
+        }
+
+        public Citations(Processor? processor, LocaleFile? locale)
         {
             Processor = processor;
             Locale = locale;
@@ -50,6 +55,15 @@ namespace Scriber.Bibliography
 
         public Run Cite(IEnumerable<string> keys)
         {
+            if (Processor == null)
+            {
+                throw new NullReferenceException(nameof(Processor));
+            }
+            if (Locale == null)
+            {
+                throw new NullReferenceException(nameof(Locale));
+            }
+
             var list = new List<Citation>();
             foreach (var key in keys)
             {
@@ -74,6 +88,15 @@ namespace Scriber.Bibliography
 
         public IEnumerable<Run> Bibliography()
         {
+            if (Processor == null)
+            {
+                throw new NullReferenceException(nameof(Processor));
+            }
+            if (Locale == null)
+            {
+                throw new NullReferenceException(nameof(Locale));
+            }
+
             return Processor.Bibliography(Locale, citedCitations.Values);
         }
     }

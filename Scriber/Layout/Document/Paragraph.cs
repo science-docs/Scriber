@@ -105,7 +105,7 @@ namespace Scriber.Layout.Document
 
         private static PositionedItem[][] ProduceLines(PositionedItem[] items)
         {
-            List<PositionedItem[]> lines = new List<PositionedItem[]>();
+            List<PositionedItem[]> lines = new();
             var curItems = new List<PositionedItem>();
             var curLine = 0;
             if (items != null)
@@ -133,7 +133,7 @@ namespace Scriber.Layout.Document
         public override SplitResult Split(Measurement source, double height)
         {
             var measurement = new Measurement(this, null, source.Margin);
-            Measurement? next = new Measurement(this, null, source.Margin);
+            Measurement? next = new(this, null, source.Margin);
             double carryOver = -1;
 
             // Never try to split less lines than the threshold specifies

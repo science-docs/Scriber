@@ -1,4 +1,5 @@
 ﻿using Scriber.Engine;
+using System.Threading;
 
 namespace Scriber.Tests.Fixture
 {
@@ -6,15 +7,15 @@ namespace Scriber.Tests.Fixture
     {
         public static CompilerState Empty()
         {
-            return new CompilerState(new Context());
+            return new CompilerState(new Context(), CancellationToken.None);
         }
 
         public static CompilerState ReflectionLoaded()
         {
-            var loader = new PluginLoader();
+            var loader = new ReflectionLoader();
             var context = new Context();
             loader.Discover(context, typeof(CompilerStateFixtures).Assembly);
-            return new CompilerState(context);
+            return new CompilerState(context, CancellationToken.None);
         }
     }
 }

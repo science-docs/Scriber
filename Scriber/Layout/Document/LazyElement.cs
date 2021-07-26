@@ -53,6 +53,9 @@ namespace Scriber.Layout.Document
 
         public override void Interlude()
         {
+            // Lazy elements are never valid only their values can be valid
+            // We therefore invalidate the element at interlude
+            IsValid = false;
             Value.Interlude();
         }
 

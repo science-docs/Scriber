@@ -11,8 +11,8 @@ namespace Scriber.Layout.Styling
 {
     public class StyleReader
     {
-        private static readonly Context context = new Context();
-        private static readonly Lazy<StyleContainer[]> defaultContainers = new Lazy<StyleContainer[]>(LoadDefaultStyles);
+        private static readonly Context context = new();
+        private static readonly Lazy<StyleContainer[]> defaultContainers = new(LoadDefaultStyles);
 
         public static StyleContainer[] GetDefaultStyles()
         {
@@ -57,6 +57,7 @@ namespace Scriber.Layout.Styling
 
         private static StyleContainer[] LoadDefaultStyles()
         {
+            // Force creating all style keys
             StyleKeys.Font.ToString();
             new ReflectionLoader().Discover(context, typeof(StyleReader).Assembly);
             var defaultContainers = new StyleReader().Read(typeof(StyleReader).Assembly.GetManifestResourceStream("Scriber.Resources.Styles.Style.css")!);

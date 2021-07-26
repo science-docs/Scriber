@@ -210,7 +210,7 @@ namespace Scriber.Bibliography
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             sb.Append(YearFrom);
 

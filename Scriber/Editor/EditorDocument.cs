@@ -82,7 +82,7 @@ namespace Scriber.Editor
 
         private int[] CalculateIndices(ReadOnlySpan<char> content)
         {
-            List<int> indices = new List<int>(this.indices.Length);
+            List<int> indices = new(this.indices.Length);
 
             for (int i = 0; i < content.Length; i++)
             {

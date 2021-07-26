@@ -17,11 +17,11 @@ namespace Scriber.Engine.Commands
     [Package]
     public static class Sections
     {
-        public static DocumentLocal<int> Header1 = new DocumentLocal<int>(0);
-        public static DocumentLocal<int> Header2 = new DocumentLocal<int>(0);
-        public static DocumentLocal<int> Header3 = new DocumentLocal<int>(0);
-        public static DocumentLocal<int> Header4 = new DocumentLocal<int>(0);
-        public static DocumentLocal<int> Header5 = new DocumentLocal<int>(0);
+        public static DocumentLocal<int> Header1 = new(0);
+        public static DocumentLocal<int> Header2 = new(0);
+        public static DocumentLocal<int> Header3 = new(0);
+        public static DocumentLocal<int> Header4 = new(0);
+        public static DocumentLocal<int> Header5 = new(0);
 
         private static readonly DocumentLocal<int>[] Headers =
         {
@@ -179,7 +179,7 @@ namespace Scriber.Engine.Commands
 
         private static string CreatePretext(Document document, int level)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             var header = Headers[level - 1];
 
             var levelLocal = document.Variable(header);

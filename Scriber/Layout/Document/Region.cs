@@ -9,7 +9,7 @@ namespace Scriber.Layout.Document
         public bool Flexible { get; set; }
         public bool Glue { get; set; }
 
-        private readonly Dictionary<Measurement, DocumentElement> elementMap = new Dictionary<Measurement, DocumentElement>();
+        private readonly Dictionary<Measurement, DocumentElement> elementMap = new();
 
         public Region()
         {

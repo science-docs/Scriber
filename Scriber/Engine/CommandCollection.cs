@@ -8,7 +8,7 @@ namespace Scriber.Engine
 {
     public class CommandCollection : IEnumerable<Command>
     {
-        private readonly Dictionary<string, List<Command>> commands = new Dictionary<string, List<Command>>();
+        private readonly Dictionary<string, List<Command>> commands = new();
 
         public void Add(Command command)
         {

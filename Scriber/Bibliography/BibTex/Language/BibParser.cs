@@ -220,7 +220,7 @@ namespace Scriber.Bibliography.BibTex.Language
 
         private string CompositeTex(string value)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             for (int i = 0; i < value.Length; i++)
             {
                 // {\'o} pattern

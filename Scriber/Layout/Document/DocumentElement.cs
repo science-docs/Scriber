@@ -49,7 +49,7 @@ namespace Scriber.Layout.Document
         public virtual SplitResult Split(Measurement source, double height)
         {
             var measurement = new Measurement(this);
-            Measurement? next = new Measurement(this);
+            Measurement? next = new(this);
             double carryOver = -1;
 
             foreach (var sub in source.Subs)

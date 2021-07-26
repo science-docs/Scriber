@@ -60,7 +60,7 @@ namespace Scriber.Language
     {
         public string Content { get; set; }
         public TokenType Type { get; set; }
-        public TextSpan Span => new TextSpan(Index, Length, Line);
+        public TextSpan Span => new(Index, Length, Line);
         public int Index { get; set; }
         public int Length => Content.Length;
         public int Line { get; set; }

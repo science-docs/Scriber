@@ -13,7 +13,7 @@ namespace Scriber.Editor
         public Completion Completion { get; }
         public CompilerState CurrentState { get; private set; }
 
-        private readonly Dictionary<Uri, EditorDocument> documents = new Dictionary<Uri, EditorDocument>();
+        private readonly Dictionary<Uri, EditorDocument> documents = new();
 
         public Environment() : this(null)
         {

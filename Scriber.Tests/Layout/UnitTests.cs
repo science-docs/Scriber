@@ -10,7 +10,7 @@ namespace Scriber.Layout.Tests
         [InlineData("32.4cm", 32.4, UnitType.Centimeter)]
         [InlineData("32pt", 32, UnitType.Point)]
         [InlineData("32", 32, UnitType.Point)]
-        [InlineData("32\tpu", 32, UnitType.Presentation)]
+        [InlineData("32\tpx", 32, UnitType.Presentation)]
         [InlineData("32 mm", 32, UnitType.Millimeter)]
         [InlineData("32 in", 32, UnitType.Inch)]
         [InlineData("96 / 3 mm", 32, UnitType.Millimeter)]
@@ -26,7 +26,7 @@ namespace Scriber.Layout.Tests
         [InlineData("pt")]
         [InlineData("32ppt")]
         [InlineData("32inch")]
-        [InlineData("_pu")]
+        [InlineData("_px")]
         public void ParseFailure(string input)
         {
             Assert.False(Unit.TryParse(input, out var _));

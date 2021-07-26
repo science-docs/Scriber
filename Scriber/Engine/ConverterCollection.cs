@@ -7,8 +7,8 @@ namespace Scriber.Engine
 {
     public class ConverterCollection
     {
-        private readonly Dictionary<(Type, Type), IConverter> converters = new Dictionary<(Type, Type), IConverter>();
-        private readonly Dictionary<Type, List<Type>> types = new Dictionary<Type, List<Type>>();
+        private readonly Dictionary<(Type, Type), IConverter> converters = new();
+        private readonly Dictionary<Type, List<Type>> types = new();
 
         public void Add(IConverter converter, Type source, params Type[] targets)
         {
@@ -171,7 +171,7 @@ namespace Scriber.Engine
             public TypeTreeNode? Parent { get; }
             public Type From { get; }
 
-            private readonly List<(Type from, TypeTreeNode node, IConverter converter)> nodes = new List<(Type, TypeTreeNode, IConverter)>();
+            private readonly List<(Type from, TypeTreeNode node, IConverter converter)> nodes = new();
 
             public TypeTreeNode(TypeTreeNode? parent, Type from)
             {

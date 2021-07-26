@@ -36,9 +36,9 @@ namespace Scriber
 
         public Culture Culture { get; set; } = Culture.Invariant;
 
-        public Locale Locale => new Locale(Culture);
+        public Locale Locale => new(Culture);
 
-        public Citations? Citations { get; set; }
+        public Citations Citations { get; } = new Citations();
 
         public StyleCollection Styles { get; }
 

@@ -49,7 +49,7 @@ namespace Scriber.Layout
     [DebuggerDisplay("{DebuggerDisplay}")]
     public struct Unit : IFormattable, IEquatable<Unit>
     {
-        public static Regex ParserRegex = new Regex(@"^(?:(?<unit>(?<value>\d+(?:\.\d+)?)\s*(?<type>pt|pu|in|mm|cm)?)\s*)+$", RegexOptions.Compiled);
+        public static Regex ParserRegex = new(@"^(?:(?<unit>(?<value>\d+(?:\.\d+)?)\s*(?<type>pt|px|in|mm|cm)?)\s*)+$", RegexOptions.Compiled);
 
         internal const double PointFactor = 1;
         internal const double InchFactor = 72;
@@ -261,7 +261,7 @@ namespace Scriber.Layout
                 UnitType.Inch => "in",
                 UnitType.Millimeter => "mm",
                 UnitType.Centimeter => "cm",
-                UnitType.Presentation => "pu",
+                UnitType.Presentation => "px",
                 _ => throw new InvalidCastException(),
             };
         }
@@ -271,7 +271,7 @@ namespace Scriber.Layout
         /// </summary>
         public static Unit FromPoint(double value)
         {
-            Unit unit = new Unit
+            Unit unit = new()
             {
                 Value = value,
                 Type = UnitType.Point
@@ -284,7 +284,7 @@ namespace Scriber.Layout
         /// </summary>
         public static Unit FromInch(double value)
         {
-            Unit unit = new Unit
+            Unit unit = new()
             {
                 Value = value,
                 Type = UnitType.Inch
@@ -297,7 +297,7 @@ namespace Scriber.Layout
         /// </summary>
         public static Unit FromMillimeter(double value)
         {
-            Unit unit = new Unit
+            Unit unit = new()
             {
                 Value = value,
                 Type = UnitType.Millimeter
@@ -310,7 +310,7 @@ namespace Scriber.Layout
         /// </summary>
         public static Unit FromCentimeter(double value)
         {
-            Unit unit = new Unit
+            Unit unit = new()
             {
                 Value = value,
                 Type = UnitType.Centimeter
@@ -323,7 +323,7 @@ namespace Scriber.Layout
         /// </summary>
         public static Unit FromPresentation(double value)
         {
-            Unit unit = new Unit
+            Unit unit = new()
             {
                 Value = value,
                 Type = UnitType.Presentation

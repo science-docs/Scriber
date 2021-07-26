@@ -24,7 +24,7 @@ namespace Scriber
 
         public Func<Uri, Resource?>? Interject { get; set; }
 
-        private readonly Stack<Resource> resourceStack = new Stack<Resource>();
+        private readonly Stack<Resource> resourceStack = new();
 
         public ResourceManager(IFileSystem fileSystem)
         {

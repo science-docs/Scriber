@@ -11,7 +11,7 @@ namespace Scriber.Editor
     {
         public Environment Environment { get; set; }
 
-        private readonly CommandProposalProvider commandProposals = new CommandProposalProvider();
+        private readonly CommandProposalProvider commandProposals = new();
 
         public Completion(Environment environment)
         {

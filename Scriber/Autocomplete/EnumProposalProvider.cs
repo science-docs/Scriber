@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Scriber.Autocomplete
 {
@@ -31,12 +30,15 @@ namespace Scriber.Autocomplete
                 throw new InvalidCastException("Type is not an enum");
             }
 
-            if (!cache.TryGetValue(type, out var provider))
+            lock (cache)
             {
-                cache[type] = provider = new EnumProposalProvider(type);
-            }
+                if (!cache.TryGetValue(type, out var provider))
+                {
+                    cache[type] = provider = new EnumProposalProvider(type);
+                }
 
-            return provider;
+                return provider;
+            }
         }
     }
 }

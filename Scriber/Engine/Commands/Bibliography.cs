@@ -1,5 +1,4 @@
 ﻿using Scriber.Autocomplete;
-using Scriber.Bibliography;
 using Scriber.Bibliography.BibTex.Language;
 using Scriber.Bibliography.Styling;
 using Scriber.Bibliography.Styling.Formatting;
@@ -22,7 +21,9 @@ namespace Scriber.Engine.Commands
             {
                 var bytes = state.Context.ResourceManager.RelativeResource(style.Value).GetContent();
                 var styleFile = File.Load<StyleFile>(bytes);
-                state.Document.Citations = new Citations(new Processor(styleFile, LocaleFile.Defaults), state.Document.Locale.File);
+                var citations = state.Document.Citations;
+                citations.Processor = new Processor(styleFile, LocaleFile.Defaults);
+                citations.Locale = state.Document.Locale.File;
             }
             catch (Exception ex)
             {
